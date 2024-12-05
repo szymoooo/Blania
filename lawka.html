@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zmiana Zawodników</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section {
+            margin: 10px;
+            text-align: center;
+        }
+
+        .players {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .player,
+        .stat-button {
+            width: 60px;
+            height: 60px;
+            background-color: lightgrey;
+            border-radius: 5px;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .player.selected,
+        .stat-button.selected {
+            border: 2px solid black;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            background-color: lightgrey;
+        }
+
+        table {
+            margin-top: 30px;
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Style dla modala */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalContent {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: red;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+
+        .stat-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .stat-button {
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            margin: 0 5px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Style dla przycisku "Dodaj" */
+        #dodajBtn:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Zmiana Zawodników</h1>
+
+    <!-- Przycisk statystyk na stronie głównej -->
+    <div class="stat-buttons">
+        <div class="stat-button" data-stat="1">1 pkt</div>
+        <div class="stat-button" data-stat="2">2 pkt</div>
+        <div class="stat-button" data-stat="3">3 pkt</div>
+        <div class="stat-button" data-stat="ast">AST</div>
+        <div class="stat-button" data-stat="zb">ZB</div>
+        <div class="stat-button" data-stat="blok">BLOK</div>
+        <div class="stat-button" data-stat="prze">PRZE</div>
+    </div>
+
+    <div class="container">
+        <!-- Parkiet Section -->
+        <div class="section">
+            <h2>Parkiet <button id="dodajBtn" disabled>Dodaj</button></h2>
+            <div class="players" id="parkiet">
+                <!-- Zawodnicy na Parkiecie -->
+                <div class="player" data-id="1">1</div>
+                <div class="player" data-id="2">2</div>
+                <div class="player" data-id="3">3</div>
+                <div class="player" data-id="4">4</div>
+                <div class="player" data-id="5">5</div>
+            </div>
+            <button id="zmianaBtn">Zmiana</button>
+        </div>
+
+        <!-- Ławka Section -->
+        <div class="section">
+            <h2>Ławka</h2>
+            <div class="players" id="lawka">
+                <!-- Zawodnicy na Ławce -->
+                <div class="player" data-id="6">6</div>
+                <div class="player" data-id="7">7</div>
+                <div class="player" data-id="8">8</div>
+                <div class="player" data-id="9">9</div>
+                <div class="player" data-id="10">10</div>
+            </div>
+        </div>
+
+        <!-- Tabela numerów zawodników -->
+        <table id="statsTable">
+            <thead>
+                <tr>
+                    <th>Nr</th>
+                    <th>1 pkt</th>
+                    <th>2 pkt</th>
+                    <th>3 pkt</th>
+                    <th>AST</th>
+                    <th>ZB</th>
+                    <th>BLOK</th>
+                    <th>PRZE</th>
+                    <th>Punkty</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-id="1"><td>1</td><td class="stat-1">0</td><td class="stat-2">0</td><td class="stat-3">0</td><td class="stat-ast">0</td><td class="stat-zb">0</td><td class="stat-blok">0</td><td class="stat-prze">0</td><td class="total-points">0</td></tr>
+                <tr data-id="2"><td>2</td><td class="stat-1">0</td><td class="stat-2">0</td><td class="stat-3">0</td><td class="stat-ast">0</td><td class="stat-zb">0</td><td class="stat-blok">0</td><td class="stat-prze">0</td><td class="total-points">0</td></tr>
+                <tr data-id="3"><td>3</td><td class="stat-1">0</td><td class="stat-2">0</td><td class="stat-3">0</td><td class="stat-ast">0</td><td class="stat-zb">0</td><td class="stat-blok">0</td><td class="stat-prze">0</td><td class="total-points">0</td></tr>
+                <tr data-id="4"><td>4</td><td class="stat-1">0</td><td class="stat-2">0</td><td class="stat-3">0</td><td class="stat-ast">0</td><td class="stat-zb">0</td><td class="stat-blok">0</td><td class="stat-prze">0</td><td class="total-points">0</td></tr>
+                <tr data-id="5"><td>5</td><td class="stat-1">0</td><td class="stat-2">0</td><td class="stat-3">0</td><td class="stat-ast">0</td><td class="stat-zb">0</td><td class="stat-blok">0</td><td class="stat-prze">0</td><td class="total-points">0</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Okno modalne do zmiany zawodników -->
+    <div id="modal">
+        <div id="modalContent">
+            <h2>Wybierz zawodników do zmiany</h2>
+            <h3>Parkiet</h3>
+            <div class="players" id="parkietModal">
+                <div class="player" data-id="1">1</div>
+                <div class="player" data-id="2">2</div>
+                <div class="player" data-id="3">3</div>
+                <div class="player" data-id="4">4</div>
+                <div class="player" data-id="5">5</div>
+            </div>
+            <h3>Ławka</h3>
+            <div class="players" id="lawkaModal">
+                <div class="player" data-id="6">6</div>
+                <div class="player" data-id="7">7</div>
+                <div class="player" data-id="8">8</div>
+                <div class="player" data-id="9">9</div>
+                <div class="player" data-id="10">10</div>
+            </div>
+            <button id="confirmChanges">Zatwierdź zmiany</button>
+            <button class="close-btn" id="closeModal">Zamknij</button>
+        </div>
+    </div>
+
+<script>
+    let selectedPlayerParkiet = null;
+    let selectedPlayerLawka = null;
+    let selectedPlayerParkietModal = null;
+    let selectedPlayerLawkaModal = null;
+
+    document.getElementById("zmianaBtn").addEventListener("click", () => {
+        document.getElementById("modal").style.display = "flex";
+    });
+
+    document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("modal").style.display = "none";
+    });
+
+    // Zaznaczanie zawodników w modalnym
+    const playersModal = document.querySelectorAll(".player");
+    playersModal.forEach(player => {
+        player.addEventListener("click", () => {
+            if (player.parentElement.id === "parkietModal") {
+                selectedPlayerParkiet = player;
+            } else if (player.parentElement.id === "lawkaModal") {
+                selectedPlayerLawka = player;
+            }
+        });
+    });
+
+    // Zatwierdzenie zmian w modalnym
+    document.getElementById("confirmChanges").addEventListener("click", () => {
+        if (selectedPlayerParkiet && selectedPlayerLawka) {
+            const idParkiet = selectedPlayerParkiet.dataset.id;
+            const idLawka = selectedPlayerLawka.dataset.id;
+
+            // Zmiana na Parkiecie i Ławce
+            document.querySelector(`#parkiet .player[data-id='${idParkiet}']`).classList.remove("selected");
+            document.querySelector(`#lawka .player[data-id='${idLawka}']`).classList.remove("selected");
+
+            selectedPlayerParkiet.classList.add("selected");
+            selectedPlayerLawka.classList.add("selected");
+
+            document.getElementById("modal").style.display = "none";
+        }
+
+
+        //
+// Otwieranie modalnego okna
+document.getElementById("zmianaBtn").addEventListener("click", () => {
+    // Zresetuj zaznaczenie zawodników na parkiecie i ławce
+    resetSelection();
+
+    // Otwórz okno modalne
+    document.getElementById("modal").style.display = "flex";
+});
+
+// Funkcja resetująca zaznaczenie
+function resetSelection() {
+    // Zresetowanie zaznaczenia zawodników na parkiecie
+    const parkietPlayers = document.querySelectorAll("#parkiet .player");
+    parkietPlayers.forEach(player => {
+        player.classList.remove("selected");
+    });
+
+    // Zresetowanie zaznaczenia zawodników na ławce
+    const lawkaPlayers = document.querySelectorAll("#lawka .player");
+    lawkaPlayers.forEach(player => {
+        player.classList.remove("selected");
+    });
+
+    // Resetowanie zmiennych przechowujących wybrane zawodników
+    selectedPlayerParkiet = null;
+    selectedPlayerLawka = null;
+
+    // Resetowanie zaznaczenia statystyki
+    if (selectedStat) {
+        selectedStat.classList.remove("selected");
+        selectedStat = null;
+    }
+
+    // Dezaktywowanie przycisku "Dodaj"
+    document.getElementById("dodajBtn").disabled = true;
+}
+
+// Zamykanie okna modalnego
+document.getElementById("closeModal").addEventListener("click", () => {
+    document.getElementById("modal").style.display = "none";
+});
+
+// Zaznaczanie zawodników w modalnym oknie
+const playersModal = document.querySelectorAll(".player");
+playersModal.forEach(player => {
+    player.addEventListener("click", () => {
+        if (player.parentElement.id === "parkietModal") {
+            selectedPlayerParkiet = player;
+        } else if (player.parentElement.id === "lawkaModal") {
+            selectedPlayerLawka = player;
+        }
+    });
+});
+
+// Zatwierdzenie zmian w modalnym oknie
+document.getElementById("confirmChanges").addEventListener("click", () => {
+    if (selectedPlayerParkiet && selectedPlayerLawka) {
+        const idParkiet = selectedPlayerParkiet.dataset.id;
+        const idLawka = selectedPlayerLawka.dataset.id;
+
+        // Zmiana na Parkiecie i Ławce
+        document.querySelector(`#parkiet .player[data-id='${idParkiet}']`).classList.remove("selected");
+        document.querySelector(`#lawka .player[data-id='${idLawka}']`).classList.remove("selected");
+
+        selectedPlayerParkiet.classList.add("selected");
+        selectedPlayerLawka.classList.add("selected");
+
+        document.getElementById("modal").style.display = "none";
+    }
+});
+
+        //
+    });
+
+    // Statystyki
+    let selectedStat = null;
+
+    document.querySelectorAll(".stat-button").forEach(button => {
+        button.addEventListener("click", () => {
+            if (selectedStat) {
+                selectedStat.classList.remove("selected");
+            }
+            selectedStat = button;
+            selectedStat.classList.add("selected");
+
+            // Aktywowanie przycisku Dodaj
+            if (selectedPlayerParkiet) {
+                document.getElementById("dodajBtn").disabled = false;
+            }
+        });
+    });
+
+    // Zaznaczanie zawodników na Parkiecie
+    document.querySelectorAll("#parkiet .player").forEach(player => {
+        player.addEventListener("click", () => {
+            if (selectedPlayerParkiet) {
+                selectedPlayerParkiet.classList.remove("selected");
+            }
+            selectedPlayerParkiet = player;
+            selectedPlayerParkiet.classList.add("selected");
+
+            // Aktywowanie przycisku Dodaj
+            if (selectedStat) {
+                document.getElementById("dodajBtn").disabled = false;
+            }
+        });
+    });
+
+    // Przycisk "Dodaj"
+    document.getElementById("dodajBtn").addEventListener("click", () => {
+        if (selectedPlayerParkiet && selectedStat) {
+            const playerId = selectedPlayerParkiet.dataset.id;
+            const statType = selectedStat.dataset.stat;
+            const playerRow = document.querySelector(`#statsTable tr[data-id='${playerId}']`);
+
+            // Zwiększanie wartości odpowiedniej kolumny
+            const statCell = playerRow.querySelector(`.stat-${statType}`);
+            const currentStatValue = parseInt(statCell.textContent);
+            statCell.textContent = currentStatValue + 1;
+
+            // Aktualizacja sumy punktów
+            updateTotalPoints(playerRow);
+
+            // Resetowanie przycisków
+            // Resetowanie statystyk
+            selectedStat.classList.remove("selected");
+            selectedStat = null;
+
+            // Resetowanie zawodnika
+            selectedPlayerParkiet.classList.remove("selected");
+            selectedPlayerParkiet = null;
+
+            // Dezaktywowanie przycisku "Dodaj"
+            document.getElementById("dodajBtn").disabled = true;
+        }
+    });
+
+ 
+    // Funkcja do obliczania sumy punktów
+// Funkcja do obliczania sumy punktów
+function updateTotalPoints(playerRow) {
+    // Zbieranie wartości z poszczególnych statystyk
+    const stat1 = parseInt(playerRow.querySelector(".stat-1").textContent) || 0;
+    const stat2 = parseInt(playerRow.querySelector(".stat-2").textContent) || 0;
+    const stat3 = parseInt(playerRow.querySelector(".stat-3").textContent) || 0;
+
+    // Obliczanie sumy punktów
+    const totalPoints = (stat1 * 1) + (stat2 * 2) + (stat3 * 3);
+
+    // Ustawianie sumy punktów w odpowiedniej komórce
+    playerRow.querySelector(".total-points").textContent = totalPoints;
+}
+
+
+</script>
+
+</body>
+
+</html>
