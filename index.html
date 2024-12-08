@@ -3,175 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blanka staty</title>
+    <title>Mecze Blanki</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            background-color: #f4f4f4;
+            flex-direction: column;
+            background-color: #ffffff;
         }
 
-        header {
-            margin-top: 10px;
-            font-size: 24px;
-            font-weight: bold;
+        h1 {
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        img {
-            width: 150px;
-            margin: 20px 0;
-        }
-
-        .buttons {
+        .container {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            width: 90%;
+            max-width: 400px;
         }
 
-        .buttons button {
-            font-size: 18px;
+        select, input[type="date"] {
+            width: 300px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        img {
+            width: 300px;
+            height: 300px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        button {
             padding: 10px 20px;
             background-color: #0078d7;
             color: white;
             border: none;
             border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
+            width: 300px;
         }
 
-        .buttons button:hover {
+        button:hover {
             background-color: #005bb5;
         }
 
+        button:disabled {
+            cursor: not-allowed;
+            background-color: lightgrey;
+        }
+
         table {
-            width: 90%;
+            margin-top: 20px;
+            width: 100%;
             border-collapse: collapse;
-            margin: 0 auto 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            display: block; /* Tabela stanie się przewijana na małych ekranach */
         }
 
         th, td {
-            border: 1px solid #ddd;
+            padding: 10px;
             text-align: center;
-            padding: 8px;
+            border: 1px solid #ddd;
         }
 
         th {
-            background-color: #0078d7;
-            color: white;
+            background-color: #f2f2f2;
         }
 
-        td {
-            background-color: #f9f9f9;
-        }
-
+        /* Responsywność - dla małych ekranów */
         @media (max-width: 600px) {
-            .buttons button {
-                font-size: 14px;
-                padding: 8px 12px;
+            table {
+                width: 100%;
+                display: block;
+                overflow-x: auto; /* Przewijanie poziome tabeli na małych urządzeniach */
+                white-space: nowrap;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 14px; /* Mniejsze czcionki */
+            }
+
+            .container {
+                width: 95%; /* Zwiększamy szerokość kontenera na małych ekranach */
+            }
+
+            select, input[type="date"], button {
+                width: 100%; /* Dopasowanie do szerokości ekranu */
+                padding: 12px;
+            }
+
+            img {
+                width: 80%; /* Zmniejszenie rozmiaru obrazu na małych ekranach */
+                height: auto;
             }
         }
+
     </style>
 </head>
 <body>
-    <header>Blanka staty</header>
-    <img src="10.png" alt="Koszulka">
-    <div class="buttons">
-        <button onclick="updateStats('2pkt', 2)">2-pkt</button>
-        <button onclick="updateStats('3pkt', 3)">3-pkt</button>
-        <button onclick="updateStats('1pkt', 1)">1-pkt</button>
-        <button onclick="updateStats('Asy', 0)">Asysta</button>
-        <button onclick="updateStats('Blok', 0)">Blok</button>
-        <button onclick="updateStats('Zb', 0)">Zbiórka</button>
-        <button onclick="updateStats('Prze', 0)">Przechwyt</button>
+    <h1>Wybór przeciwnika</h1>
+
+    <div class="container">
+        <!-- Drużyna -->
+        <select id="team-selector" onchange="changeLogo()">
+            <option value="Elbląg">Elbląg</option>
+            <option value="BAT Sierakowice">BAT Sierakowice</option>
+            <option value="BAT Kartuzy">BAT Kartuzy</option>
+            <option value="Bryza Pruszcz Gd">Bryza Pruszcz Gd</option>
+            <option value="Pruszcz Gdański 1">Pruszcz Gdański 1</option>
+            <option value="Pruszcz Gdański 2">Pruszcz Gdański 2</option>
+        </select>
+
+        <!-- Logo drużyny -->
+        <img id="team-logo" src="Elblag.png" alt="Logo drużyny">
+
+        <!-- Data meczu -->
+        <input type="date" id="game-date">
+
+        <!-- Przycisk -->
+        <button onclick="redirectToBlania()">Gramy</button>
+
+        <!-- Tabela -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Drużyna</th>
+                    <th>Data meczu</th>
+                    <th>2-pkt</th>
+                    <th>3-pkt</th>
+                    <th>1-pkt</th>
+                    <th>Asysta</th>
+                    <th>Blok</th>
+                    <th>Zbiórka</th>
+                    <th>Przechwyt</th>
+                    <th>Łącznie</th>
+                </tr>
+            </thead>
+            <tbody id="matches-table">
+                <!-- Zapisane mecze i statystyki -->
+            </tbody>
+        </table>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Statystyka</th>
-                <th>Wartość</th>
-                <th>Punkty</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr id="2pkt">
-                <td>2-pkt</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr id="3pkt">
-                <td>3-pkt</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr id="1pkt">
-                <td>1-pkt</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr id="Asy">
-                <td>Asysta</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr id="Blok">
-                <td>Blok</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr id="Zb">
-                <td>Zbiórka</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr id="Prze">
-                <td>Przechwyt</td>
-                <td class="value">0</td>
-                <td class="points">0</td>
-            </tr>
-            <tr>
-                <th>Łącznie</th>
-                <th></th>
-                <th id="totalPoints">0</th>
-            </tr>
-        </tbody>
-    </table>
 
     <script>
-        function updateStats(statId, points) {
-            // Pobierz wiersz dla danej statystyki
-            const row = document.getElementById(statId);
-            const valueCell = row.querySelector('.value');
-            const pointsCell = row.querySelector('.points');
+        const logos = {
+            "BAT Sierakowice": "BAT Sierakowice.png",
+            "BAT Kartuzy": "BAT Kartuzy.png",
+            "Bryza Pruszcz Gd": "Bryza Pruszcz Gd.png",
+            "Elbląg": "Elblag.png",
+            "Pruszcz Gdański 1": "Pruszcz Gdanski 1.png",
+            "Pruszcz Gdański 2": "Pruszcz Gdanski 2.png"
+        };
 
-            // Zaktualizuj wartości w wierszu
-            const currentValue = parseInt(valueCell.textContent, 10);
-            const currentPoints = parseInt(pointsCell.textContent, 10);
+        // Automatyczne ustawienie dzisiejszej daty
+        document.getElementById('game-date').value = new Date().toISOString().split('T')[0];
 
-            valueCell.textContent = currentValue + 1;
-            pointsCell.textContent = currentPoints + points;
-
-            // Zaktualizuj całkowitą liczbę punktów
-            updateTotalPoints();
+        function changeLogo() {
+            const teamSelector = document.getElementById('team-selector');
+            const logo = document.getElementById('team-logo');
+            logo.src = logos[teamSelector.value];
         }
 
-        function updateTotalPoints() {
-            const pointsCells = document.querySelectorAll('.points');
-            let total = 0;
+        function redirectToBlania() {
+            const team = document.getElementById('team-selector').value;
+            const date = document.getElementById('game-date').value;
 
-            pointsCells.forEach(cell => {
-                total += parseInt(cell.textContent, 10);
+            if (!date) {
+                alert("Proszę wybrać datę meczu!");
+                return;
+            }
+
+            // Zapisz dane do localStorage
+            localStorage.setItem("selectedTeam", team);
+            localStorage.setItem("selectedDate", date);
+
+            // Przenieś do Blanka.html
+            window.location.href = "blania.html";
+        }
+
+        // Funkcja wyświetlająca dane z localStorage
+        function populateTable() {
+            const tableBody = document.getElementById('matches-table');
+            const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
+
+            savedMatches.forEach(match => {
+                const newRow = document.createElement('tr');
+                const stats = ["team", "date", "2pkt", "3pkt", "1pkt", "Asy", "Blok", "Zb", "Prze", "total"];
+
+                stats.forEach(stat => {
+                    const statCell = document.createElement('td');
+                    statCell.textContent = match[stat] || 0;  // Wyświetl wartość statystyki
+                    newRow.appendChild(statCell);
+                });
+
+                tableBody.appendChild(newRow);
             });
-
-            document.getElementById('totalPoints').textContent = total;
         }
+
+        // Wywołanie funkcji przy załadowaniu strony
+        window.onload = function() {
+            populateTable();
+        };
     </script>
 </body>
 </html>
