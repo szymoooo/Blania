@@ -4,7 +4,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $host = 'db4free.net';            // Host serwera
     $db = 'stat_blanka';              // Zmieniona nazwa bazy danych
     $user = 'blanka_user';            // Twój użytkownik (zarejestrowany na db4free.net)
-    $password = 'securepassword123';  // Twoje hasło
+    $password = 'q5a.ssCr5TmF76L';  // Twoje hasło
 
     try {
         // Połączenie z bazą danych
