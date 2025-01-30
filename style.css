@@ -1,0 +1,159 @@
+/* 1. Czcionka Roboto */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffffff;
+    color: #333;
+    padding: 1px; /* Zmniejszenie paddingu */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+    margin: 0;
+    box-sizing: border-box; /* Ważne, aby padding nie powodował scrollowania */
+}
+
+/* 2. Jednolite nagłówki */
+header {
+    font-size: 28px; /* Zmniejszenie rozmiaru czcionki */
+    font-weight: bold;
+    text-align: center;
+    margin-top: 4px; /* Zmniejszenie marginesu, zmniejszenie przestrzeni nad nagłówkiem */
+    margin-bottom: 4px; /* Zmniejszenie marginesu poniżej nagłówka */
+    color: #333;
+}
+
+/* 3. Jednolite style tabeli */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px; /* Zmniejszenie odstępu od tabeli do innych elementów */
+}
+
+th, td {
+    padding: 8px; /* Zmniejszenie paddingu */
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 13px; /* Zmniejszenie rozmiaru czcionki */
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* 4. Jednolite style dla formularzy i inputów */
+input, .team-selector, .date-input {
+    width: 230px; /* Zmieniamy szerokość na 200px */
+    padding: 8px; /* Zmniejszenie paddingu */
+    margin: 8px 0; /* Zmniejszenie marginesu */
+    font-size: 14px; /* Zmniejszenie rozmiaru czcionki */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input:focus, .team-selector:focus, .date-input:focus {
+    border-color: #0078d7;
+    outline: none;
+}
+
+/* 5. Przyciski z main.html */
+.primary-btn, .buttons button, .form-container button {
+    font-size: 16px; /* Zmniejszenie rozmiaru czcionki */
+    padding: 10px 18px; /* Zmniejszenie paddingu */
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto;
+    min-width: 80px;
+}
+
+.primary-btn:hover, .buttons button:hover, .form-container button:hover {
+    background-color: #005bb5;
+}
+
+/* 6. Jednolite style dla kontenerów */
+.container, .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px; /* Zmniejszenie paddingu */
+    max-width: 700px;
+    background-color: white;
+    border-radius: 8px;
+    margin-top: 1px; /* Zmniejszenie marginesu */
+}
+
+.form-container {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    margin-top: 15px; /* Zmniejszenie marginesu */
+}
+
+/* 7. Stopka */
+.footer {
+    margin-top: 20px; /* Zmniejszenie marginesu */
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+}
+
+/* 8. Logo drużyny - specyficzne dla main.html */
+.team-logo-container {
+    text-align: center;
+    margin-bottom: 4px; /* Zmniejszenie marginesu */
+    display: flex;
+    flex-direction: column;  /* Logo na górze, select poniżej */
+    align-items: center;
+}
+
+.team-logo {
+    width: 230px; /* Zmniejszenie rozmiaru logo */
+    height: 230px;
+    margin: 4px 0; /* Zmniejszenie marginesów */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.team-selector {
+    width: 250px; /* Zmniejszenie szerokości */
+    padding: 8px; /* Zmniejszenie paddingu */
+    margin: 8px 0; /* Zmniejszenie marginesu */
+    font-size: 14px; /* Zmniejszenie rozmiaru czcionki */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* 9. Style dla przycisków nawigacji - Poprzednia, Następna */
+#pagination button {
+    background-color: #0078d7; /* Podstawowy kolor tła */
+    color: white;
+    padding: 8px 16px; /* Zmniejszenie paddingu */
+    font-size: 14px; /* Zmniejszenie rozmiaru czcionki */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, opacity 0.3s ease; /* Płynne przejścia */
+    margin: 8px; /* Zmniejszenie marginesów */
+}
+
+#pagination button:hover {
+    background-color: #005bb5; /* Kolor przycisku przy najechaniu */
+}
+
+/* Przycisk nieaktywny (disabled) */
+#pagination button:disabled {
+    background-color: #ccc; /* Jasnoszary kolor dla nieaktywnych przycisków */
+    cursor: not-allowed; /* Zmienia kursor na "zakazany" */
+    opacity: 0.6; /* Zmniejsza przezroczystość przycisku */
+}
+
+#pagination button:disabled:hover {
+    background-color: #ccc; /* Brak zmiany koloru przycisku, gdy jest nieaktywny */
+}
