@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mecze Blanki</title>
-    <!-- Połączenie z plikiem CSS -->
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
     <header>
         <h2>Wybór przeciwnika</h2>
     </header>
 
-    <div class="container">
+    <div class="team-selection-container">
+    <!-- Lewa strona: Logo drużyny -->
     <div class="team-logo-container">
         <img id="team-logo" src="BAT Sierakowice.png" alt="Logo drużyny" class="team-logo">
-        <select id="team-selector" class="team-selector" onchange="changeLogo()">
+    </div>
+
+    <!-- Prawa strona: Wybór drużyny, data meczu i przycisk -->
+    <div class="team-info-container">
+        <select id="team-selector" class="team-selector uniform-width" onchange="changeLogo()">
             <option value="BAT Sierakowice">BAT Sierakowice</option>
             <option value="BAT Kartuzy">BAT Kartuzy</option>
             <option value="Bryza Pruszcz Gd">Bryza Pruszcz Gd</option>
@@ -28,37 +33,37 @@
             <option value="UKS ŻAK Nowy Sącz">UKS ŻAK Nowy Sącz</option>
             <option value="Young Angels Košice">Young Angels Košice</option>
         </select>
+
+        <input type="date" id="game-date" class="uniform-width">
+        <button class="primary-btn uniform-width" onclick="startGame()">Gramy</button>
     </div>
-    
-    <input type="date" id="game-date">
-    <button class="primary-btn" onclick="startGame()">Gramy</button>
 </div>
 
 
     <table id="matches-table">
-    <thead>
-        <tr>
-            <th>Drużyna</th>
-            <th>Data meczu</th>
-            <th>2-pkt</th>
-            <th>3-pkt</th>
-            <th>1-pkt</th>
-            <th>Asysty</th>
-            <th>Bloki</th>
-            <th>Zbiórki</th>
-            <th>Przechwyty</th>
-            <th>Łącznie</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+        <thead>
+            <tr>
+                <th>Drużyna</th>
+                <th>Data meczu</th>
+                <th>Punkty</th>
+               <!-- <th>2-pkt</th>
+                <th>3-pkt</th>
+                <th>1-pkt</th>-->
+                <th>Asysty</th>
+                <th>Bloki</th>
+                <th>Zbiórki</th>
+                <th>Przechwyty</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-<!-- Paginacja -->
-<div id="pagination" style="text-align: center;">
-    <button id="prev-btn" onclick="changePage(-1)" disabled>Poprzednia</button>
-    <button id="next-btn" onclick="changePage(1)" disabled>Następna</button>
-</div>
-
+    <!-- Paginacja -->
+    <div id="pagination" style="text-align: center;">
+        <button id="prev-btn" onclick="changePage(-1)" disabled>Poprzednia</button>
+        <button id="next-btn" onclick="changePage(1)" disabled>Następna</button>
+    </div>
 
     <script>
         const logos = {
@@ -96,71 +101,97 @@
 
             localStorage.setItem("selectedTeam", team);
             localStorage.setItem("selectedDate", date);
+            localStorage.removeItem("editMatchIndex");
+
             window.location.href = "blania.html";
         }
 
+        let currentPage = 1;
+        const recordsPerPage = 5;
+
         function loadSavedMatches() {
             const tableBody = document.querySelector("#matches-table tbody");
-            tableBody.innerHTML = "";
-
             const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
 
-            savedMatches.forEach(match => {
+            // Wyświetl tylko 5 meczów na stronę
+            const start = (currentPage - 1) * recordsPerPage;
+            const end = start + recordsPerPage;
+            const paginatedMatches = savedMatches.slice(start, end);
+
+            tableBody.innerHTML = "";
+            paginatedMatches.forEach((match, index) => {
                 const row = document.createElement("tr");
-                ["team", "date", "2pkt", "3pkt", "1pkt", "Asy", "Blok", "Zb", "Prze", "total"].forEach(stat => {
+                ["team", "date","total", //"2pkt", "3pkt", "1pkt",
+                    "Asy", "Blok", "Zb", "Prze"].forEach(stat => {
                     const cell = document.createElement("td");
                     cell.textContent = match[stat] || 0;
                     row.appendChild(cell);
                 });
+
+                // Akcje
+                const actionCell = document.createElement("td");
+// Tworzymy kontener na przyciski akcji
+const actionContainer = document.createElement("div");
+actionContainer.classList.add("action-container");
+
+// Ikona edycji (ołówek)
+const editButton = document.createElement("button");
+editButton.innerHTML = '<img src="edit.png" alt="Edytuj" class="action-icon">';
+editButton.classList.add("action-btn", "edit-btn");
+editButton.title = "Edytuj";
+editButton.onclick = function() {
+    localStorage.setItem("editMatchIndex", index + (currentPage - 1) * recordsPerPage);
+    window.location.href = "blania.html";
+};
+actionContainer.appendChild(editButton);
+
+// Ikona usuwania (kosz)
+const deleteButton = document.createElement("button");
+deleteButton.innerHTML = '<img src="trash.png" alt="Usuń" class="action-icon">';
+deleteButton.classList.add("action-btn", "delete-btn");
+deleteButton.title = "Usuń";
+deleteButton.onclick = function() {
+    const confirmDelete = confirm("Czy na pewno chcesz usunąć ten mecz?");
+    if (confirmDelete) {
+        savedMatches.splice(index + (currentPage - 1) * recordsPerPage, 1);
+        localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
+        loadSavedMatches();
+    }
+};
+actionContainer.appendChild(deleteButton);
+
+// Ikona YouTube
+const youtubeButton = document.createElement("button");
+youtubeButton.innerHTML = '<img src="youtube.png" alt="YouTube" class="action-icon">';
+youtubeButton.classList.add("action-btn", "yt-btn");
+youtubeButton.title = "Otwórz YouTube";
+youtubeButton.onclick = function() {
+    window.open("https://www.youtube.com", "_blank");
+};
+actionContainer.appendChild(youtubeButton);
+
+// Dodajemy kontener do komórki tabeli
+actionCell.appendChild(actionContainer);
+
+
+                row.appendChild(actionCell);
                 tableBody.appendChild(row);
             });
+
+            // Ustawienie przycisków paginacji
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage * recordsPerPage >= savedMatches.length;
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            loadSavedMatches();
         }
 
         window.onload = function() {
             setTodayDate();
             loadSavedMatches();
         };
-
-        let currentPage = 1;
-const recordsPerPage = 5;
-
-function loadSavedMatches() {
-    const tableBody = document.querySelector("#matches-table tbody");
-    const pagination = document.getElementById("pagination");
-    const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-
-    // Wyświetl tylko 5 meczów na stronę
-    const start = (currentPage - 1) * recordsPerPage;
-    const end = start + recordsPerPage;
-    const paginatedMatches = savedMatches.slice(start, end);
-
-    tableBody.innerHTML = "";
-    paginatedMatches.forEach(match => {
-        const row = document.createElement("tr");
-        ["team", "date", "2pkt", "3pkt", "1pkt", "Asy", "Blok", "Zb", "Prze", "total"].forEach(stat => {
-            const cell = document.createElement("td");
-            cell.textContent = match[stat] || 0;
-            row.appendChild(cell);
-        });
-        tableBody.appendChild(row);
-    });
-
-    // Ustaw przyciski na aktywne lub nieaktywne
-    document.getElementById("prev-btn").disabled = currentPage === 1;
-    document.getElementById("next-btn").disabled = currentPage * recordsPerPage >= savedMatches.length;
-}
-
-function changePage(direction) {
-    currentPage += direction;
-    loadSavedMatches();
-}
-
-window.onload = function() {
-    setTodayDate();
-    loadSavedMatches();
-};
-
-
     </script>
 </body>
 </html>
