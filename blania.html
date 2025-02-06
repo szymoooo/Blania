@@ -4,105 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blanka</title>
-
     <style>
-        /* 1. Czcionka Roboto */
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #ffffff;
             color: #333;
-            padding: 1px; /* Zmniejszenie paddingu */
+            padding: 1px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             flex-direction: column;
             margin: 0;
-            box-sizing: border-box; /* Ważne, aby padding nie powodował scrollowania */
+            box-sizing: border-box;
         }
-
-        /* 2. Jednolite nagłówki */
         header {
-            font-size: 28px; /* Zmniejszenie rozmiaru czcionki */
+            font-size: 28px;
             font-weight: bold;
             text-align: center;
-            margin-top: 4px; /* Zmniejszenie marginesu, zmniejszenie przestrzeni nad nagłówkiem */
-            margin-bottom: 4px; /* Zmniejszenie marginesu poniżej nagłówka */
-            color: #333;
+            margin: 10px 0;
         }
-
-        /* 3. Jednolite style tabeli */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px; /* Zmniejszenie odstępu od tabeli do innych elementów */
+            margin-top: 10px;
         }
-
         th, td {
-            padding: 8px; /* Zmniejszenie paddingu */
+            padding: 8px;
             text-align: center;
             border: 1px solid #ddd;
-            font-size: 13px; /* Zmniejszenie rozmiaru czcionki */
+            font-size: 14px;
         }
-
         th {
             background-color: #f2f2f2;
         }
-
-        /* 4. Jednolite style dla formularzy i inputów */
-            /* Styl dla przycisków w formularzu */
-            /* Styl dla przycisków w formularzu */
-.buttons {
-    display: flex;
-    align-items: center; /* Wyrównanie przycisków i inputa w pionie */
-    justify-content: center; /* Wyrównanie przycisków i inputa w poziomie */
-}
-
-.buttons button {
-    width: 35px !important;  /* Ustawia szerokość przycisków na 30px */
-    height: 35px !important; /* Ustawia wysokość przycisków, żeby były kwadratowe */
-    margin: 0 5px !important; /* Dodaje odstępy między przyciskami */
-    padding: 0 !important; /* Usuwa dodatkowy padding */
-    font-size: 16px !important; /* Dostosowanie rozmiaru czcionki */
-    display: flex !important; /* Ustawia przyciski jako elementy flex */
-    justify-content: center !important; /* Wyrównanie tekstu w przycisku */
-    align-items: center !important; /* Wyrównanie tekstu w przycisku */
-}
-
-.buttons input[type="text"] {
-    width: 50px; /* Zmieniamy szerokość na 50px */
-    padding: 8px;
-    margin: 8px 0;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    text-align: center; /* Wyśrodkowanie tekstu wewnątrz inputa */
-}
-
-
-input[type="text"]:focus {
-    border-color: #0078d7;
-    outline: none;
-}
-.readonly-input {
-    width: 150px; /* Zmieniamy szerokość na 50px */
-    padding: 8px;
-    margin: 8px 0;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    text-align: center; /* Wyśrodkowanie tekstu */
-    cursor: not-allowed; /* Blokowanie możliwości edycji */
-}
-
-            
-
-        /* 5. Wyśrodkowanie przycisku "Zapisz" w formularzu */
-        .form-container button[type="button"] {
+        .buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .buttons button {
+            width: 35px;
+            height: 35px;
+            margin: 0 5px;
+            font-size: 16px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buttons button:hover {
+            background-color: #005bb5;
+        }
+        .buttons input[type="text"] {
+            width: 50px;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        .form-container button {
             display: block;
-            margin: 20px auto 0; /* Wyśrodkowanie poziome + margines górny */
+            margin: 10px auto;
             padding: 12px 20px;
             font-size: 16px;
             background-color: #0078d7;
@@ -110,188 +76,118 @@ input[type="text"]:focus {
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            min-width: 20px;
+            width: 50%;
         }
-
-        .form-container button[type="button"]:hover {
-            background-color: #005bb5; /* Zmiana koloru przycisku na hover */
+        .form-container button:hover {
+            background-color: #005bb5;
         }
-
-        /* 6. Jednolite style dla kontenerów */
-        .container, .form-container {
+        .form-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            padding: 20px; /* Zmniejszenie paddingu */
             max-width: 500px;
             background-color: white;
             border-radius: 8px;
-            margin-top: 1px; /* Zmniejszenie marginesu */
-        }
-
-        .form-container {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
-
-        .container {
-            margin-top: 15px; /* Zmniejszenie marginesu */
-        }
-
-        /* 7. Stopka */
         .footer {
-            margin-top: 20px; /* Zmniejszenie marginesu */
+            margin-top: 20px;
             text-align: center;
             font-size: 14px;
             color: #888;
         }
-
-       
     </style>
-
 </head>
 <body>
     <header>Statystyki meczu - <span id="team-name"></span></header>
     <div class="form-container">
         <form id="match-stats-form">
             <table>
-                <tr>
-                    <th>Statystyka</th>
-                    <th>Wartość</th>
-                </tr>
-                <tr>
-                    <td>2-punkty:</td>
-                    <td>
-                        <div class="buttons">
-                            <button type="button" onclick="changeStat('2pkt', -1)">-</button>
-                            <input type="text" id="2pkt" value="0" readonly>
-                            <button type="button" onclick="changeStat('2pkt', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>3-punkty:</td>
-                    <td>
-                        <div class="buttons">
-                             <button type="button" onclick="changeStat('3pkt', -1)">-</button>
-                             <input type="text" id="3pkt" value="0" readonly>
-                            <button type="button" onclick="changeStat('3pkt', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>1-punkty:</td>
-                    <td>
-                        <div class="buttons">
-                            <button type="button" onclick="changeStat('1pkt', -1)">-</button>
-                            <input type="text" id="1pkt" value="0" readonly>
-                            <button type="button" onclick="changeStat('1pkt', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Asysta:</td>
-                    <td>
-                        <div class="buttons">
-                            <button type="button" onclick="changeStat('Asy', -1)">-</button>
-                            <input type="text" id="Asy" value="0" readonly>
-                            <button type="button" onclick="changeStat('Asy', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Blok:</td>
-                    <td>
-                        <div class="buttons">
-                            <button type="button" onclick="changeStat('Blok', -1)">-</button>
-                            <input type="text" id="Blok" value="0" readonly>
-                            <button type="button" onclick="changeStat('Blok', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Zbiórka:</td>
-                    <td>
-                        <div class="buttons">
-                            <button type="button" onclick="changeStat('Zb', -1)">-</button>
-                            <input type="text" id="Zb" value="0" readonly>
-                            <button type="button" onclick="changeStat('Zb', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Przechwyt:</td>
-                    <td>
-                        <div class="buttons">
-                            <button type="button" onclick="changeStat('Prze', -1)">-</button>
-                            <input type="text" id="Prze" value="0" readonly>
-                            <button type="button" onclick="changeStat('Prze', 1)">+</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="total-points">
-    <td><strong>Łącznie punkty:</strong></td>
-    <td><input type="text" id="totalPoints" class="readonly-input" value="0" readonly></td>
-</tr>
+                <tr><th>Statystyka</th><th>Wartość</th></tr>
+                <tr><td>2-punkty:</td><td><div class="buttons"><button type="button" onclick="changeStat('2pkt', -1)">-</button><input type="text" id="2pkt" value="0" readonly><button type="button" onclick="changeStat('2pkt', 1)">+</button></div></td></tr>
+                <tr><td>3-punkty:</td><td><div class="buttons"><button type="button" onclick="changeStat('3pkt', -1)">-</button><input type="text" id="3pkt" value="0" readonly><button type="button" onclick="changeStat('3pkt', 1)">+</button></div></td></tr>
+                <tr><td>1-punkty:</td><td><div class="buttons"><button type="button" onclick="changeStat('1pkt', -1)">-</button><input type="text" id="1pkt" value="0" readonly><button type="button" onclick="changeStat('1pkt', 1)">+</button></div></td></tr>
+                <tr><td>Asysty:</td><td><div class="buttons"><button type="button" onclick="changeStat('Asy', -1)">-</button><input type="text" id="Asy" value="0" readonly><button type="button" onclick="changeStat('Asy', 1)">+</button></div></td></tr>
+                <tr><td>Bloki:</td><td><div class="buttons"><button type="button" onclick="changeStat('Blok', -1)">-</button><input type="text" id="Blok" value="0" readonly><button type="button" onclick="changeStat('Blok', 1)">+</button></div></td></tr>
+                <tr><td>Zbiórki:</td><td><div class="buttons"><button type="button" onclick="changeStat('Zb', -1)">-</button><input type="text" id="Zb" value="0" readonly><button type="button" onclick="changeStat('Zb', 1)">+</button></div></td></tr>
+                <tr><td>Przechwyty:</td><td><div class="buttons"><button type="button" onclick="changeStat('Prze', -1)">-</button><input type="text" id="Prze" value="0" readonly><button type="button" onclick="changeStat('Prze', 1)">+</button></div></td></tr>
+                <tr class="total-points"><td><strong>Łącznie punkty:</strong></td><td><input type="text" id="totalPoints" value="0" readonly></td></tr>
             </table>
             <button type="button" onclick="saveMatch()">Zapisz</button>
         </form>
     </div>
- 
-    <div class="footer">
-        <p>© 2024 Blanka. Wszystkie prawa zastrzeżone.</p>
-    </div>
-
+    <div class="footer"><p>© 2024 Blanka. Wszystkie prawa zastrzeżone.</p></div>
     <script>
         function changeStat(stat, delta) {
             const statElement = document.getElementById(stat);
             let currentValue = parseInt(statElement.value) || 0;
-            currentValue += delta;
-
-            if (currentValue < 0) currentValue = 0;
-
-            statElement.value = currentValue;
+            statElement.value = Math.max(0, currentValue + delta);
             updateTotal();
         }
 
         function updateTotal() {
-            const points1 = parseInt(document.getElementById('1pkt').value) || 0;
-            const points2 = parseInt(document.getElementById('2pkt').value) || 0;
-            const points3 = parseInt(document.getElementById('3pkt').value) || 0;
-
-            const totalPoints = points1 + points2 * 2 + points3 * 3;
-            document.getElementById('totalPoints').value = totalPoints;
+            const total = ["1pkt", "2pkt", "3pkt"].reduce((sum, id) => sum + (parseInt(document.getElementById(id).value) || 0) * (id === "2pkt" ? 2 : id === "3pkt" ? 3 : 1), 0);
+            document.getElementById('totalPoints').value = total;
         }
 
         function saveMatch() {
-            const team = localStorage.getItem("selectedTeam");
-            const date = localStorage.getItem("selectedDate");
+    const matchIndex = localStorage.getItem("editMatchIndex");
+    const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
 
-            const stats = {
-                team: team,
-                date: date,
-                "2pkt": document.getElementById('2pkt').value,
-                "3pkt": document.getElementById('3pkt').value,
-                "1pkt": document.getElementById('1pkt').value,
-                Asy: document.getElementById('Asy').value,
-                Blok: document.getElementById('Blok').value,
-                Zb: document.getElementById('Zb').value,
-                Prze: document.getElementById('Prze').value,
-                total: document.getElementById('totalPoints').value
-            };
+    const newMatch = { 
+        "team": document.getElementById("team-name").textContent, 
+        "date": localStorage.getItem("selectedDate") || "Brak daty",
+        "2pkt": document.getElementById("2pkt").value, 
+        "3pkt": document.getElementById("3pkt").value, 
+        "1pkt": document.getElementById("1pkt").value, 
+        "Asy": document.getElementById("Asy").value, 
+        "Blok": document.getElementById("Blok").value, 
+        "Zb": document.getElementById("Zb").value, 
+        "Prze": document.getElementById("Prze").value, 
+        "total": document.getElementById("totalPoints").value 
+    };
 
-            let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-            savedMatches.push(stats);
-            localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
+    if (matchIndex !== null && savedMatches[matchIndex]) {
+        savedMatches[matchIndex] = newMatch; // Nadpisujemy istniejący mecz
+    } else {
+        savedMatches.push(newMatch); // Dodajemy nowy mecz
+    }
 
-            window.location.href = "main.html"; // jeśli to główna strona
-        }
+    localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
+    localStorage.removeItem("editMatchIndex");
+    window.location.href = "main.html";
+}
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const team = localStorage.getItem("selectedTeam") || "Nieznany zespół";
-            document.getElementById("team-name").textContent = team;
+
+document.addEventListener("DOMContentLoaded", function() {
+    const matchIndex = localStorage.getItem("editMatchIndex");
+    const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
+    const team = localStorage.getItem("selectedTeam") || "Nieznany zespół";
+    document.getElementById("team-name").textContent = team;
+
+    if (matchIndex !== null && savedMatches[matchIndex]) {
+        // Tryb edycji – wypełnij pola danymi z localStorage
+        const match = savedMatches[matchIndex];
+        Object.keys(match).forEach(key => {
+            if (document.getElementById(key)) {
+                document.getElementById(key).value = match[key];
+            }
         });
+
+        // PRZELICZ "Łącznie punkty" od razu po wczytaniu danych
+        updateTotal();
+    } else {
+        // Tryb nowego meczu – ustaw domyślnie 0
+        ["2pkt", "3pkt", "1pkt", "Asy", "Blok", "Zb", "Prze", "totalPoints"].forEach(id => {
+            document.getElementById(id).value = "0";
+        });
+    }
+});
+
+
+
     </script>
 </body>
 </html>
