@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularz Notatek</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .notes-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 2px solid #0078d7;
+            border-radius: 8px;
+            background-color: transparent; /* Usunięcie szarego tła */
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .rating span {
+            cursor: pointer;
+            font-size: 24px;
+            color: #ddd;
+        }
+
+        .rating span.active {
+            color: #ffc107;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            background-color: #0078d7;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-actions button:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <div class="notes-form-container">
+        <h3 id="notes-form-title">Dodaj notatkę</h3>
+        <textarea id="notes-strengths" placeholder="Mocne strony"></textarea>
+        <textarea id="notes-weaknesses" placeholder="Słabe strony"></textarea>
+        <textarea id="notes-focus" placeholder="Na co zwrócić uwagę"></textarea>
+        <textarea id="notes-star" placeholder="Kto jest gwiazdą"></textarea>
+        <textarea id="notes-defender" placeholder="Kto mnie krył"></textarea>
+        <textarea id="notes-other" placeholder="Inne"></textarea>
+        <div class="rating">
+            <span onclick="setRating(1)">★</span>
+            <span onclick="setRating(2)">★</span>
+            <span onclick="setRating(3)">★</span>
+            <span onclick="setRating(4)">★</span>
+            <span onclick="setRating(5)">★</span>
+        </div>
+        <div class="form-actions">
+            <button class="primary-btn" onclick="saveNote()">Zapisz</button>
+            <button class="primary-btn" onclick="closeNotesForm()">Anuluj</button>
+        </div>
+    </div>
+
+    <script>
+        function setRating(rating) {
+            document.querySelectorAll('.rating span').forEach((star, index) => {
+                star.classList.toggle('active', index < rating);
+            });
+        }
+
+        function saveNote() {
+            const note = {
+                strengths: document.getElementById('notes-strengths').value,
+                weaknesses: document.getElementById('notes-weaknesses').value,
+                focus: document.getElementById('notes-focus').value,
+                star: document.getElementById('notes-star').value,
+                defender: document.getElementById('notes-defender').value,
+                other: document.getElementById('notes-other').value,
+                rating: document.querySelectorAll('.rating span.active').length
+            };
+
+            const team = localStorage.getItem('currentTeam');
+            let notes = JSON.parse(localStorage.getItem('notes')) || {};
+            if (!notes[team]) {
+                notes[team] = [];
+            }
+
+            const noteIndex = localStorage.getItem('currentNoteIndex');
+            if (noteIndex !== null) {
+                // Edycja istniejącej notatki
+                notes[team][noteIndex] = note;
+            } else {
+                // Dodanie nowej notatki
+                notes[team].push(note);
+            }
+
+            localStorage.setItem('notes', JSON.stringify(notes));
+            localStorage.removeItem('noteToEdit'); // Wyczyść dane edycji
+            window.location.href = 'main.html'; // Powrót do głównej strony
+        }
+
+        function closeNotesForm() {
+            localStorage.removeItem('noteToEdit'); // Wyczyść dane edycji
+            window.location.href = 'main.html'; // Powrót do głównej strony
+        }
+
+        window.onload = function () {
+            const noteToEdit = JSON.parse(localStorage.getItem('noteToEdit'));
+            if (noteToEdit) {
+                document.getElementById('notes-strengths').value = noteToEdit.strengths || '';
+                document.getElementById('notes-weaknesses').value = noteToEdit.weaknesses || '';
+                document.getElementById('notes-focus').value = noteToEdit.focus || '';
+                document.getElementById('notes-star').value = noteToEdit.star || '';
+                document.getElementById('notes-defender').value = noteToEdit.defender || '';
+                document.getElementById('notes-other').value = noteToEdit.other || '';
+                setRating(noteToEdit.rating || 0);
+            }
+        };
+    </script>
+</body>
+</html>
