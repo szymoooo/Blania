@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dodaj wydarzenie</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .form-group .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .form-group .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .form-actions button[type="submit"] {
+            background-color: #0078d7;
+            color: white;
+        }
+        .form-actions button[type="button"] {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Dodaj nowe wydarzenie</h2>
+        <form id="event-form">
+            <!-- Typ wydarzenia -->
+            <div class="form-group">
+                <label for="event-type">Typ wydarzenia:</label>
+                <select id="event-type" name="event-type" required onchange="handleEventTypeChange()">
+                    <option value="mecz-ligowy">Mecz ligowy</option>
+                    <option value="trening">Trening</option>
+                    <option value="fizjoterapeuta">Fizjoterapeuta</option>
+                    <option value="mecz-sparingowy">Mecz sparingowy</option>
+                    <option value="turniej">Turniej</option>
+                    <option value="oboz">Obóz</option>
+                    <option value="bus">Bus</option>
+                </select>
+            </div>
+
+            <!-- Nazwa wydarzenia -->
+            <div class="form-group">
+                <label for="event-name">Nazwa wydarzenia:</label>
+                <input type="text" id="event-name" name="event-name" required>
+                <select id="team-selector" class="team-selector uniform-width" style="display: none;" onchange="updateEventName()">
+                    <option value="BAT Sierakowice">BAT Sierakowice</option>
+                    <option value="BAT Kartuzy">BAT Kartuzy</option>
+                    <option value="Bryza Pruszcz Gd">Bryza Pruszcz Gd</option>
+                    <option value="Elbląg">Elbląg</option>
+                    <option value="Pruszcz Gdański 1">Pruszcz Gdański 1</option>
+                    <option value="Pruszcz Gdański 2">Pruszcz Gdański 2</option>
+                    <option value="BK VLCI Žďár">BK VLCI Žďár</option>
+                    <option value="BKM Žilina">BKM Žilina</option>
+                    <option value="MOSiR Bochnia">MOSiR Bochnia</option>
+                    <option value="UKS ŻAK Nowy Sącz">UKS ŻAK Nowy Sącz</option>
+                    <option value="Young Angels Košice">Young Angels Košice</option>
+                </select>
+            </div>
+
+            <!-- Data -->
+            <div class="form-group">
+                <label for="event-date">Data:</label>
+                <input type="date" id="event-date" name="event-date" required onchange="setDefaultTime()">
+            </div>
+
+            <!-- Godzina -->
+            <div class="form-group">
+                <label for="event-time">Godzina:</label>
+                <input type="time" id="event-time" name="event-time" step="900" required> <!-- Krok co 15 minut -->
+            </div>
+
+            <!-- Lokalizacja -->
+            <div class="form-group">
+                <label for="event-location">Lokalizacja:</label>
+                <select id="event-location" name="event-location">
+                    <option value="Gdynia, ul. Cechowa 22 - SP6">Gdynia, ul. Cechowa 22 - SP6</option>
+                    <option value="Gdynia, ul. Wiczlińska 50a - Microsoft">Gdynia, ul. Wiczlińska 50a - Microsoft</option>
+                    <option value="Gdynia, ul. Kopernika 34 - Maku">Gdynia, ul. Kopernika 34 - Maku</option>
+                    <option value="Gdynia, ul. Olimpijska 5/9 - GCS">Gdynia, ul. Olimpijska 5/9 - GCS</option>
+                    <option value="Sopot, ul. Książąt Pomorskich 16-18 ">Sopot, ul. Książąt Pomorskich 16-18 </option>
+                    <option value="Mecz wyjazdowy">Mecz wyjazdowy</option>
+                    <option value="Dom">Domek</option>
+                </select>
+            </div>
+
+            <!-- Powtarzanie cykliczne -->
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="event-repeat" name="event-repeat">
+                    <label for="event-repeat">Powtarzaj co tydzień</label>
+                </div>
+            </div>
+
+            <!-- Notatki -->
+            <div class="form-group">
+                <label for="event-notes">Notatki:</label>
+                <textarea id="event-notes" name="event-notes"></textarea>
+            </div>
+
+            <!-- Przypomnienie -->
+            <div class="form-group">
+                <label for="event-reminder">Przypomnienie:</label>
+                <select id="event-reminder" name="event-reminder">
+                    <option value="0">Brak przypomnienia</option>
+                    <option value="5">5 minut przed</option>
+                    <option value="15">15 minut przed</option>
+                    <option value="30">30 minut przed</option>
+                    <option value="60">1 godzina przed</option>
+                    <option value="1440">1 dzień przed</option>
+                </select>
+            </div>
+
+            <!-- Przyciski akcji -->
+            <div class="form-actions">
+                <button type="button" onclick="window.history.back()">Anuluj</button>
+                <button type="submit">Zapisz</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Automatyczne przypisanie koloru na podstawie typu wydarzenia
+        const eventColors = {
+            'mecz-ligowy': '#0078d7',
+            'trening': '#28a745',
+            'fizjoterapeuta': '#ffc107',
+            'mecz-sparingowy': '#dc3545',
+            'turniej': '#6f42c1',
+            'oboz': '#17a2b8',
+            'bus': '#17a2b8' // Dodano brakujący przecinek i ikonę dla 'bus'
+        };
+
+        // Wczytaj edytowane wydarzenie (jeśli istnieje)
+        const editEventId = localStorage.getItem('editEventId');
+        let editEvent = null;
+
+        if (editEventId) {
+            const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
+            editEvent = savedEvents.find(event => event.id === parseInt(editEventId));
+        }
+
+        // Wypełnij formularz danymi edytowanego wydarzenia
+        if (editEvent) {
+            document.getElementById('event-name').value = editEvent.name;
+            document.getElementById('event-date').value = editEvent.date.split('T')[0]; // Tylko data
+            document.getElementById('event-time').value = editEvent.date.split('T')[1].substring(0, 5); // Tylko godzina
+            document.getElementById('event-location').value = editEvent.location;
+            document.getElementById('event-repeat').checked = editEvent.repeat;
+            document.getElementById('event-notes').value = editEvent.notes;
+            document.getElementById('event-reminder').value = editEvent.reminder;
+            document.getElementById('event-type').value = editEvent.type;
+        }
+
+        // Ustaw domyślną datę z localStorage (jeśli istnieje)
+        const selectedDate = localStorage.getItem('selectedDate');
+        if (selectedDate) {
+            document.getElementById('event-date').value = selectedDate;
+            setDefaultTime(); // Ustaw domyślną godzinę
+        }
+
+        // Funkcja do ustawienia domyślnej godziny na 10:30
+        function setDefaultTime() {
+            const eventTime = document.getElementById('event-time');
+            if (!eventTime.value) {
+                eventTime.value = '10:30'; // Domyślna godzina
+            }
+        }
+
+        // Obsługa formularza
+        document.getElementById('event-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Pobierz wartości z formularza
+            const eventName = document.getElementById('event-name').value.trim();
+            const eventDate = document.getElementById('event-date').value;
+            const eventTime = document.getElementById('event-time').value;
+            const eventLocation = document.getElementById('event-location').value;
+            const eventRepeat = document.getElementById('event-repeat').checked;
+            const eventNotes = document.getElementById('event-notes').value.trim();
+            const eventReminder = document.getElementById('event-reminder').value;
+            const eventType = document.getElementById('event-type').value;
+
+            // Walidacja danych
+            if (!eventName) {
+                alert("Proszę podać nazwę wydarzenia.");
+                return;
+            }
+            if (!eventDate) {
+                alert("Proszę wybrać datę wydarzenia.");
+                return;
+            }
+            if (!eventTime) {
+                alert("Proszę wybrać godzinę wydarzenia.");
+                return;
+            }
+            if (!eventLocation) {
+                alert("Proszę wybrać lokalizację wydarzenia.");
+                return;
+            }
+
+            // Utwórz obiekt wydarzenia
+            const event = {
+                id: editEvent ? editEvent.id : Date.now(), // Użyj istniejącego ID lub utwórz nowe
+                name: eventName,
+                date: eventDate + 'T' + eventTime, // Połącz datę i godzinę
+                location: eventLocation,
+                repeat: eventRepeat,
+                notes: eventNotes,
+                reminder: eventReminder,
+                type: eventType,
+                color: eventColors[eventType] // Automatyczny kolor
+            };
+
+            // Zapisz wydarzenie w localStorage
+            const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
+            if (editEvent) {
+                // Edytuj istniejące wydarzenie
+                const eventIndex = savedEvents.findIndex(e => e.id === editEvent.id);
+                if (eventIndex !== -1) {
+                    savedEvents[eventIndex] = event;
+                }
+            } else {
+                // Dodaj nowe wydarzenie
+                savedEvents.push(event);
+
+                // Jeśli opcja "Powtarzaj co tydzień" jest zaznaczona, dodaj wydarzenia dla kolejnych tygodni
+                if (eventRepeat) {
+                    const repeatWeeks = 8; // Liczba tygodni, przez które wydarzenie ma się powtarzać
+                    for (let i = 1; i <= repeatWeeks; i++) {
+                        const newEventDate = new Date(event.date);
+                        newEventDate.setDate(newEventDate.getDate() + 7 * i); // Dodaj 7 dni dla każdego kolejnego tygodnia
+
+                        const repeatedEvent = {
+                            ...event,
+                            id: Date.now() + i, // Unikalne ID dla każdego powtórzenia
+                            date: newEventDate.toISOString().split('T')[0] + 'T' + eventTime // Zachowaj tę samą godzinę
+                        };
+
+                        savedEvents.push(repeatedEvent);
+                    }
+                }
+            }
+
+            localStorage.setItem('savedEvents', JSON.stringify(savedEvents));
+
+            // Wyczyść edytowane wydarzenie
+            localStorage.removeItem('editEventId');
+
+            // Przekieruj z powrotem do kalendarza
+            window.location.href = 'main.html';
+        });
+
+        // Funkcja do obsługi zmiany typu wydarzenia
+        function handleEventTypeChange() {
+            const eventType = document.getElementById('event-type').value;
+            const teamSelector = document.getElementById('team-selector');
+            const eventNameInput = document.getElementById('event-name');
+
+            if (eventType === 'mecz-ligowy' || eventType === 'mecz-sparingowy') {
+                teamSelector.style.display = 'block';
+                eventNameInput.style.display = 'none';
+                updateEventName(); // Automatycznie ustaw nazwę wydarzenia na podstawie wybranego zespołu
+            } else {
+                teamSelector.style.display = 'none';
+                eventNameInput.style.display = 'block';
+            }
+        }
+
+        // Funkcja do aktualizacji nazwy wydarzenia na podstawie wybranego zespołu
+        function updateEventName() {
+            const teamSelector = document.getElementById('team-selector');
+            const eventNameInput = document.getElementById('event-name');
+            eventNameInput.value = teamSelector.value;
+        }
+
+        // Inicjalizacja formularza
+        handleEventTypeChange();
+        setDefaultTime(); // Ustaw domyślną godzinę po załadowaniu strony
+    </script>
+</body>
+</html>
