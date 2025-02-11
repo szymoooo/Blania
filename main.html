@@ -488,6 +488,21 @@
     let currentPage = 1; // Aktualna strona paginacji
     const recordsPerPage = 5; // Liczba meczów na stronę
 
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "fetchData") {
+        fetch("https://api.example.com/data")
+            .then(response => response.json())
+            .then(data => {
+                sendResponse({ data: data }); // Wysyłamy odpowiedź
+            })
+            .catch(error => {
+                sendResponse({ error: error.message }); // Wysyłamy odpowiedź w przypadku błędu
+            });
+        return true; // Zwracamy true, ponieważ odpowiedź będzie asynchroniczna
+    }
+    return false; // Zwracamy false, jeśli nie zamierzamy wysłać odpowiedzi
+});
+
     // Funkcja do obsługi logowania przez Google
         function handleCredentialResponse(response) {
             const user = decodeJwt(response.credential);
