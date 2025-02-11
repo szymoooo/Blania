@@ -24,49 +24,99 @@
             text-align: center;
             margin: 10px 0;
         }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 700px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 0 20px;
+        }
+        .stats-section {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .stats-section h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
         th, td {
             padding: 8px;
             text-align: center;
             border: 1px solid #ddd;
-            font-size: 14px;
         }
         th {
             background-color: #f2f2f2;
         }
-        .buttons {
+        .counter {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .buttons button {
-            width: 35px;
-            height: 35px;
-            margin: 0 5px;
+        .counter button {
+            width: 30px;
+            height: 30px;
             font-size: 16px;
             background-color: #0078d7;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin: 0 5px;
         }
-        .buttons button:hover {
+        .counter button:hover {
             background-color: #005bb5;
         }
-        .buttons input[type="text"] {
+        .counter input {
             width: 50px;
-            padding: 8px;
+            padding: 5px;
             font-size: 14px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #f9f9f9;
             text-align: center;
         }
-        .form-container button {
+        .total-and-stream {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .total-points {
+            display: flex;
+            align-items: center;
+        }
+        .total-points label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .stream-link {
+            display: flex;
+            align-items: center;
+        }
+        .stream-link label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .stream-link input {
+            width: 200px;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .save-btn {
             display: block;
             margin: 10px auto;
             padding: 12px 20px;
@@ -78,19 +128,8 @@
             cursor: pointer;
             width: 50%;
         }
-        .form-container button:hover {
+        .save-btn:hover {
             background-color: #005bb5;
-        }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 500px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 20px;
         }
         .footer {
             margin-top: 20px;
@@ -98,96 +137,257 @@
             font-size: 14px;
             color: #888;
         }
+        #other-stats-table th:nth-child(1), #other-stats-table td:nth-child(1) { width: 25%; }
+        #other-stats-table th:nth-child(2), #other-stats-table td:nth-child(2) { width: 25%; }
+        #other-stats-table th:nth-child(3), #other-stats-table td:nth-child(3) { width: 25%; }
+        #other-stats-table th:nth-child(4), #other-stats-table td:nth-child(4) { width: 25%; }
     </style>
 </head>
 <body>
     <header>Statystyki meczu - <span id="team-name"></span></header>
     <div class="form-container">
-        <form id="match-stats-form">
+        <div class="stats-section">
+            <h3>Statystyki rzutowe</h3>
             <table>
-                <tr><th>Statystyka</th><th>Wartość</th></tr>
-                <tr><td>2-punkty:</td><td><div class="buttons"><button type="button" onclick="changeStat('2pkt', -1)">-</button><input type="text" id="2pkt" value="0" readonly><button type="button" onclick="changeStat('2pkt', 1)">+</button></div></td></tr>
-                <tr><td>3-punkty:</td><td><div class="buttons"><button type="button" onclick="changeStat('3pkt', -1)">-</button><input type="text" id="3pkt" value="0" readonly><button type="button" onclick="changeStat('3pkt', 1)">+</button></div></td></tr>
-                <tr><td>1-punkty:</td><td><div class="buttons"><button type="button" onclick="changeStat('1pkt', -1)">-</button><input type="text" id="1pkt" value="0" readonly><button type="button" onclick="changeStat('1pkt', 1)">+</button></div></td></tr>
-                <tr><td>Asysty:</td><td><div class="buttons"><button type="button" onclick="changeStat('Asy', -1)">-</button><input type="text" id="Asy" value="0" readonly><button type="button" onclick="changeStat('Asy', 1)">+</button></div></td></tr>
-                <tr><td>Bloki:</td><td><div class="buttons"><button type="button" onclick="changeStat('Blok', -1)">-</button><input type="text" id="Blok" value="0" readonly><button type="button" onclick="changeStat('Blok', 1)">+</button></div></td></tr>
-                <tr><td>Zbiórki:</td><td><div class="buttons"><button type="button" onclick="changeStat('Zb', -1)">-</button><input type="text" id="Zb" value="0" readonly><button type="button" onclick="changeStat('Zb', 1)">+</button></div></td></tr>
-                <tr><td>Przechwyty:</td><td><div class="buttons"><button type="button" onclick="changeStat('Prze', -1)">-</button><input type="text" id="Prze" value="0" readonly><button type="button" onclick="changeStat('Prze', 1)">+</button></div></td></tr>
-                <tr class="total-points"><td><strong>Łącznie punkty:</strong></td><td><input type="text" id="totalPoints" value="0" readonly></td></tr>
+                <tr>
+                    <th></th>
+                    <th>Celny</th>
+                    <th>Niecelny</th>
+                    <th>Skuteczność</th>
+                </tr>
+                <tr>
+                    <td><strong>2-pkt:</strong></td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('2pkt-celne', -1)">-</button>
+                            <input type="text" id="2pkt-celne" value="0" readonly>
+                            <button onclick="changeStat('2pkt-celne', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('2pkt-niecelne', -1)">-</button>
+                            <input type="text" id="2pkt-niecelne" value="0" readonly>
+                            <button onclick="changeStat('2pkt-niecelne', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <span id="2pkt-skutecznosc">0%</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>3-pkt:</strong></td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('3pkt-celne', -1)">-</button>
+                            <input type="text" id="3pkt-celne" value="0" readonly>
+                            <button onclick="changeStat('3pkt-celne', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('3pkt-niecelne', -1)">-</button>
+                            <input type="text" id="3pkt-niecelne" value="0" readonly>
+                            <button onclick="changeStat('3pkt-niecelne', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <span id="3pkt-skutecznosc">0%</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>1-pkt:</strong></td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('1pkt-celne', -1)">-</button>
+                            <input type="text" id="1pkt-celne" value="0" readonly>
+                            <button onclick="changeStat('1pkt-celne', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('1pkt-niecelne', -1)">-</button>
+                            <input type="text" id="1pkt-niecelne" value="0" readonly>
+                            <button onclick="changeStat('1pkt-niecelne', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <span id="1pkt-skutecznosc">0%</span>
+                    </td>
+                </tr>
             </table>
-            <button type="button" onclick="saveMatch()">Zapisz</button>
-        </form>
+        </div>
+
+        <div class="stats-section">
+            <h3>Statystyki pozostałe</h3>
+            <table id="other-stats-table">
+                <tr>
+                    <th>Asysty</th>
+                    <th>Bloki</th>
+                    <th>Zbiórki</th>
+                    <th>Przechwyty</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('Asy', -1)">-</button>
+                            <input type="text" id="Asy" value="0" readonly>
+                            <button onclick="changeStat('Asy', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('Blok', -1)">-</button>
+                            <input type="text" id="Blok" value="0" readonly>
+                            <button onclick="changeStat('Blok', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('Zb', -1)">-</button>
+                            <input type="text" id="Zb" value="0" readonly>
+                            <button onclick="changeStat('Zb', 1)">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="counter">
+                            <button onclick="changeStat('Prze', -1)">-</button>
+                            <input type="text" id="Prze" value="0" readonly>
+                            <button onclick="changeStat('Prze', 1)">+</button>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="total-and-stream">
+            <div class="total-points">
+                <label>Suma pkt:</label>
+                <div class="counter">
+                    <input type="text" id="totalPoints" value="0" readonly>
+                </div>
+            </div>
+            <div class="stream-link">
+                <label>Transmisja:</label>
+                <input type="text" id="streamLink" placeholder="Wklej link do transmisji">
+            </div>
+        </div>
+
+        <button class="save-btn" onclick="saveMatch()">Zapisz</button>
     </div>
     <div class="footer"><p>© 2024 Blanka. Wszystkie prawa zastrzeżone.</p></div>
-    <script>
+
+<script>
         function changeStat(stat, delta) {
             const statElement = document.getElementById(stat);
             let currentValue = parseInt(statElement.value) || 0;
             statElement.value = Math.max(0, currentValue + delta);
-            updateTotal();
+
+            if (stat.includes('-celne') || stat.includes('-niecelne')) {
+                updateEffectiveness(stat.split('-')[0]);
+            }
+
+            updateTotalPoints();
         }
 
-        function updateTotal() {
-            const total = ["1pkt", "2pkt", "3pkt"].reduce((sum, id) => sum + (parseInt(document.getElementById(id).value) || 0) * (id === "2pkt" ? 2 : id === "3pkt" ? 3 : 1), 0);
-            document.getElementById('totalPoints').value = total;
+        function updateEffectiveness(type) {
+            const celne = parseInt(document.getElementById(`${type}-celne`).value) || 0;
+            const niecelne = parseInt(document.getElementById(`${type}-niecelne`).value) || 0;
+            const total = celne + niecelne;
+
+            let effectiveness = 0;
+            if (total > 0) {
+                effectiveness = Math.round((celne / total) * 100);
+            }
+
+            document.getElementById(`${type}-skutecznosc`).textContent = `${effectiveness}%`;
+        }
+
+        function updateTotalPoints() {
+            const pkt2 = parseInt(document.getElementById("2pkt-celne").value) || 0;
+            const pkt3 = parseInt(document.getElementById("3pkt-celne").value) || 0;
+            const pkt1 = parseInt(document.getElementById("1pkt-celne").value) || 0;
+
+            const totalPoints = (pkt2 * 2) + (pkt3 * 3) + (pkt1 * 1);
+            document.getElementById("totalPoints").value = totalPoints;
         }
 
         function saveMatch() {
-    const matchIndex = localStorage.getItem("editMatchIndex");
-    const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
+            const matchId = localStorage.getItem("editMatchId");
+            let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
 
-    const newMatch = { 
-        "team": document.getElementById("team-name").textContent, 
-        "date": localStorage.getItem("selectedDate") || "Brak daty",
-        "2pkt": document.getElementById("2pkt").value, 
-        "3pkt": document.getElementById("3pkt").value, 
-        "1pkt": document.getElementById("1pkt").value, 
-        "Asy": document.getElementById("Asy").value, 
-        "Blok": document.getElementById("Blok").value, 
-        "Zb": document.getElementById("Zb").value, 
-        "Prze": document.getElementById("Prze").value, 
-        "total": document.getElementById("totalPoints").value 
-    };
+            const newMatch = { 
+                id: matchId || Date.now(),
+                team: document.getElementById("team-name").textContent, 
+                date: localStorage.getItem("selectedDate") || "Brak daty",
+                "2pkt-celne": document.getElementById("2pkt-celne").value, 
+                "2pkt-niecelne": document.getElementById("2pkt-niecelne").value, 
+                "3pkt-celne": document.getElementById("3pkt-celne").value, 
+                "3pkt-niecelne": document.getElementById("3pkt-niecelne").value, 
+                "1pkt-celne": document.getElementById("1pkt-celne").value, 
+                "1pkt-niecelne": document.getElementById("1pkt-niecelne").value, 
+                Asy: document.getElementById("Asy").value, 
+                Blok: document.getElementById("Blok").value, 
+                Zb: document.getElementById("Zb").value, 
+                Prze: document.getElementById("Prze").value, 
+                total: document.getElementById("totalPoints").value, 
+                streamLink: document.getElementById("streamLink").value.trim()
+            };
 
-    if (matchIndex !== null && savedMatches[matchIndex]) {
-        savedMatches[matchIndex] = newMatch; // Nadpisujemy istniejący mecz
-    } else {
-        savedMatches.push(newMatch); // Dodajemy nowy mecz
-    }
+            if (matchId) {
+                const matchIndex = savedMatches.findIndex(m => m.id === Number(matchId)); // Konwersja na liczbę
+                if (matchIndex !== -1) {
+                    savedMatches[matchIndex] = newMatch;
+                }
+            } else {
+                savedMatches.push(newMatch);
+            }
 
-    localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
-    localStorage.removeItem("editMatchIndex");
-    window.location.href = "main.html";
-}
+            localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
+            localStorage.removeItem("editMatchId");
+            localStorage.removeItem("selectedTeam");
+            localStorage.removeItem("selectedDate");
 
+            window.location.href = "main.html";
+        }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const matchIndex = localStorage.getItem("editMatchIndex");
-    const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-    const team = localStorage.getItem("selectedTeam") || "Nieznany zespół";
-    document.getElementById("team-name").textContent = team;
+        document.addEventListener("DOMContentLoaded", function() {
+            const matchId = localStorage.getItem("editMatchId");
+            let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
+            const team = localStorage.getItem("selectedTeam") || "Nieznany zespół";
 
-    if (matchIndex !== null && savedMatches[matchIndex]) {
-        // Tryb edycji – wypełnij pola danymi z localStorage
-        const match = savedMatches[matchIndex];
-        Object.keys(match).forEach(key => {
-            if (document.getElementById(key)) {
-                document.getElementById(key).value = match[key];
+            console.log("Wczytano z localStorage:", { // Debugowanie
+                matchId: matchId,
+                selectedTeam: team,
+                savedMatches: savedMatches
+            });
+
+            document.getElementById("team-name").textContent = team;
+
+            if (matchId !== null) {
+                const match = savedMatches.find(m => m.id === Number(matchId)); // Konwersja na liczbę
+
+                console.log("Wczytany rekord do edycji:", match); // Debugowanie
+                console.log("Wszystkie rekordy:", savedMatches); // Debugowanie
+
+                if (match) {
+                    Object.keys(match).forEach(key => {
+                        if (document.getElementById(key)) {
+                            document.getElementById(key).value = match[key];
+                        }
+                    });
+
+                    updateEffectiveness("2pkt");
+                    updateEffectiveness("3pkt");
+                    updateEffectiveness("1pkt");
+                    updateTotalPoints();
+                } else {
+                    console.log("Nie znaleziono rekordu o podanym ID."); // Debugowanie
+                }
+            } else {
+                console.log("Tryb nowego meczu – brak rekordu do edycji."); // Debugowanie
             }
         });
-
-        // PRZELICZ "Łącznie punkty" od razu po wczytaniu danych
-        updateTotal();
-    } else {
-        // Tryb nowego meczu – ustaw domyślnie 0
-        ["2pkt", "3pkt", "1pkt", "Asy", "Blok", "Zb", "Prze", "totalPoints"].forEach(id => {
-            document.getElementById(id).value = "0";
-        });
-    }
-});
-
-
-
     </script>
 </body>
 </html>
