@@ -6,6 +6,23 @@
     <title>Mecze Blanki</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
+        /* Style dla kontenera logowania Google */
+            .google-login-container {
+                position: absolute; /* Pozycjonowanie absolutne */
+                top: 20px; /* Odstęp od góry */
+                right: 20px; /* Odstęp od prawej krawędzi */
+                z-index: 1000; /* Upewnij się, że przycisk jest na wierzchu */
+            }
+            
+            /* Dostosowanie stylów przycisku logowania Google */
+            .g_id_signin {
+                margin: 0; /* Usuń domyślne marginesy */
+            }
+            
+            /* Dostosowanie nagłówka, aby nie nachodził na przycisk logowania */
+            header {
+                margin-top: 60px; /* Dodaj margines, aby nagłówek nie nachodził na przycisk */
+            }
         /* 1. Ogólne style dla strony */
         body {
             font-family: 'Roboto', sans-serif;
@@ -359,6 +376,21 @@
     
 </head>
 <body>
+    <!-- Przycisk logowania Google w prawym górnym rogu -->
+    <div class="google-login-container">
+        <div id="g_id_onload"
+             data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
+        </div>
+    </div>
     <header>
         <h2>Mój planner:</h2>
     </header>
