@@ -492,9 +492,9 @@
         </div>
         <!-- Przyciski nawigacyjne -->
         <div class="navigation-buttons">
-            <button class="primary-btn" onclick="moveCalendar(-1)">Poprzednia</button>
-            <button class="primary-btn add-event" onclick="addEvent()">+ Dodaj wydarzenie</button>
-            <button class="primary-btn" onclick="moveCalendar(1)">Następna</button>
+            <button class="btn-prev-calendar" onclick="moveCalendar(-1)">Poprzednia</button>
+            <button class="btn-add-event" onclick="addEvent()">+ Dodaj wydarzenie</button>
+            <button class="btn-next-calendar" onclick="moveCalendar(1)">Następna</button>
         </div>
     </div>
 
@@ -523,8 +523,8 @@
                     <option value="UKS ŻAK Nowy Sącz">UKS ŻAK Nowy Sącz</option>
                     <option value="Young Angels Košice">Young Angels Košice</option>
                 </select>
-                <input type="date" id="game-date">
-                <button class="primary-btn" onclick="startGame()">Gramy</button>
+                <input type="date" id="game-date" class="date-input">
+                <button class="btn-start-game" onclick="startGame()">Gramy</button>
             </div>
         </div>
 
@@ -535,10 +535,10 @@
             </div>
             <!-- Przyciski nawigacyjne -->
             <div class="notes-navigation" id="notes-navigation">
-                <button class="primary-btn" onclick="prevNote()">Poprzednia</button>
-                <button class="primary-btn" onclick="editNote()">Edytuj</button>
-                <button class="primary-btn" onclick="openNotesForm()">Dodaj</button>
-                <button class="primary-btn" onclick="nextNote()">Następna</button>
+                <button class="btn-prev-note" onclick="prevNote()">Poprzednia</button>
+                <button class="btn-edit-note" onclick="editNote()">Edytuj</button>
+                <button class="btn-add-note" onclick="openNotesForm()">Dodaj</button>
+                <button class="btn-next-note" onclick="nextNote()">Następna</button>
             </div>
         </div>
     </div>
@@ -566,13 +566,10 @@
 
         <!-- Paginacja -->
         <div id="pagination" style="margin-top: 10px;">
-            <button id="prev-btn" class="primary-btn" onclick="changePage(-1)" disabled>Poprzednia</button>
-            <button id="next-btn" class="primary-btn" onclick="changePage(1)" disabled>Następna</button>
+            <button id="prev-btn" class="btn-prev-stats" onclick="changePage(-1)" disabled>Poprzednia</button>
+            <button id="next-btn" class="btn-next-stats" onclick="changePage(1)" disabled>Następna</button>
         </div>
     </div>
-
-
-    <!-- Reszta Twojej strony -->
 <script>
     // Słownik z logo drużyn
     const logos = {
