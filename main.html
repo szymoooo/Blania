@@ -6,371 +6,461 @@
     <title>Mecze Blanki</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        /* Style dla kontenera logowania Google */
-            .google-login-container {
-                position: absolute; /* Pozycjonowanie absolutne */
-                top: 20px; /* Odstęp od góry */
-                right: 20px; /* Odstęp od prawej krawędzi */
-                z-index: 1000; /* Upewnij się, że przycisk jest na wierzchu */
-            }
-            
-            /* Dostosowanie stylów przycisku logowania Google */
-            .g_id_signin {
-                margin: 0; /* Usuń domyślne marginesy */
-            }
-            
-            /* Dostosowanie nagłówka, aby nie nachodził na przycisk logowania */
-            header {
-                margin-top: 60px; /* Dodaj margines, aby nagłówek nie nachodził na przycisk */
-            }
-        /* 1. Ogólne style dla strony */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #ffffff;
-            color: #333;
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-            display: flex;
+    /* Style dla kontenera logowania Google */
+    .google-login-container {
+        position: absolute; /* Pozycjonowanie absolutne */
+        top: 20px; /* Odstęp od góry */
+        right: 20px; /* Odstęp od prawej krawędzi */
+        z-index: 1000; /* Upewnij się, że przycisk jest na wierzchu */
+    }
+
+    /* Dostosowanie stylów przycisku logowania Google */
+    .g_id_signin {
+        margin: 0; /* Usuń domyślne marginesy */
+    }
+
+    /* Dostosowanie nagłówka, aby nie nachodził na przycisk logowania */
+    header {
+        margin-top: 60px; /* Dodaj margines, aby nagłówek nie nachodził na przycisk */
+    }
+
+    /* 1. Ogólne style dla strony */
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #ffffff;
+        color: #333;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    /* 2. Nagłówek */
+    header {
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        margin: 10px 0;
+        color: #333;
+    }
+
+    /* 3. Kalendarz */
+    .calendar-container {
+        width: 1200px; /* Stała szerokość */
+        margin: 20px auto;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border: 2px solid #0078d7; /* Obramowanie */
+        position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
+        padding-bottom: 80px; /* Dodajemy większy margines dolny */
+    }
+
+    .calendar-week {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .calendar-day {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        min-height: 150px; /* Minimalna wysokość */
+        max-height: 200px; /* Maksymalna wysokość */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; /* Wydarzenia od góry */
+        min-width: 120px;
+        overflow-y: auto; /* Scrollowanie w pionie */
+    }
+
+    .calendar-day h3 {
+        white-space: nowrap; /* Zapobiega zawijaniu tekstu */
+        font-size: 14px; /* Dostosuj rozmiar czcionki */
+        margin: 0; /* Usuwa domyślny margines */
+    }
+
+    .calendar-day.past {
+        background-color: #f8f9fa;
+        opacity: 0.7;
+    }
+
+    .calendar-day.current {
+        background-color: #e3f2fd;
+        border: 2px solid #2196f3;
+    }
+
+    .event-item {
+        display: flex;
+        align-items: center; /* Wyśrodkowanie ikony w pionie */
+        gap: 8px;
+        padding: 6px;
+        margin: 4px 0;
+        background-color: #fff;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 80px; /* Stała wysokość na 4 linie */
+        cursor: pointer; /* Klikalny event */
+    }
+
+    .event-icon {
+        width: 32px;
+        height: 32px;
+        background-color: #eee;
+        border-radius: 4px;
+        flex-shrink: 0;
+        background-size: cover; /* Dopasowanie ikony */
+    }
+
+    .event-text {
+        flex-grow: 1;
+        text-align: left;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Wyśrodkowanie tekstu w pionie */
+        line-height: 1.2; /* Zmniejszenie odstępów między liniami */
+    }
+
+    .event-text strong {
+        white-space: nowrap; /* Zapobiega zawijaniu tytułu */
+        overflow: hidden; /* Ukrywa nadmiarowy tekst */
+        text-overflow: ellipsis; /* Dodaje "..." jeśli tekst jest za długi */
+        max-width: 200px; /* Maksymalna szerokość tytułu */
+        margin-bottom: 2px; /* Mniejszy odstęp między liniami */
+    }
+
+    .event-text small {
+        font-size: 12px; /* Mniejszy rozmiar czcionki dla adresu */
+        margin-top: 2px; /* Mniejszy odstęp między liniami */
+    }
+
+    /* Style dla przycisków nawigacyjnych kalendarza */
+    .navigation-buttons {
+        position: absolute; /* Pozycjonowanie absolutne */
+        bottom: 20px; /* 20px od dolnej krawędzi kontenera */
+        left: 50%; /* Wyśrodkowanie w poziomie */
+        transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
+        display: flex;
+        gap: 10px; /* Odstęp między przyciskami */
+    }
+
+    /* Przycisk "Poprzednia" */
+    .btn-prev-calendar {
+        background-color: #0078d7;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "+ Dodaj wydarzenie" */
+    .btn-add-event {
+        background-color: #28a745;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Następna" */
+    .btn-next-calendar {
+        background-color: #0078d7;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* 4. Wybór zespołu i notatki */
+    .team-and-notes-container {
+        display: flex;
+        gap: 20px;
+        width: 1200px;
+        margin: 20px auto;
+        position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
+    }
+
+    .team-selection-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+        width: 600px;
+        height: 320px;
+        border: 2px solid #0078d7;
+        border-radius: 8px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        position: relative; /* Umożliwia pozycjonowanie przycisku "Gramy" */
+    }
+
+    /* Logo po lewej stronie */
+    .team-logo-container {
+        flex-shrink: 0;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .team-logo {
+        width: 300px;
+        height: 300px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Formularz po prawej */
+    .team-info-container {
+        display: flex;
+        flex-direction: column; /* Ustawiamy przyciski w kolumnie */
+        align-items: flex-start;
+        gap: 10px; /* Odstęp między elementami */
+        position: relative; /* Umożliwia pozycjonowanie przycisku "Gramy" */
+        padding-bottom: 80px; /* Dodajemy miejsce na przycisk "Gramy" */
+    }
+
+    /* Styl dla SELECT i INPUT (data) */
+    .team-selector, .date-input {
+        width: 200px;
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        appearance: none; /* Usuwa domyślne strzałki w select/input[type="date"] */
+        -webkit-appearance: none; /* Safari */
+        -moz-appearance: none; /* Firefox */
+        margin-bottom: 10px; /* Dodajemy margines dolny */
+    }
+
+    /* Efekt hover i focus dla obu pól */
+    .team-selector:hover, .date-input:hover,
+    .team-selector:focus, .date-input:focus {
+        border-color: #0078d7;
+        outline: none;
+    }
+
+    /* Przycisk "Gramy" */
+    .btn-start-game {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Pole na notatki */
+    .scouting-notes {
+        width: 600px; /* Stała szerokość */
+        height: 330px; /* Stała wysokość */
+        overflow-y: auto; /* Przewijanie pionowe, jeśli zawartość jest zbyt długa */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border: 2px solid #0078d7; /* Obramowanie */
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
+    }
+
+    .notes-display {
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        max-height: 200px; /* Ograniczenie wysokości notatki */
+        overflow-y: auto; /* Przewijanie pionowe, jeśli tekst jest zbyt długi */
+    }
+
+    .notes-display p {
+        margin: 5px 0;
+        text-align: left; /* Tekst wyrównany do lewej */
+        word-wrap: break-word; /* Zawijanie długich słów */
+        white-space: pre-wrap; /* Zachowuje formatowanie tekstu (np. nowe linie) */
+        font-size: 14px; /* Standardowy rozmiar czcionki */
+    }
+
+    /* Wyśrodkowanie przycisków nawigacji dla notatek */
+    .notes-navigation {
+        position: absolute; /* Pozycjonowanie absolutne */
+        bottom: 10px; /* 10px od dolnej krawędzi kontenera */
+        left: 50%; /* Wyśrodkowanie w poziomie */
+        transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
+        display: flex;
+        gap: 10px; /* Odstęp między przyciskami */
+    }
+
+    /* Przycisk "Poprzednia notatka" */
+    .btn-prev-note {
+        background-color: #0078d7;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Dodaj" */
+    .btn-add-note {
+        background-color: #28a745;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Edytuj" */
+    .btn-edit-note {
+        background-color: #ffc107;
+        color: black;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Następna notatka" */
+    .btn-next-note {
+        background-color: #0078d7;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* 5. Statystyki */
+    .stats-container {
+        width: 1200px; /* Stała szerokość */
+        margin: 20px auto;
+        border: 2px solid #0078d7; /* Obramowanie */
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+
+    #matches-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #matches-table th, #matches-table td {
+        padding: 8px;
+        font-size: 14px;
+        text-align: center;
+        border: 1px solid #ddd;
+        white-space: nowrap;
+    }
+
+    #matches-table th {
+        background-color: #f2f2f2;
+    }
+
+    /* Przycisk "Edytuj staty" */
+    .btn-edit-stats {
+        background-color: #ffc107;
+        color: black;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Usuń staty" */
+    .btn-delete-stats {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "YouTube" */
+    .btn-youtube {
+        background-color: #ff0000;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Poprzednia statystyka" */
+    .btn-prev-stats {
+        background-color: #0078d7;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Przycisk "Następna statystyka" */
+    .btn-next-stats {
+        background-color: #0078d7;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Efekty hover i focus dla przycisków */
+    .btn-prev-calendar:hover, .btn-prev-calendar:focus,
+    .btn-add-event:hover, .btn-add-event:focus,
+    .btn-next-calendar:hover, .btn-next-calendar:focus,
+    .btn-start-game:hover, .btn-start-game:focus,
+    .btn-prev-note:hover, .btn-prev-note:focus,
+    .btn-add-note:hover, .btn-add-note:focus,
+    .btn-edit-note:hover, .btn-edit-note:focus,
+    .btn-next-note:hover, .btn-next-note:focus,
+    .btn-edit-stats:hover, .btn-edit-stats:focus,
+    .btn-delete-stats:hover, .btn-delete-stats:focus,
+    .btn-youtube:hover, .btn-youtube:focus,
+    .btn-prev-stats:hover, .btn-prev-stats:focus,
+    .btn-next-stats:hover, .btn-next-stats:focus {
+        opacity: 0.9;
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+    }
+
+    /* 6. Responsywność */
+    @media screen and (max-width: 768px) {
+        .team-and-notes-container {
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .primary-btn {
-            background-color: #0078d7;
-            color: white;
-            padding: 8px 16px;
-            font-size: 14px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .primary-btn:hover {
-            background-color: #005bb5;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        /* 2. Nagłówek */
-        header {
-            font-size: 28px;
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0;
-            color: #333;
-        }
-
-        /* 3. Kalendarz */
-        .calendar-container {
-            width: 1200px; /* Stała szerokość */
-            margin: 20px auto;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            border: 2px solid #0078d7; /* Obramowanie */
-            position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
-            padding-bottom: 80px; /* Dodajemy większy margines dolny */
         }
 
         .calendar-week {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .calendar-day {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #fff;
-            min-height: 150px; /* Minimalna wysokość */
-            max-height: 200px; /* Maksymalna wysokość */
-            display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* Wydarzenia od góry */
-            min-width: 120px;
-            overflow-y: auto; /* Scrollowanie w pionie */
         }
 
-        .calendar-day h3 {
-            white-space: nowrap; /* Zapobiega zawijaniu tekstu */
-            font-size: 14px; /* Dostosuj rozmiar czcionki */
-            margin: 0; /* Usuwa domyślny margines */
-        }
-
-        .calendar-day.past {
-            background-color: #f8f9fa;
-            opacity: 0.7;
-        }
-
-        .calendar-day.current {
-            background-color: #e3f2fd;
-            border: 2px solid #2196f3;
-        }
-
-        .event-item {
-            display: flex;
-            align-items: center; /* Wyśrodkowanie ikony w pionie */
-            gap: 8px;
-            padding: 6px;
-            margin: 4px 0;
-            background-color: #fff;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            height: 80px; /* Stała wysokość na 4 linie */
-            cursor: pointer; /* Klikalny event */
-        }
-
-        .event-icon {
-            width: 32px;
-            height: 32px;
-            background-color: #eee;
-            border-radius: 4px;
-            flex-shrink: 0;
-            background-size: cover; /* Dopasowanie ikony */
-        }
-
-        .event-text {
-            flex-grow: 1;
-            text-align: left;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Wyśrodkowanie tekstu w pionie */
-            line-height: 1.2; /* Zmniejszenie odstępów między liniami */
-        }
-
-        .event-text strong {
-            white-space: nowrap; /* Zapobiega zawijaniu tytułu */
-            overflow: hidden; /* Ukrywa nadmiarowy tekst */
-            text-overflow: ellipsis; /* Dodaje "..." jeśli tekst jest za długi */
-            max-width: 200px; /* Maksymalna szerokość tytułu */
-            margin-bottom: 2px; /* Mniejszy odstęp między liniami */
-        }
-
-        .event-text small {
-            font-size: 12px; /* Mniejszy rozmiar czcionki dla adresu */
-            margin-top: 2px; /* Mniejszy odstęp między liniami */
-        }
-
-        /* Style dla przycisków nawigacyjnych kalendarza */
         .navigation-buttons {
-            position: absolute; /* Pozycjonowanie absolutne */
-            bottom: 20px; /* 20px od dolnej krawędzi kontenera */
-            left: 50%; /* Wyśrodkowanie w poziomie */
-            transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
-            display: flex;
-            gap: 10px; /* Odstęp między przyciskami */
+            flex-direction: column; /* Przyciski w kolumnie na małych ekranach */
+            gap: 5px; /* Mniejszy odstęp */
         }
 
-        /* 4. Wybór zespołu i notatki */
-        .team-and-notes-container {
-            display: flex;
-            gap: 20px;
-            width: 1200px;
-            margin: 20px auto;
-            position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
-        }
-
-        .team-selection-container {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 20px;
-            width: 600px;
-            height: 320px;
-            border: 2px solid #0078d7;
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            position: relative; /* Umożliwia pozycjonowanie przycisku "Gramy" */
-        }
-
-        /* Logo po lewej stronie */
-        .team-logo-container {
-            flex-shrink: 0;
-            display: flex;
-            justify-content: left;
-            align-items: center;
-        }
-
-        .team-logo {
-            width: 300px;
-            height: 300px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Formularz po prawej */
-        .team-info-container {
-            display: flex;
-            flex-direction: column; /* Ustawiamy przyciski w kolumnie */
-            align-items: flex-start;
-            gap: 10px; /* Odstęp między elementami */
-            position: relative; /* Umożliwia pozycjonowanie przycisku "Gramy" */
-            padding-bottom: 80px; /* Dodajemy miejsce na przycisk "Gramy" */
-        }
-
-        /* Styl dla SELECT i INPUT (data) */
-        .team-selector, .date-input {
-            width: 200px;
-            padding: 8px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            appearance: none; /* Usuwa domyślne strzałki w select/input[type="date"] */
-            -webkit-appearance: none; /* Safari */
-            -moz-appearance: none; /* Firefox */
-            margin-bottom: 10px; /* Dodajemy margines dolny */
-        }
-
-        /* Efekt hover i focus dla obu pól */
-        .team-selector:hover, .date-input:hover,
-        .team-selector:focus, .date-input:focus {
-            border-color: #0078d7;
-            outline: none;
-        }
-
-        /* Styl przycisku "Gramy" */
-        .team-info-container .primary-btn {
-            position: absolute; /* Pozycjonowanie absolutne */
-            bottom: 10px; /* 10px od dolnej krawędzi kontenera */
-            left: 50%; /* Wyśrodkowanie w poziomie */
-            transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
-            margin-top: 10px; /* Górny margines 10px */
-        }
-
-        .scouting-notes {
-            width: 600px; /* Stała szerokość */
-            height: 330px; /* Stała wysokość */
-            overflow-y: auto; /* Przewijanie pionowe, jeśli zawartość jest zbyt długa */
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border: 2px solid #0078d7; /* Obramowanie */
-            border-radius: 8px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
-        }
-
-        .notes-display {
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            max-height: 200px; /* Ograniczenie wysokości notatki */
-            overflow-y: auto; /* Przewijanie pionowe, jeśli tekst jest zbyt długi */
-        }
-
-        .notes-display p {
-            margin: 5px 0;
-            text-align: left; /* Tekst wyrównany do lewej */
-            word-wrap: break-word; /* Zawijanie długich słów */
-            white-space: pre-wrap; /* Zachowuje formatowanie tekstu (np. nowe linie) */
-            font-size: 14px; /* Standardowy rozmiar czcionki */
-        }
-
-        /* Wyśrodkowanie przycisków nawigacji dla notatek */
         .notes-navigation {
-            position: absolute; /* Pozycjonowanie absolutne */
-            bottom: 10px; /* 10px od dolnej krawędzi kontenera */
-            left: 50%; /* Wyśrodkowanie w poziomie */
-            transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
-            display: flex;
-            gap: 10px; /* Odstęp między przyciskami */
+            flex-direction: column; /* Przyciski w kolumnie na małych ekranach */
+            gap: 5px; /* Mniejszy odstęp */
         }
-
-        /* Wyśrodkowanie przycisków nawigacji dla statystyk */
-        #pagination {
-            display: flex;
-            justify-content: center; /* Wyśrodkowanie w poziomie */
-            align-items: center; /* Wyśrodkowanie w pionie */
-            gap: 10px; /* Odstęp między przyciskami */
-            margin-top: 10px;
-            position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
-        }
-
-        .notes-navigation button {
-            background-color: #0078d7;
-            color: white;
-            padding: 8px 16px;
-            font-size: 14px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .notes-navigation button:hover {
-            background-color: #005bb5;
-        }
-
-        .notes-navigation button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* 5. Statystyki */
-        .stats-container {
-            width: 1200px; /* Stała szerokość */
-            margin: 20px auto;
-            border: 2px solid #0078d7; /* Obramowanie */
-            border-radius: 8px;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-
-        #matches-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        #matches-table th, #matches-table td {
-            padding: 8px;
-            font-size: 14px;
-            text-align: center;
-            border: 1px solid #ddd;
-            white-space: nowrap;
-        }
-
-        #matches-table th {
-            background-color: #f2f2f2;
-        }
-
-        /* 6. Responsywność */
-        @media screen and (max-width: 768px) {
-            .team-and-notes-container {
-                flex-direction: column;
-            }
-
-            .calendar-week {
-                flex-direction: column;
-            }
-
-            .navigation-buttons {
-                flex-direction: column; /* Przyciski w kolumnie na małych ekranach */
-                gap: 5px; /* Mniejszy odstęp */
-            }
-
-            .notes-navigation {
-                flex-direction: column; /* Przyciski w kolumnie na małych ekranach */
-                gap: 5px; /* Mniejszy odstęp */
-            }
-        }
-    </style>
+    }
+</style>
     <!-- Skrypt Google Identity Services do logowania -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
