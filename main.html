@@ -587,30 +587,40 @@
         
         return true;
     }
-
-    // Autoryzacja do Google Calendar API
-    async function authorize() {
-        return new Promise((resolve) => {
-            const client = google.accounts.oauth2.initTokenClient({
-                client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-                scope: 'https://www.googleapis.com/auth/calendar.events',
-                callback: (response) => {
-                    if (response.access_token) {
-                        localStorage.setItem('googleAccessToken', response.access_token);
-                        console.log("Token dostępu:", response.access_token);
-                        resolve(true);
-                    } else {
-                        resolve(false);
-                    }
-                },
-                error: (error) => {
-                    console.error("Błąd autoryzacji:", error);
-                    resolve(false);
-                }
-            });
-            client.requestAccessToken();
-        });
+    async function handleGoogleError(error) {
+    console.error("Błąd Google API:", error);
+    
+    if (error.error === 'access_denied') {
+        alert('Aplikacja jest w trakcie weryfikacji przez Google. Tylko zatwierdzeni testerzy mogą obecnie korzystać z tej funkcji. Skontaktuj się z administratorem.');
+    } else {
+        alert('Wystąpił błąd podczas komunikacji z Google. Spróbuj ponownie później.');
     }
+    
+    // Możesz też wyświetlić przycisk do zgłoszenia problemu
+    const reportBtn = document.createElement('button');
+    reportBtn.textContent = 'Zgłoś problem';
+    reportBtn.onclick = () => window.open('mailto:szymonbaj@gmail.com?subject=Problem z aplikacją');
+    document.body.appendChild(reportBtn);
+}
+   // Przykład użycia w funkcji authorize()
+async function authorize() {
+    try {
+        const client = google.accounts.oauth2.initTokenClient({
+            client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
+            scope: 'https://www.googleapis.com/auth/calendar.events',
+            callback: (response) => {
+                if (response.access_token) {
+                    localStorage.setItem('googleAccessToken', response.access_token);
+                } else if (response.error) {
+                    handleGoogleError(response);
+                }
+            },
+        });
+        client.requestAccessToken();
+    } catch (error) {
+        handleGoogleError(error);
+    }
+}
 
     // Dodawanie wydarzenia do Google Calendar
     async function addEventToGoogleCalendar(event) {
