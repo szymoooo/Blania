@@ -641,20 +641,6 @@
             });
         }
 
-        // Reszta funkcjonalności aplikacji
-        document.getElementById('logout-btn').addEventListener('click', logout);
-        document.getElementById('team-selector').addEventListener('change', changeLogo);
-        document.getElementById('btn-prev-calendar').addEventListener('click', () => moveCalendar(-1));
-        document.getElementById('btn-next-calendar').addEventListener('click', () => moveCalendar(1));
-        document.getElementById('btn-add-event').addEventListener('click', addEvent);
-        document.getElementById('btn-start-game').addEventListener('click', startGame);
-        document.getElementById('btn-prev-note').addEventListener('click', prevNote);
-        document.getElementById('btn-next-note').addEventListener('click', nextNote);
-        document.getElementById('btn-add-note').addEventListener('click', openNotesForm);
-        document.getElementById('btn-edit-note').addEventListener('click', editNote);
-        document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
-        document.getElementById('next-btn').addEventListener('click', () => changePage(1));
-
         function changeLogo() {
             const teamSelector = document.getElementById('team-selector');
             const logo = document.getElementById('team-logo');
@@ -996,6 +982,20 @@
             generateCalendar();
             loadSavedMatches();
             loadNotes();
+
+            // Poprawione nasłuchiwanie zdarzeń
+            document.getElementById('logout-btn').addEventListener('click', logout);
+            document.getElementById('team-selector').addEventListener('change', changeLogo);
+            document.querySelector('.btn-prev-calendar').addEventListener('click', () => moveCalendar(-1));
+            document.querySelector('.btn-next-calendar').addEventListener('click', () => moveCalendar(1));
+            document.querySelector('.btn-add-event').addEventListener('click', addEvent);
+            document.querySelector('.btn-start-game').addEventListener('click', startGame);
+            document.querySelector('.btn-prev-note').addEventListener('click', prevNote);
+            document.querySelector('.btn-next-note').addEventListener('click', nextNote);
+            document.querySelector('.btn-add-note').addEventListener('click', openNotesForm);
+            document.querySelector('.btn-edit-note').addEventListener('click', editNote);
+            document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
+            document.getElementById('next-btn').addEventListener('click', () => changePage(1));
         });
     </script>
 </body>
