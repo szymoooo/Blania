@@ -1,3 +1,4 @@
+// Stałe i zmienne globalne
 const logos = {
     'BAT Sierakowice': 'BAT Sierakowice.png',
     'BAT Kartuzy': 'BAT Kartuzy.png',
@@ -19,46 +20,43 @@ let currentNoteIndex = 0;
 let currentPage = 1;
 const recordsPerPage = 5;
 
-function decodeJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64));
-}
-
-function checkLoginStatus() {
-    const user = JSON.parse(localStorage.getItem('googleUser'));
-    if (!user) return false;
-    
-    const tokenExpiration = user.exp * 1000;
-    if (Date.now() > tokenExpiration) {
-        localStorage.removeItem('googleUser');
-        localStorage.removeItem('googleAccessToken');
-        return false;
-    }
-    return true;
-}
-
-window.handleCredentialResponse = function(response) {
+// Bezpieczne funkcje pomocnicze
+function safeJsonParse(jsonString) {
     try {
-        if (response.error) {
-            handleAuthError(response.error);
-            return;
-        }
-        
-        const user = decodeJwt(response.credential);
-        console.log("Zalogowany użytkownik:", user);
-        
-        localStorage.setItem('googleUser', JSON.stringify(user));
-        updateUserUI(user);
-        
-        authorize().catch(error => {
-            console.error("Błąd autoryzacji:", error);
-            handleAuthError(error);
-        });
-    } catch (error) {
-        console.error("Błąd przetwarzania odpowiedzi:", error);
-        handleAuthError('unknown_error');
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.error('Błąd parsowania JSON:', e);
+        return null;
     }
+}
+
+function decodeJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return safeJsonParse(atob(base64));
+    } catch (e) {
+        console.error('Błąd dekodowania JWT:', e);
+        return null;
+    }
+}
+
+// Logika logowania Google
+window.handleCredentialResponse = function(response) {
+    if (response.error) {
+        handleAuthError(response.error);
+        return;
+    }
+    
+    const user = decodeJwt(response.credential);
+    if (!user) {
+        handleAuthError('invalid_token');
+        return;
+    }
+    
+    localStorage.setItem('googleUser', JSON.stringify(user));
+    updateUserUI(user);
+    authorize().catch(handleAuthError);
 };
 
 function updateUserUI(user) {
@@ -70,21 +68,29 @@ function updateUserUI(user) {
         userName.textContent = user.name || user.email;
         userInfo.style.display = 'block';
         loginButton.style.display = 'none';
+        
+        if (window.google?.accounts?.id) {
+            google.accounts.id.renderButton(
+                loginButton,
+                { theme: "outline", size: "large", width: "0" }
+            );
+        }
     } else {
         userInfo.style.display = 'none';
         loginButton.style.display = 'block';
+        
+        if (window.google?.accounts?.id) {
+            google.accounts.id.renderButton(
+                loginButton,
+                { theme: "outline", size: "large" }
+            );
+        }
     }
 }
 
 function handleAuthError(error) {
     console.error('Błąd autoryzacji:', error);
-    let message = 'Wystąpił błąd podczas logowania.';
-    
-    if (error === 'access_denied') {
-        message = 'Aby korzystać z tej funkcji, musisz być zatwierdzonym testerem. Skontaktuj się z administratorem aplikacji.';
-    }
-    
-    alert(message);
+    alert('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
 }
 
 function logout() {
@@ -95,7 +101,7 @@ function logout() {
 
 async function authorize() {
     return new Promise((resolve, reject) => {
-        if (!window.google || !google.accounts.oauth2) {
+        if (!window.google?.accounts?.oauth2) {
             reject(new Error("Google API nie zostało załadowane"));
             return;
         }
@@ -109,9 +115,7 @@ async function authorize() {
                     localStorage.setItem('googleAccessToken', response.access_token);
                     resolve(response.access_token);
                 } else {
-                    const error = response.error || 'unknown_error';
-                    handleAuthError(error);
-                    reject(error);
+                    reject(response.error || 'unknown_error');
                 }
             },
         });
@@ -119,6 +123,7 @@ async function authorize() {
     });
 }
 
+// Logika aplikacji
 function changeLogo() {
     const teamSelector = document.getElementById('team-selector');
     const logo = document.getElementById('team-logo');
@@ -211,12 +216,9 @@ function editNote() {
     }
 }
 
+// Kalendarz i wydarzenia
 function moveCalendar(days) {
-    if (days === 1) {
-        currentWeekStart.setDate(currentWeekStart.getDate() + 5);
-    } else if (days === -1) {
-        currentWeekStart.setDate(currentWeekStart.getDate() - 5);
-    }
+    currentWeekStart.setDate(currentWeekStart.getDate() + (days * 5));
     generateCalendar();
 }
 
@@ -244,8 +246,11 @@ function generateCalendar() {
         eventsList.className = 'events-container';
         dayElement.appendChild(eventsList);
 
-        const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
-        const hasEvents = savedEvents.some(event => new Date(event.date).toISOString().split('T')[0] === day.toISOString().split('T')[0]);
+        const savedEvents = safeJsonParse(localStorage.getItem('savedEvents')) || [];
+        const hasEvents = savedEvents.some(event => {
+            const eventDate = new Date(event.date).toISOString().split('T')[0];
+            return eventDate === day.toISOString().split('T')[0];
+        });
 
         if (!hasEvents) {
             const noEventsText = document.createElement('p');
@@ -260,7 +265,7 @@ function generateCalendar() {
 }
 
 function loadEvents() {
-    const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
+    const savedEvents = safeJsonParse(localStorage.getItem('savedEvents')) || [];
     const eventIcons = {
         'mecz-ligowy': 'match.png',
         'trening': 'training.png',
@@ -304,7 +309,7 @@ function loadEvents() {
 }
 
 function editEvent(eventId) {
-    const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
+    const savedEvents = safeJsonParse(localStorage.getItem('savedEvents')) || [];
     const eventToEdit = savedEvents.find(event => event.id === eventId);
 
     if (eventToEdit) {
@@ -316,9 +321,10 @@ function editEvent(eventId) {
     }
 }
 
+// Statystyki i mecze
 function loadSavedMatches() {
     const tableBody = document.querySelector("#matches-table tbody");
-    let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
+    let savedMatches = safeJsonParse(localStorage.getItem("savedMatches")) || [];
 
     savedMatches.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -441,11 +447,24 @@ async function addEventToGoogleCalendar(event) {
     }
 }
 
-// Inicjalizacja strony
-window.addEventListener('DOMContentLoaded', () => {
+// Inicjalizacja aplikacji
+function checkLoginStatus() {
+    const user = safeJsonParse(localStorage.getItem('googleUser'));
+    if (!user) return false;
+    
+    const tokenExpiration = user.exp * 1000;
+    if (Date.now() > tokenExpiration) {
+        localStorage.removeItem('googleUser');
+        localStorage.removeItem('googleAccessToken');
+        return false;
+    }
+    return true;
+}
+
+function initializeApp() {
     setTodayDate();
 
-    const user = JSON.parse(localStorage.getItem('googleUser'));
+    const user = safeJsonParse(localStorage.getItem('googleUser'));
     updateUserUI(user);
 
     const savedTeam = localStorage.getItem('currentTeam');
@@ -461,7 +480,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadSavedMatches();
     loadNotes();
 
-    // Nasłuchiwanie zdarzeń
+    // Event listeners
     document.getElementById('logout-btn').addEventListener('click', logout);
     document.getElementById('team-selector').addEventListener('change', changeLogo);
     document.querySelector('.btn-prev-calendar').addEventListener('click', () => moveCalendar(-1));
@@ -474,4 +493,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.btn-edit-note').addEventListener('click', editNote);
     document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
     document.getElementById('next-btn').addEventListener('click', () => changePage(1));
-});
+}
+
+// Start aplikacji po załadowaniu DOM
+document.addEventListener('DOMContentLoaded', initializeApp);
