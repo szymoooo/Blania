@@ -8,23 +8,35 @@
     <style>
     /* Style dla kontenera logowania Google */
     .google-login-container {
-        position: absolute; /* Pozycjonowanie absolutne */
-        top: 20px; /* Odstęp od góry */
-        right: 20px; /* Odstęp od prawej krawędzi */
-        z-index: 1000; /* Upewnij się, że przycisk jest na wierzchu */
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    /* Dostosowanie stylów przycisku logowania Google */
-    .g_id_signin {
-        margin: 0; /* Usuń domyślne marginesy */
+    #user-info {
+        position: absolute;
+        top: 20px;
+        right: 120px;
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    /* Dostosowanie nagłówka, aby nie nachodził na przycisk logowania */
-    header {
-        margin-top: 60px; /* Dodaj margines, aby nagłówek nie nachodził na przycisk */
+    #logout-btn {
+        background-color: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
     }
 
-    /* 1. Ogólne style dla strony */
+    /* Reszta styli pozostaje bez zmian */
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #ffffff;
@@ -38,26 +50,25 @@
         min-height: 100vh;
     }
 
-    /* 2. Nagłówek */
     header {
         font-size: 28px;
         font-weight: bold;
         text-align: center;
         margin: 10px 0;
         color: #333;
+        margin-top: 60px;
     }
 
-    /* 3. Kalendarz */
     .calendar-container {
-        width: 1200px; /* Stała szerokość */
+        width: 1200px;
         margin: 20px auto;
         background-color: #f9f9f9;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         padding: 20px;
-        border: 2px solid #0078d7; /* Obramowanie */
-        position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
-        padding-bottom: 80px; /* Dodajemy większy margines dolny */
+        border: 2px solid #0078d7;
+        position: relative;
+        padding-bottom: 80px;
     }
 
     .calendar-week {
@@ -73,19 +84,19 @@
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: #fff;
-        min-height: 150px; /* Minimalna wysokość */
-        max-height: 200px; /* Maksymalna wysokość */
+        min-height: 150px;
+        max-height: 200px;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start; /* Wydarzenia od góry */
+        justify-content: flex-start;
         min-width: 120px;
-        overflow-y: auto; /* Scrollowanie w pionie */
+        overflow-y: auto;
     }
 
     .calendar-day h3 {
-        white-space: nowrap; /* Zapobiega zawijaniu tekstu */
-        font-size: 14px; /* Dostosuj rozmiar czcionki */
-        margin: 0; /* Usuwa domyślny margines */
+        white-space: nowrap;
+        font-size: 14px;
+        margin: 0;
     }
 
     .calendar-day.past {
@@ -100,15 +111,15 @@
 
     .event-item {
         display: flex;
-        align-items: center; /* Wyśrodkowanie ikony w pionie */
+        align-items: center;
         gap: 8px;
         padding: 6px;
         margin: 4px 0;
         background-color: #fff;
         border-radius: 4px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        height: 80px; /* Stała wysokość na 4 linie */
-        cursor: pointer; /* Klikalny event */
+        height: 80px;
+        cursor: pointer;
     }
 
     .event-icon {
@@ -117,7 +128,7 @@
         background-color: #eee;
         border-radius: 4px;
         flex-shrink: 0;
-        background-size: cover; /* Dopasowanie ikony */
+        background-size: cover;
     }
 
     .event-text {
@@ -126,35 +137,33 @@
         font-size: 14px;
         display: flex;
         flex-direction: column;
-        justify-content: center; /* Wyśrodkowanie tekstu w pionie */
-        line-height: 1.2; /* Zmniejszenie odstępów między liniami */
+        justify-content: center;
+        line-height: 1.2;
     }
 
     .event-text strong {
-        white-space: nowrap; /* Zapobiega zawijaniu tytułu */
-        overflow: hidden; /* Ukrywa nadmiarowy tekst */
-        text-overflow: ellipsis; /* Dodaje "..." jeśli tekst jest za długi */
-        max-width: 200px; /* Maksymalna szerokość tytułu */
-        margin-bottom: 2px; /* Mniejszy odstęp między liniami */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        margin-bottom: 2px;
     }
 
     .event-text small {
-        font-size: 12px; /* Mniejszy rozmiar czcionki dla adresu */
-        margin-top: 2px; /* Mniejszy odstęp między liniami */
+        font-size: 12px;
+        margin-top: 2px;
     }
 
-    /* Style dla przycisków nawigacyjnych kalendarza */
     .navigation-buttons {
-        position: absolute; /* Pozycjonowanie absolutne */
-        bottom: 20px; /* 20px od dolnej krawędzi kontenera */
-        left: 50%; /* Wyśrodkowanie w poziomie */
-        transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
-        gap: 50px; /* Odstęp między przyciskami */
+        gap: 50px;
     }
 
-    /* Przycisk "Poprzednia" */
-    .btn-prev-calendar {
+    .btn-prev-calendar, .btn-next-calendar {
         background-color: #0078d7;
         color: white;
         padding: 8px 16px;
@@ -163,7 +172,6 @@
         cursor: pointer;
     }
 
-    /* Przycisk "+ Dodaj wydarzenie" */
     .btn-add-event {
         background-color: #28a745;
         color: white;
@@ -173,9 +181,8 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Następna" */
-    .btn-next-calendar {
-        background-color: #0078d7;
+    .btn-start-game {
+        background-color: #dc3545;
         color: white;
         padding: 8px 16px;
         border-radius: 5px;
@@ -183,13 +190,13 @@
         cursor: pointer;
     }
 
-    /* 4. Wybór zespołu i notatki */
+    /* Reszta styli pozostaje bez zmian */
     .team-and-notes-container {
         display: flex;
         gap: 20px;
         width: 1200px;
         margin: 20px auto;
-        position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
+        position: relative;
     }
 
     .team-selection-container {
@@ -203,10 +210,9 @@
         border-radius: 8px;
         padding: 15px;
         background-color: #f8f9fa;
-        position: relative; /* Umożliwia pozycjonowanie przycisku "Gramy" */
+        position: relative;
     }
 
-    /* Logo po lewej stronie */
     .team-logo-container {
         flex-shrink: 0;
         display: flex;
@@ -221,17 +227,15 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    /* Formularz po prawej */
     .team-info-container {
         display: flex;
-        flex-direction: column; /* Ustawiamy przyciski w kolumnie */
+        flex-direction: column;
         align-items: flex-start;
-        gap: 10px; /* Odstęp między elementami */
-        position: relative; /* Umożliwia pozycjonowanie przycisku "Gramy" */
-        padding-bottom: 80px; /* Dodajemy miejsce na przycisk "Gramy" */
+        gap: 10px;
+        position: relative;
+        padding-bottom: 80px;
     }
 
-    /* Styl dla SELECT i INPUT (data) */
     .team-selector, .date-input {
         width: 200px;
         padding: 8px;
@@ -239,42 +243,24 @@
         border: 1px solid #ddd;
         border-radius: 5px;
         background-color: #f9f9f9;
-        appearance: none; /* Usuwa domyślne strzałki w select/input[type="date"] */
-        -webkit-appearance: none; /* Safari */
-        -moz-appearance: none; /* Firefox */
-        margin-bottom: 10px; /* Dodajemy margines dolny */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        margin-bottom: 10px;
     }
 
-    /* Efekt hover i focus dla obu pól */
-    .team-selector:hover, .date-input:hover,
-    .team-selector:focus, .date-input:focus {
-        border-color: #0078d7;
-        outline: none;
-    }
-
-    /* Przycisk "Gramy" */
-    .btn-start-game {
-        background-color: #dc3545;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-    }
-
-    /* Pole na notatki */
     .scouting-notes {
-        width: 600px; /* Stała szerokość */
-        height: 330px; /* Stała wysokość */
-        overflow-y: auto; /* Przewijanie pionowe, jeśli zawartość jest zbyt długa */
+        width: 600px;
+        height: 330px;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 10px;
-        border: 2px solid #0078d7; /* Obramowanie */
+        border: 2px solid #0078d7;
         border-radius: 8px;
         padding: 10px;
         background-color: #f8f9fa;
-        position: relative; /* Umożliwia pozycjonowanie przycisków nawigacyjnych */
+        position: relative;
     }
 
     .notes-display {
@@ -282,30 +268,28 @@
         background-color: #fff;
         border-radius: 4px;
         margin-bottom: 10px;
-        max-height: 200px; /* Ograniczenie wysokości notatki */
-        overflow-y: auto; /* Przewijanie pionowe, jeśli tekst jest zbyt długi */
+        max-height: 200px;
+        overflow-y: auto;
     }
 
     .notes-display p {
         margin: 5px 0;
-        text-align: left; /* Tekst wyrównany do lewej */
-        word-wrap: break-word; /* Zawijanie długich słów */
-        white-space: pre-wrap; /* Zachowuje formatowanie tekstu (np. nowe linie) */
-        font-size: 14px; /* Standardowy rozmiar czcionki */
+        text-align: left;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        font-size: 14px;
     }
 
-    /* Wyśrodkowanie przycisków nawigacji dla notatek */
     .notes-navigation {
-        position: absolute; /* Pozycjonowanie absolutne */
-        bottom: 10px; /* 10px od dolnej krawędzi kontenera */
-        left: 50%; /* Wyśrodkowanie w poziomie */
-        transform: translateX(-50%); /* Wyśrodkowanie w poziomie */
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
-        gap: 10px; /* Odstęp między przyciskami */
+        gap: 10px;
     }
 
-    /* Przycisk "Poprzednia notatka" */
-    .btn-prev-note {
+    .btn-prev-note, .btn-next-note {
         background-color: #0078d7;
         color: white;
         padding: 8px 16px;
@@ -314,7 +298,6 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Dodaj" */
     .btn-add-note {
         background-color: #28a745;
         color: white;
@@ -324,7 +307,6 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Edytuj" */
     .btn-edit-note {
         background-color: #ffc107;
         color: black;
@@ -334,21 +316,10 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Następna notatka" */
-    .btn-next-note {
-        background-color: #0078d7;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-    }
-
-    /* 5. Statystyki */
     .stats-container {
-        width: 1200px; /* Stała szerokość */
+        width: 1200px;
         margin: 20px auto;
-        border: 2px solid #0078d7; /* Obramowanie */
+        border: 2px solid #0078d7;
         border-radius: 8px;
         padding: 20px;
         background-color: #f9f9f9;
@@ -371,7 +342,6 @@
         background-color: #f2f2f2;
     }
 
-    /* Przycisk "Edytuj staty" */
     .btn-edit-stats {
         background-color: #ffc107;
         color: black;
@@ -381,7 +351,6 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Usuń staty" */
     .btn-delete-stats {
         background-color: #dc3545;
         color: white;
@@ -391,7 +360,6 @@
         cursor: pointer;
     }
 
-    /* Przycisk "YouTube" */
     .btn-youtube {
         background-color: #ff0000;
         color: white;
@@ -401,8 +369,7 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Poprzednia statystyka" */
-    .btn-prev-stats {
+    .btn-prev-stats, .btn-next-stats {
         background-color: #0078d7;
         color: white;
         padding: 8px 16px;
@@ -411,17 +378,6 @@
         cursor: pointer;
     }
 
-    /* Przycisk "Następna statystyka" */
-    .btn-next-stats {
-        background-color: #0078d7;
-        color: white;
-        padding: 8px 16px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-    }
-
-    /* Efekty hover i focus dla przycisków */
     .btn-prev-calendar:hover, .btn-prev-calendar:focus,
     .btn-add-event:hover, .btn-add-event:focus,
     .btn-next-calendar:hover, .btn-next-calendar:focus,
@@ -440,7 +396,6 @@
         transition: all 0.3s ease;
     }
 
-    /* 6. Responsywność */
     @media screen and (max-width: 768px) {
         .team-and-notes-container {
             flex-direction: column;
@@ -450,24 +405,21 @@
             flex-direction: column;
         }
 
-        .navigation-buttons {
-            flex-direction: column; /* Przyciski w kolumnie na małych ekranach */
-            gap: 5px; /* Mniejszy odstęp */
-        }
-
-        .notes-navigation {
-            flex-direction: column; /* Przyciski w kolumnie na małych ekranach */
-            gap: 5px; /* Mniejszy odstęp */
+        .navigation-buttons, .notes-navigation {
+            flex-direction: column;
+            gap: 5px;
         }
     }
 </style>
-    <!-- Skrypt Google Identity Services do logowania -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
 </head>
 <body>
-    <!-- Przycisk logowania Google w prawym górnym rogu -->
+    <!-- Sekcja logowania Google i informacji o użytkowniku -->
     <div class="google-login-container">
+        <div id="user-info" style="display:none;">
+            Zalogowany jako: <span id="user-name"></span>
+            <button id="logout-btn" onclick="logout()">Wyloguj</button>
+        </div>
         <div id="g_id_onload"
              data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
              data-callback="handleCredentialResponse">
@@ -481,6 +433,7 @@
              data-logo_alignment="left">
         </div>
     </div>
+
     <header>
         <h2>Mój planner:</h2>
     </header>
@@ -490,7 +443,6 @@
         <div class="calendar-week">
             <!-- Dni tygodnia będą generowane dynamicznie -->
         </div>
-        <!-- Przyciski nawigacyjne -->
         <div class="navigation-buttons">
             <button class="btn-prev-calendar" onclick="moveCalendar(-1)">Poprzednia</button>
             <button class="btn-add-event" onclick="addEvent()">+ Dodaj wydarzenie</button>
@@ -533,7 +485,6 @@
             <div class="notes-display" id="notes-display">
                 <p>Tutaj dodaj swoje spostrzeżenia na temat przeciwnika. Kliknij "Dodaj".</p>
             </div>
-            <!-- Przyciski nawigacyjne -->
             <div class="notes-navigation" id="notes-navigation">
                 <button class="btn-prev-note" onclick="prevNote()">Poprzednia</button>
                 <button class="btn-edit-note" onclick="editNote()">Edytuj</button>
@@ -547,7 +498,6 @@
         <h2>Moje statystyki:</h2>
     </header>
     <div class="stats-container">
-        <!-- Tabela meczów -->
         <table id="matches-table">
             <thead>
                 <tr>
@@ -564,12 +514,12 @@
             <tbody></tbody>
         </table>
 
-        <!-- Paginacja -->
         <div id="pagination" style="margin-top: 10px;">
             <button id="prev-btn" class="btn-prev-stats" onclick="changePage(-1)" disabled>Poprzednia</button>
             <button id="next-btn" class="btn-next-stats" onclick="changePage(1)" disabled>Następna</button>
         </div>
     </div>
+
 <script>
     // Słownik z logo drużyn
     const logos = {
@@ -587,72 +537,129 @@
     };
 
     // Zmienne globalne
-    let currentWeekStart = new Date(); // Początek bieżącego tygodnia
-    let notes = JSON.parse(localStorage.getItem('notes')) || {}; // Notatki
-    let currentTeam = 'BAT Sierakowice'; // Domyślnie wybrany zespół
-    let currentNoteIndex = 0; // Indeks aktualnej notatki
-    let currentPage = 1; // Aktualna strona paginacji
-    const recordsPerPage = 5; // Liczba meczów na stronę
+    let currentWeekStart = new Date();
+    let notes = JSON.parse(localStorage.getItem('notes')) || {};
+    let currentTeam = 'BAT Sierakowice';
+    let currentNoteIndex = 0;
+    let currentPage = 1;
+    const recordsPerPage = 5;
 
-    // Funkcja do obsługi logowania przez Google
-        function handleCredentialResponse(response) {
-            const user = decodeJwt(response.credential);
-            console.log("Zalogowany użytkownik:", user);
-            localStorage.setItem('googleUser', JSON.stringify(user));
-        }
-
-        // Funkcja do dekodowania tokena JWT
-        function decodeJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(atob(base64));
-        }
-
-    
-    // Funkcja do autoryzacji i uzyskania tokena dostępu do Google Calendar
-    async function authorize() {
-        const client = google.accounts.oauth2.initTokenClient({
-            client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/calendar.events',
-            callback: (response) => {
-                if (response.access_token) {
-                    localStorage.setItem('googleAccessToken', response.access_token);
-                    console.log("Token dostępu:", response.access_token);
-                }
-            },
-        });
-        client.requestAccessToken();
+    // Funkcje do obsługi logowania Google
+    function handleCredentialResponse(response) {
+        const user = decodeJwt(response.credential);
+        console.log("Zalogowany użytkownik:", user);
+        localStorage.setItem('googleUser', JSON.stringify(user));
+        
+        // Aktualizuj UI
+        document.getElementById('user-info').style.display = 'block';
+        document.getElementById('user-name').textContent = user.name;
+        document.getElementById('logout-btn').style.display = 'inline-block';
+        
+        // Automatyczna autoryzacja do Google Calendar
+        authorize();
     }
 
-    // Funkcja do dodawania wydarzenia do Google Calendar
-    async function addEventToGoogleCalendar(event) {
-        const accessToken = localStorage.getItem('googleAccessToken');
-        if (!accessToken) {
-            alert("Najpierw zaloguj się przez Google.");
-            return;
+    function decodeJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(base64));
+    }
+
+    function logout() {
+        localStorage.removeItem('googleUser');
+        localStorage.removeItem('googleAccessToken');
+        document.getElementById('user-info').style.display = 'none';
+        window.location.reload();
+    }
+
+    function checkLoginStatus() {
+        const user = JSON.parse(localStorage.getItem('googleUser'));
+        if (!user) {
+            return false;
         }
+        
+        const tokenExpiration = user.exp * 1000;
+        if (Date.now() > tokenExpiration) {
+            localStorage.removeItem('googleUser');
+            localStorage.removeItem('googleAccessToken');
+            return false;
+        }
+        
+        return true;
+    }
 
-        const eventDetails = {
-            summary: event.name,
-            location: event.location,
-            description: event.notes,
-            start: {
-                dateTime: event.date, // Format: "2025-02-11T10:30:00"
-                timeZone: 'Europe/Warsaw',
-            },
-            end: {
-                dateTime: new Date(new Date(event.date).getTime() + 60 * 60 * 1000).toISOString(), // 1 godzina później
-                timeZone: 'Europe/Warsaw',
-            },
-            reminders: {
-                useDefault: false,
-                overrides: [
-                    { method: 'popup', minutes: event.reminder },
-                ],
-            },
-        };
+    // Autoryzacja do Google Calendar API
+    async function authorize() {
+        return new Promise((resolve) => {
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
+                scope: 'https://www.googleapis.com/auth/calendar.events',
+                callback: (response) => {
+                    if (response.access_token) {
+                        localStorage.setItem('googleAccessToken', response.access_token);
+                        console.log("Token dostępu:", response.access_token);
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                },
+                error: (error) => {
+                    console.error("Błąd autoryzacji:", error);
+                    resolve(false);
+                }
+            });
+            client.requestAccessToken();
+        });
+    }
 
+    // Dodawanie wydarzenia do Google Calendar
+    async function addEventToGoogleCalendar(event) {
         try {
+            if (!checkLoginStatus()) {
+                alert("Proszę zalogować się przez Google");
+                return null;
+            }
+
+            let accessToken = localStorage.getItem('googleAccessToken');
+            if (!accessToken) {
+                const authorized = await authorize();
+                if (!authorized) {
+                    throw new Error("Autoryzacja nie powiodła się");
+                }
+                accessToken = localStorage.getItem('googleAccessToken');
+            }
+
+            if (!event.date || !event.name) {
+                throw new Error("Wydarzenie musi mieć datę i nazwę");
+            }
+
+            const startDate = new Date(event.date);
+            if (isNaN(startDate.getTime())) {
+                throw new Error("Nieprawidłowy format daty");
+            }
+
+            const endDate = new Date(startDate.getTime() + (event.duration || 60) * 60 * 1000);
+
+            const eventDetails = {
+                summary: event.name,
+                location: event.location || '',
+                description: event.notes || '',
+                start: {
+                    dateTime: startDate.toISOString(),
+                    timeZone: 'Europe/Warsaw',
+                },
+                end: {
+                    dateTime: endDate.toISOString(),
+                    timeZone: 'Europe/Warsaw',
+                },
+                reminders: {
+                    useDefault: false,
+                    overrides: [
+                        { method: 'popup', minutes: event.reminder || 30 },
+                    ],
+                },
+            };
+
             const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
                 method: 'POST',
                 headers: {
@@ -662,50 +669,58 @@
                 body: JSON.stringify(eventDetails),
             });
 
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem('googleAccessToken');
+                    return addEventToGoogleCalendar(event);
+                }
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || "Błąd podczas dodawania wydarzenia");
+            }
+
             const data = await response.json();
-            console.log("Wydarzenie dodane do Google Calendar:", data);
-            alert("Wydarzenie zostało dodane do Google Calendar!");
+            console.log("Wydarzenie dodane:", data);
+            return data;
         } catch (error) {
-            console.error("Błąd podczas dodawania wydarzenia:", error);
-            alert("Wystąpił błąd podczas dodawania wydarzenia.");
+            console.error("Błąd:", error);
+            throw error;
         }
     }
 
     // Funkcja do dodawania wydarzenia
     function addEvent() {
+        if (!checkLoginStatus()) {
+            alert("Proszę zalogować się przez Google przed dodaniem wydarzenia");
+            return;
+        }
+        
         const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
         localStorage.setItem("selectedDate", selectedDate);
-        window.location.href = "add-event.html"; // Przekierowanie do strony dodawania wydarzeń
-        console.log("Przekierowanie do strony dodawania wydarzeń."); // Log przekierowania
+        window.location.href = "add-event.html";
     }
 
-    // Funkcja zmieniająca logo drużyny
+    // Reszta funkcji pozostaje bez zmian
     function changeLogo() {
         const teamSelector = document.getElementById('team-selector');
         const logo = document.getElementById('team-logo');
         logo.src = logos[teamSelector.value] || 'BAT Sierakowice.png';
         currentTeam = teamSelector.value;
-        localStorage.setItem('currentTeam', currentTeam); // Zapisuje wybrany zespół
-        loadNotes(); // Ładuje notatki dla nowej drużyny
-        updateNotesNavigation(); // Aktualizuje przyciski nawigacji
-        console.log(`Wybrano zespół: ${currentTeam}`);
+        localStorage.setItem('currentTeam', currentTeam);
+        loadNotes();
+        updateNotesNavigation();
     }
 
-    // Funkcja ustawiająca dzisiejszą datę w polu daty
     function setTodayDate() {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('game-date').value = today;
-        console.log(`Ustawiono dzisiejszą datę: ${today}`); // Log ustawienia daty
     }
 
-    // Funkcja rozpoczynająca mecz
     function startGame() {
         const team = document.getElementById('team-selector').value;
         const date = document.getElementById('game-date').value;
 
         if (!date) {
             alert("Proszę wybrać datę meczu!");
-            console.log("Nie wybrano daty meczu."); // Log braku daty
             return;
         }
 
@@ -713,77 +728,21 @@
         localStorage.setItem("selectedDate", date);
         localStorage.removeItem("editMatchId");
 
-        console.log(`Rozpoczęto mecz z zespołem: ${team}, data: ${date}`); // Log rozpoczęcia meczu
         window.location.href = "blania.html";
     }
 
-    // Funkcja otwierająca formularz notatek
     function openNotesForm() {
-        localStorage.setItem('currentTeam', currentTeam); // Zapisuje aktualnie wybrany zespół
+        localStorage.setItem('currentTeam', currentTeam);
         localStorage.removeItem('currentNoteIndex');
-        console.log(`Otwieranie formularza notatek dla zespołu: ${currentTeam}`);
         window.location.href = 'notes-form.html';
     }
 
-    // Funkcja zamykająca formularz notatek
-    function closeNotesForm() {
-        localStorage.removeItem('noteToEdit');
-        console.log("Zamknięto formularz notatek."); // Log zamknięcia formularza
-        window.location.href = 'main.html';
-    }
-
-    // Funkcja ustawiająca ocenę (gwiazdki)
-    function setRating(rating) {
-        document.querySelectorAll('.rating span').forEach((star, index) => {
-            star.classList.toggle('active', index < rating);
-        });
-        console.log(`Ustawiono ocenę: ${rating} gwiazdek`); // Log ustawienia oceny
-    }
-
-    // Funkcja zapisująca notatkę
-    function saveNote() {
-        const note = {
-            id: Date.now(), // Unikalne ID na podstawie znacznika czasu
-            strengths: document.getElementById('notes-strengths').value,
-            weaknesses: document.getElementById('notes-weaknesses').value,
-            focus: document.getElementById('notes-focus').value,
-            star: document.getElementById('notes-star').value,
-            defender: document.getElementById('notes-defender').value,
-            other: document.getElementById('notes-other').value,
-            rating: document.querySelectorAll('.rating span.active').length
-        };
-
-        const team = localStorage.getItem('currentTeam');
-        let notes = JSON.parse(localStorage.getItem('notes')) || {};
-
-        if (!notes[team]) {
-            notes[team] = []; // Utwórz pustą listę notatek dla nowej drużyny
-        }
-
-        const noteIndex = localStorage.getItem('currentNoteIndex');
-        if (noteIndex !== null) {
-            // Edycja istniejącej notatki
-            notes[team][noteIndex] = note;
-            console.log(`Zaktualizowano notatkę dla zespołu: ${team}`); // Log aktualizacji notatki
-        } else {
-            // Dodanie nowej notatki
-            notes[team].push(note);
-            console.log(`Dodano nową notatkę dla zespołu: ${team}`); // Log dodania notatki
-        }
-
-        localStorage.setItem('notes', JSON.stringify(notes)); // Zapisz notatki
-        localStorage.removeItem('noteToEdit'); // Wyczyść dane edycji
-        window.location.href = 'main.html'; // Powrót do głównej strony
-    }
-
-    // Funkcja ładująca notatki
     function loadNotes() {
         const notesDisplay = document.getElementById('notes-display');
-        const teamNotes = notes[currentTeam] || []; // Pobierz notatki dla aktualnej drużyny
+        const teamNotes = notes[currentTeam] || [];
 
         if (teamNotes.length === 0) {
             notesDisplay.innerHTML = '<p>Tutaj dodaj swoje spostrzeżenia na temat przeciwnika. Kliknij "Dodaj".</p>';
-            console.log(`Brak notatek dla zespołu: ${currentTeam}`); // Log braku notatek
         } else {
             const note = teamNotes[currentNoteIndex];
             notesDisplay.innerHTML = `
@@ -795,60 +754,47 @@
                 <p><strong>Inne:</strong> ${note.other}</p>
                 <p><strong>Ocena:</strong> ${'★'.repeat(note.rating)}</p>
             `;
-            console.log(`Załadowano notatkę dla zespołu: ${currentTeam}, indeks: ${currentNoteIndex}`); // Log załadowania notatki
         }
 
-        updateNotesNavigation(); // Aktualizuj przyciski nawigacji
+        updateNotesNavigation();
     }
 
-    // Funkcja aktualizująca przyciski nawigacji
     function updateNotesNavigation() {
         const teamNotes = notes[currentTeam] || [];
         const notesNavigation = document.getElementById('notes-navigation');
 
-        // Zawsze pokazuj przycisk "Dodaj"
         const addButton = notesNavigation.querySelector('button[onclick="openNotesForm()"]');
-        addButton.style.display = 'inline-block'; // Pokazuje przycisk "Dodaj"
+        addButton.style.display = 'inline-block';
 
-        // Przyciski "Poprzednia", "Edytuj" i "Następna"
         const prevButton = notesNavigation.querySelector('button[onclick="prevNote()"]');
         const editButton = notesNavigation.querySelector('button[onclick="editNote()"]');
         const nextButton = notesNavigation.querySelector('button[onclick="nextNote()"]');
 
         if (teamNotes.length >= 1) {
-            // Pokazuje przyciski, jeśli jest co najmniej jedna notatka
-            prevButton.style.display = teamNotes.length >= 2 ? 'inline-block' : 'none'; // "Poprzednia" tylko dla 2+ notatek
-            editButton.style.display = 'inline-block'; // "Edytuj" widoczny, gdy jest co najmniej jedna notatka
-            nextButton.style.display = teamNotes.length >= 2 ? 'inline-block' : 'none'; // "Następna" tylko dla 2+ notatek
-            console.log("Przyciski nawigacji są widoczne (co najmniej jedna notatka).");
+            prevButton.style.display = teamNotes.length >= 2 ? 'inline-block' : 'none';
+            editButton.style.display = 'inline-block';
+            nextButton.style.display = teamNotes.length >= 2 ? 'inline-block' : 'none';
         } else {
-            // Ukrywa przyciski, jeśli nie ma notatek
             prevButton.style.display = 'none';
             editButton.style.display = 'none';
             nextButton.style.display = 'none';
-            console.log("Przyciski nawigacji są ukryte (brak notatek).");
         }
     }
 
-    // Funkcja przewijająca do poprzedniej notatki
     function prevNote() {
         if (currentNoteIndex > 0) {
             currentNoteIndex--;
             loadNotes();
-            console.log(`Przewinięto do poprzedniej notatki. Aktualny indeks: ${currentNoteIndex}`); // Log przewijania
         }
     }
 
-    // Funkcja przewijająca do następnej notatki
     function nextNote() {
         if (currentNoteIndex < notes[currentTeam].length - 1) {
             currentNoteIndex++;
             loadNotes();
-            console.log(`Przewinięto do następnej notatki. Aktualny indeks: ${currentNoteIndex}`); // Log przewijania
         }
     }
 
-    // Funkcja edytująca notatkę
     function editNote() {
         const teamNotes = notes[currentTeam] || [];
         if (teamNotes.length > 0) {
@@ -856,68 +802,43 @@
             localStorage.setItem('currentTeam', currentTeam);
             localStorage.setItem('currentNoteIndex', currentNoteIndex);
             localStorage.setItem('noteToEdit', JSON.stringify(note));
-            console.log(`Edytowanie notatki dla zespołu: ${currentTeam}, indeks: ${currentNoteIndex}`); // Log edycji
             window.location.href = 'notes-form.html';
         }
     }
 
-    // Funkcja edytująca mecz
-    function editMatch(matchId) {
-        const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-        const matchToEdit = savedMatches.find(match => match.id === matchId);
-
-        if (matchToEdit) {
-            localStorage.setItem("selectedTeam", matchToEdit.team);
-            localStorage.setItem("selectedDate", matchToEdit.date);
-            localStorage.setItem("editMatchId", matchToEdit.id);
-            console.log(`Edytowanie meczu: ${matchToEdit.team}, data: ${matchToEdit.date}`); // Log edycji meczu
-            window.location.href = "blania.html"; // Przekierowanie do strony edycji
-        } else {
-            alert("Mecz nie został znaleziony.");
-            console.log("Mecz nie został znaleziony."); // Log błędu
-        }
-    }
-
-    // Funkcja przewijająca kalendarz
     function moveCalendar(days) {
         if (days === 1) {
-            currentWeekStart.setDate(currentWeekStart.getDate() + 5); // Przesuwamy się o 5 dni do przodu
+            currentWeekStart.setDate(currentWeekStart.getDate() + 5);
         } else if (days === -1) {
-            currentWeekStart.setDate(currentWeekStart.getDate() - 5); // Przesuwamy się o 5 dni do tyłu
+            currentWeekStart.setDate(currentWeekStart.getDate() - 5);
         }
-
-        console.log(`Przewinięto kalendarz o ${days} dni. Aktualna data: ${currentWeekStart.toISOString().split('T')[0]}`); // Log przewijania kalendarza
-        generateCalendar(); // Generujemy kalendarz na nowo
+        generateCalendar();
     }
 
-    // Funkcja generująca kalendarz
     function generateCalendar() {
         const calendarWeek = document.querySelector('.calendar-week');
-        calendarWeek.innerHTML = ""; // Czyści zawartość kalendarza
+        calendarWeek.innerHTML = "";
 
-        // Generujemy 5 dni, zaczynając od currentWeekStart
         for (let i = 0; i < 5; i++) {
             const day = new Date(currentWeekStart);
             day.setDate(currentWeekStart.getDate() + i);
 
             const dayElement = document.createElement('div');
             dayElement.classList.add('calendar-day');
-            if (day < new Date()) dayElement.classList.add('past'); // Dodaje klasę "past" dla dni z przeszłości
-            if (day.toDateString() === new Date().toDateString()) dayElement.classList.add('current'); // Dodaje klasę "current" dla bieżącego dnia
+            if (day < new Date()) dayElement.classList.add('past');
+            if (day.toDateString() === new Date().toDateString()) dayElement.classList.add('current');
 
-            // Formatowanie daty: dd.mm.rrrr + nazwa dnia tygodnia (skrócona)
             const options = { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' };
             const formattedDate = new Intl.DateTimeFormat('pl-PL', options).format(day);
             const dayHeader = document.createElement('h3');
-            dayHeader.textContent = formattedDate.replace('.', ''); // Usuwa kropkę po skrócie dnia
-            dayHeader.setAttribute('data-date', day.toISOString().split('T')[0]); // Zapisujemy datę w formacie ISO
+            dayHeader.textContent = formattedDate.replace('.', '');
+            dayHeader.setAttribute('data-date', day.toISOString().split('T')[0]);
             dayElement.appendChild(dayHeader);
 
             const eventsList = document.createElement('div');
             eventsList.className = 'events-container';
             dayElement.appendChild(eventsList);
 
-            // Sprawdź, czy są wydarzenia w tym dniu
             const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
             const hasEvents = savedEvents.some(event => new Date(event.date).toISOString().split('T')[0] === day.toISOString().split('T')[0]);
 
@@ -932,10 +853,9 @@
             calendarWeek.appendChild(dayElement);
         }
 
-        loadEvents(); // Ładuje wydarzenia dla wygenerowanych dni
+        loadEvents();
     }
 
-    // Funkcja ładująca wydarzenia
     function loadEvents() {
         const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
         const eventIcons = {
@@ -982,21 +902,19 @@
         });
     }
 
-    // Funkcja edytująca event
     function editEvent(eventId) {
         const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
         const eventToEdit = savedEvents.find(event => event.id === eventId);
 
         if (eventToEdit) {
-            localStorage.setItem("selectedDate", eventToEdit.date.split('T')[0]); // Tylko data
+            localStorage.setItem("selectedDate", eventToEdit.date.split('T')[0]);
             localStorage.setItem("editEventId", eventToEdit.id);
-            window.location.href = "add-event.html"; // Przekierowanie do strony edycji
+            window.location.href = "add-event.html";
         } else {
             alert("Event nie został znaleziony.");
         }
     }
 
-    // Funkcja ładująca zapisane mecze
     function loadSavedMatches() {
         const tableBody = document.querySelector("#matches-table tbody");
         let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
@@ -1024,7 +942,7 @@
             editButton.innerHTML = '<img src="edit.png" alt="Edytuj" class="action-icon">';
             editButton.classList.add("action-btn", "edit-btn");
             editButton.onclick = function () {
-                editMatch(match.id); // Wywołanie funkcji editMatch
+                editMatch(match.id);
             };
             actionContainer.appendChild(editButton);
 
@@ -1037,7 +955,6 @@
                     savedMatches = savedMatches.filter(m => m.id !== match.id);
                     localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
                     loadSavedMatches();
-                    console.log(`Usunięto mecz: ${match.team}, data: ${match.date}`); // Log usunięcia meczu
                 }
             };
             actionContainer.appendChild(deleteButton);
@@ -1057,50 +974,48 @@
             tableBody.appendChild(row);
         });
 
-        // Pokazuj przyciski nawigacji tylko, jeśli jest co najmniej 6 rekordów
         const pagination = document.getElementById("pagination");
         if (savedMatches.length > recordsPerPage) {
-            pagination.style.display = 'flex'; // Pokazuje przyciski nawigacji
-            console.log("Przyciski nawigacji są widoczne (co najmniej 6 rekordów).");
+            pagination.style.display = 'flex';
         } else {
-            pagination.style.display = 'none'; // Ukrywa przyciski nawigacji
-            console.log("Przyciski nawigacji są ukryte (mniej niż 6 rekordów).");
+            pagination.style.display = 'none';
         }
 
         document.getElementById("prev-btn").disabled = currentPage === 1;
         document.getElementById("next-btn").disabled = currentPage * recordsPerPage >= savedMatches.length;
-
-        console.log(`Załadowano mecze: ${paginatedMatches.length} na stronie ${currentPage}`); // Log załadowania meczów
     }
 
-    // Funkcja zmieniająca stronę w paginacji
     function changePage(direction) {
         currentPage += direction;
-        console.log(`Zmieniono stronę na: ${currentPage}`); // Log zmiany strony
         loadSavedMatches();
     }
 
-    // Funkcja wywoływana po załadowaniu strony
+    // Inicjalizacja strony
     window.onload = function () {
         setTodayDate();
 
-        // Odczytaj zapisany zespół z localStorage
+        // Sprawdź czy użytkownik jest zalogowany
+        const user = JSON.parse(localStorage.getItem('googleUser'));
+        if (user) {
+            document.getElementById('user-info').style.display = 'block';
+            document.getElementById('user-name').textContent = user.name;
+            document.getElementById('logout-btn').style.display = 'inline-block';
+        }
+
         const savedTeam = localStorage.getItem('currentTeam');
         if (savedTeam) {
             currentTeam = savedTeam;
-            document.getElementById('team-selector').value = currentTeam; // Ustaw wybrany zespół w select
-            changeLogo(); // Załaduj logo i notatki dla zapisanego zespołu
+            document.getElementById('team-selector').value = currentTeam;
+            changeLogo();
         } else {
-            changeLogo(); // Domyślnie załaduj BAT Sierakowice
+            changeLogo();
         }
 
         generateCalendar();
         loadSavedMatches();
-        loadNotes(); // Ładuje notatki na starcie
-        updateNotesNavigation(); // Inicjalizuje przyciski nawigacji
-        console.log("Strona została załadowana.");
+        loadNotes();
+        updateNotesNavigation();
     };
 </script>
- 
 </body>
 </html>
