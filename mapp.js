@@ -66,8 +66,10 @@ function updateUserUI(user) {
     
     if (user) {
         userName.textContent = user.name || user.email;
-        userInfo.style.display = 'block';
-        loginButton.style.display = 'none';
+        userInfo.classList.add('display-block');
+        userInfo.classList.remove('display-none');
+        loginButton.classList.add('display-none');
+        loginButton.classList.remove('display-block');
         
         if (window.google?.accounts?.id) {
             google.accounts.id.renderButton(
@@ -76,8 +78,10 @@ function updateUserUI(user) {
             );
         }
     } else {
-        userInfo.style.display = 'none';
-        loginButton.style.display = 'block';
+        userInfo.classList.add('display-none');
+        userInfo.classList.remove('display-block');
+        loginButton.classList.add('display-block');
+        loginButton.classList.remove('display-none');
         
         if (window.google?.accounts?.id) {
             google.accounts.id.renderButton(
@@ -186,9 +190,9 @@ function updateNotesNavigation() {
     const notesNavigation = document.getElementById('notes-navigation');
     const buttons = notesNavigation.querySelectorAll('button');
     
-    buttons[0].style.display = teamNotes.length >= 2 ? 'inline-block' : 'none';
-    buttons[1].style.display = teamNotes.length > 0 ? 'inline-block' : 'none';
-    buttons[3].style.display = teamNotes.length >= 2 ? 'inline-block' : 'none';
+    buttons[0].classList.toggle('display-inline-block', teamNotes.length >= 2);
+    buttons[1].classList.toggle('display-inline-block', teamNotes.length > 0);
+    buttons[3].classList.toggle('display-inline-block', teamNotes.length >= 2);
 }
 
 function prevNote() {
