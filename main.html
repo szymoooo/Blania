@@ -520,6 +520,11 @@
         </div>
     </div>
 
+<footer style="margin: 20px 0; text-align: center; padding: 10px; font-size: 12px;">
+    <a href="privacy.html" target="_blank">Polityka Prywatności</a> | 
+    &copy; 2023 Mecze Blanki. Wszelkie prawa zastrzeżone.
+</footer>
+
 <script>
     // Słownik z logo drużyn
     const logos = {
@@ -555,73 +560,39 @@
         document.getElementById('user-name').textContent = user.name;
         document.getElementById('logout-btn').style.display = 'inline-block';
         
-        // Automatyczna autoryzacja do Google Calendar
-        authorize();
-    }
-
-    function decodeJwt(token) {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return JSON.parse(atob(base64));
-    }
-
-    function logout() {
-        localStorage.removeItem('googleUser');
-        localStorage.removeItem('googleAccessToken');
-        document.getElementById('user-info').style.display = 'none';
-        window.location.reload();
-    }
-
-    function checkLoginStatus() {
-        const user = JSON.parse(localStorage.getItem('googleUser'));
-        if (!user) {
-            return false;
-        }
-        
-        const tokenExpiration = user.exp * 1000;
-        if (Date.now() > tokenExpiration) {
-            localStorage.removeItem('googleUser');
-            localStorage.removeItem('googleAccessToken');
-            return false;
-        }
-        
-        return true;
-    }
-    async function handleGoogleError(error) {
-    console.error("Błąd Google API:", error);
-    
-    if (error.error === 'access_denied') {
-        alert('Aplikacja jest w trakcie weryfikacji przez Google. Tylko zatwierdzeni testerzy mogą obecnie korzystać z tej funkcji. Skontaktuj się z administratorem.');
-    } else {
-        alert('Wystąpił błąd podczas komunikacji z Google. Spróbuj ponownie później.');
-    }
-    
-    // Możesz też wyświetlić przycisk do zgłoszenia problemu
-    const reportBtn = document.createElement('button');
-    reportBtn.textContent = 'Zgłoś problem';
-    reportBtn.onclick = () => window.open('mailto:szymonbaj@gmail.com?subject=Problem z aplikacją');
-    document.body.appendChild(reportBtn);
-}
-   // Przykład użycia w funkcji authorize()
-async function authorize() {
-    try {
-        const client = google.accounts.oauth2.initTokenClient({
-            client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/calendar.events',
-            callback: (response) => {
-                if (response.access_token) {
-                    localStorage.setItem('googleAccessToken', response.access_token);
-                } else if (response.error) {
-                    handleGoogleError(response);
-                }
-            },
+    // Autoryzacja do Google Calendar API
+    async function authorize() {
+        return new Promise((resolve, reject) => {
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
+                scope: 'https://www.googleapis.com/auth/calendar.events',
+                prompt: 'consent',
+                callback: (response) => {
+                    if (response.access_token) {
+                        localStorage.setItem('googleAccessToken', response.access_token);
+                        resolve(response.access_token);
+                    } else {
+                        handleAuthError(response.error);
+                        reject(response.error);
+                    }
+                },
+            });
+            client.requestAccessToken();
         });
-        client.requestAccessToken();
-    } catch (error) {
-        handleGoogleError(error);
     }
-}
 
+    function handleAuthError(error) {
+        console.error('Błąd autoryzacji:', error);
+        let message = 'Wystąpił błąd podczas logowania.';
+        
+        if (error === 'access_denied') {
+            message = 'Aby korzystać z tej funkcji, musisz być zatwierdzonym testerem. ' + 
+                     'Skontaktuj się z administratorem aplikacji.';
+        }
+        
+        alert(message);
+    }
+   
     // Dodawanie wydarzenia do Google Calendar
     async function addEventToGoogleCalendar(event) {
         try {
