@@ -1,3 +1,16 @@
+/* Nowe klasy dodane na początku */
+.display-block {
+    display: block;
+}
+
+.display-none {
+    display: none;
+}
+
+.display-inline-block {
+    display: inline-block;
+}
+
 .google-auth-container {
     position: absolute;
     top: 20px;
