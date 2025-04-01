@@ -6,25 +6,24 @@
     <title>Mecze Blanki</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-    /* Style dla kontenera logowania Google */
-    .google-login-container {
+    .google-auth-container {
         position: absolute;
         top: 20px;
         right: 20px;
         z-index: 1000;
     }
-
+    
     #user-info {
         position: absolute;
         top: 20px;
         right: 20px;
         background: #f8f9fa;
-        padding: 5px 10px;
+        padding: 8px 15px;
         border-radius: 5px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         display: none;
     }
-
+    
     #logout-btn {
         background-color: #dc3545;
         color: white;
@@ -35,7 +34,6 @@
         margin-left: 10px;
     }
 
-    /* Reszta styli */
     body {
         font-family: 'Roboto', sans-serif;
         background-color: #ffffff;
@@ -412,32 +410,29 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-    <!-- Sekcja logowania Google -->
-    <div id="user-info">
-        Zalogowany jako: <span id="user-name"></span>
-        <button id="logout-btn" onclick="logout()">Wyloguj</button>
+    <div class="google-auth-container">
+        <div id="user-info">
+            Zalogowany jako: <span id="user-name"></span>
+            <button id="logout-btn">Wyloguj</button>
+        </div>
+        <div id="g_id_onload"
+             data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div id="google-login-button"></div>
     </div>
-    
-    <div id="g_id_onload"
-         data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
-    </div>
-    <div id="google-login-button" style="position: absolute; top: 20px; right: 20px;"></div>
 
     <header>
         <h2>Mój planner:</h2>
     </header>
     
-    <!-- Sekcja kalendarza -->
     <div class="calendar-container">
-        <div class="calendar-week">
-            <!-- Dni tygodnia będą generowane dynamicznie -->
-        </div>
+        <div class="calendar-week"></div>
         <div class="navigation-buttons">
-            <button class="btn-prev-calendar" onclick="moveCalendar(-1)">Poprzednia</button>
-            <button class="btn-add-event" onclick="addEvent()">+ Dodaj wydarzenie</button>
-            <button class="btn-next-calendar" onclick="moveCalendar(1)">Następna</button>
+            <button class="btn-prev-calendar">Poprzednia</button>
+            <button class="btn-add-event">+ Dodaj wydarzenie</button>
+            <button class="btn-next-calendar">Następna</button>
         </div>
     </div>
 
@@ -445,15 +440,13 @@
         <h2>Najbliższy przeciwnik:</h2>
     </header>
 
-    <!-- Kontener na wybór przeciwnika i notatki -->
     <div class="team-and-notes-container">
-        <!-- Wybór przeciwnika -->
         <div class="team-selection-container">
             <div class="team-logo-container">
-                <img id="team-logo" src="BAT Sierakowice.png" alt="Logo drużyny" class="team-logo" style="width: 300px; height: 300px;">
+                <img id="team-logo" src="BAT Sierakowice.png" alt="Logo drużyny" class="team-logo">
             </div>
             <div class="team-info-container">
-                <select id="team-selector" class="team-selector" onchange="changeLogo()">
+                <select id="team-selector" class="team-selector">
                     <option value="BAT Sierakowice">BAT Sierakowice</option>
                     <option value="BAT Kartuzy">BAT Kartuzy</option>
                     <option value="Bryza Pruszcz Gd">Bryza Pruszcz Gd</option>
@@ -467,20 +460,19 @@
                     <option value="Young Angels Košice">Young Angels Košice</option>
                 </select>
                 <input type="date" id="game-date" class="date-input">
-                <button class="btn-start-game" onclick="startGame()">Gramy</button>
+                <button class="btn-start-game">Gramy</button>
             </div>
         </div>
 
-        <!-- Pole na notatki -->
         <div class="scouting-notes">
             <div class="notes-display" id="notes-display">
                 <p>Tutaj dodaj swoje spostrzeżenia na temat przeciwnika. Kliknij "Dodaj".</p>
             </div>
             <div class="notes-navigation" id="notes-navigation">
-                <button class="btn-prev-note" onclick="prevNote()">Poprzednia</button>
-                <button class="btn-edit-note" onclick="editNote()">Edytuj</button>
-                <button class="btn-add-note" onclick="openNotesForm()">Dodaj</button>
-                <button class="btn-next-note" onclick="nextNote()">Następna</button>
+                <button class="btn-prev-note">Poprzednia</button>
+                <button class="btn-edit-note">Edytuj</button>
+                <button class="btn-add-note">Dodaj</button>
+                <button class="btn-next-note">Następna</button>
             </div>
         </div>
     </div>
@@ -505,19 +497,18 @@
             <tbody></tbody>
         </table>
 
-        <div id="pagination" style="margin-top: 10px;">
-            <button id="prev-btn" class="btn-prev-stats" onclick="changePage(-1)" disabled>Poprzednia</button>
-            <button id="next-btn" class="btn-next-stats" onclick="changePage(1)" disabled>Następna</button>
+        <div id="pagination">
+            <button id="prev-btn" class="btn-prev-stats" disabled>Poprzednia</button>
+            <button id="next-btn" class="btn-next-stats" disabled>Następna</button>
         </div>
     </div>
 
-    <footer style="margin: 20px 0; text-align: center; padding: 10px; font-size: 12px;">
+    <footer>
         <a href="privacy.html" target="_blank">Polityka Prywatności</a> | 
         &copy; 2023 Mecze Blanki. Wszelkie prawa zastrzeżone.
     </footer>
 
     <script>
-        // Słownik z logo drużyn
         const logos = {
             'BAT Sierakowice': 'BAT Sierakowice.png',
             'BAT Kartuzy': 'BAT Kartuzy.png',
@@ -532,7 +523,6 @@
             'Young Angels Košice': 'Young Angels Kosice.png'
         };
 
-        // Zmienne globalne
         let currentWeekStart = new Date();
         let notes = JSON.parse(localStorage.getItem('notes')) || {};
         let currentTeam = 'BAT Sierakowice';
@@ -540,7 +530,6 @@
         let currentPage = 1;
         const recordsPerPage = 5;
 
-        // Funkcje do obsługi logowania Google
         function decodeJwt(token) {
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -573,7 +562,6 @@
                 localStorage.setItem('googleUser', JSON.stringify(user));
                 updateUserUI(user);
                 
-                // Autoryzacja do Google Calendar
                 authorize().catch(error => {
                     console.error("Błąd autoryzacji:", error);
                     handleAuthError(error);
@@ -587,20 +575,26 @@
         function updateUserUI(user) {
             const userInfo = document.getElementById('user-info');
             const userName = document.getElementById('user-name');
+            const loginButton = document.getElementById('google-login-button');
             
             if (user) {
                 userName.textContent = user.name || user.email;
                 userInfo.style.display = 'block';
                 
-                // Ukryj przycisk logowania Google
                 if (window.google && google.accounts.id) {
                     google.accounts.id.renderButton(
-                        document.getElementById("google-login-button"),
+                        loginButton,
                         { theme: "outline", size: "large", width: "0" }
                     );
                 }
             } else {
                 userInfo.style.display = 'none';
+                if (window.google && google.accounts.id) {
+                    google.accounts.id.renderButton(
+                        loginButton,
+                        { theme: "outline", size: "large" }
+                    );
+                }
             }
         }
 
@@ -609,8 +603,7 @@
             let message = 'Wystąpił błąd podczas logowania.';
             
             if (error === 'access_denied') {
-                message = 'Aby korzystać z tej funkcji, musisz być zatwierdzonym testerem. ' + 
-                         'Skontaktuj się z administratorem aplikacji.';
+                message = 'Aby korzystać z tej funkcji, musisz być zatwierdzonym testerem. Skontaktuj się z administratorem aplikacji.';
             }
             
             alert(message);
@@ -619,20 +612,16 @@
         function logout() {
             localStorage.removeItem('googleUser');
             localStorage.removeItem('googleAccessToken');
-            document.getElementById('user-info').style.display = 'none';
-            
-            // Przywróć przycisk logowania Google
-            if (window.google && google.accounts.id) {
-                google.accounts.id.renderButton(
-                    document.getElementById("google-login-button"),
-                    { theme: "outline", size: "large" }
-                );
-            }
+            updateUserUI(null);
         }
 
-        // Autoryzacja do Google Calendar API
         async function authorize() {
             return new Promise((resolve, reject) => {
+                if (!window.google || !google.accounts.oauth2) {
+                    reject(new Error("Google API nie zostało załadowane"));
+                    return;
+                }
+
                 const client = google.accounts.oauth2.initTokenClient({
                     client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
                     scope: 'https://www.googleapis.com/auth/calendar.events',
@@ -642,8 +631,9 @@
                             localStorage.setItem('googleAccessToken', response.access_token);
                             resolve(response.access_token);
                         } else {
-                            handleAuthError(response.error);
-                            reject(response.error);
+                            const error = response.error || 'unknown_error';
+                            handleAuthError(error);
+                            reject(error);
                         }
                     },
                 });
@@ -651,70 +641,20 @@
             });
         }
 
-        // Dodawanie wydarzenia do Google Calendar
-        async function addEventToGoogleCalendar(event) {
-            try {
-                if (!checkLoginStatus()) {
-                    throw new Error("Proszę zalogować się przez Google");
-                }
+        // Reszta funkcjonalności aplikacji
+        document.getElementById('logout-btn').addEventListener('click', logout);
+        document.getElementById('team-selector').addEventListener('change', changeLogo);
+        document.getElementById('btn-prev-calendar').addEventListener('click', () => moveCalendar(-1));
+        document.getElementById('btn-next-calendar').addEventListener('click', () => moveCalendar(1));
+        document.getElementById('btn-add-event').addEventListener('click', addEvent);
+        document.getElementById('btn-start-game').addEventListener('click', startGame);
+        document.getElementById('btn-prev-note').addEventListener('click', prevNote);
+        document.getElementById('btn-next-note').addEventListener('click', nextNote);
+        document.getElementById('btn-add-note').addEventListener('click', openNotesForm);
+        document.getElementById('btn-edit-note').addEventListener('click', editNote);
+        document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
+        document.getElementById('next-btn').addEventListener('click', () => changePage(1));
 
-                let accessToken = localStorage.getItem('googleAccessToken');
-                if (!accessToken) {
-                    accessToken = await authorize();
-                }
-
-                const startDate = new Date(event.date);
-                if (isNaN(startDate.getTime())) {
-                    throw new Error("Nieprawidłowy format daty");
-                }
-
-                const endDate = new Date(startDate.getTime() + (event.duration || 60) * 60 * 1000);
-
-                const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        summary: event.name,
-                        location: event.location || '',
-                        description: event.notes || '',
-                        start: { dateTime: startDate.toISOString(), timeZone: 'Europe/Warsaw' },
-                        end: { dateTime: endDate.toISOString(), timeZone: 'Europe/Warsaw' },
-                        reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: event.reminder || 30 }] }
-                    }),
-                });
-
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        localStorage.removeItem('googleAccessToken');
-                        return addEventToGoogleCalendar(event);
-                    }
-                    const errorData = await response.json();
-                    throw new Error(errorData.error?.message || "Błąd podczas dodawania wydarzenia");
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error("Błąd:", error);
-                throw error;
-            }
-        }
-
-        // Funkcja do dodawania wydarzenia
-        function addEvent() {
-            if (!checkLoginStatus()) {
-                alert("Proszę zalogować się przez Google przed dodaniem wydarzenia");
-                return;
-            }
-            
-            const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
-            localStorage.setItem("selectedDate", selectedDate);
-            window.location.href = "add-event.html";
-        }
-
-        // Reszta funkcji pozostaje bez zmian
         function changeLogo() {
             const teamSelector = document.getElementById('team-selector');
             const logo = document.getElementById('team-logo');
@@ -742,7 +682,6 @@
             localStorage.setItem("selectedTeam", team);
             localStorage.setItem("selectedDate", date);
             localStorage.removeItem("editMatchId");
-
             window.location.href = "blania.html";
         }
 
@@ -770,30 +709,17 @@
                     <p><strong>Ocena:</strong> ${'★'.repeat(note.rating)}</p>
                 `;
             }
-
             updateNotesNavigation();
         }
 
         function updateNotesNavigation() {
             const teamNotes = notes[currentTeam] || [];
             const notesNavigation = document.getElementById('notes-navigation');
-
-            const addButton = notesNavigation.querySelector('button[onclick="openNotesForm()"]');
-            addButton.style.display = 'inline-block';
-
-            const prevButton = notesNavigation.querySelector('button[onclick="prevNote()"]');
-            const editButton = notesNavigation.querySelector('button[onclick="editNote()"]');
-            const nextButton = notesNavigation.querySelector('button[onclick="nextNote()"]');
-
-            if (teamNotes.length >= 1) {
-                prevButton.style.display = teamNotes.length >= 2 ? 'inline-block' : 'none';
-                editButton.style.display = 'inline-block';
-                nextButton.style.display = teamNotes.length >= 2 ? 'inline-block' : 'none';
-            } else {
-                prevButton.style.display = 'none';
-                editButton.style.display = 'none';
-                nextButton.style.display = 'none';
-            }
+            const buttons = notesNavigation.querySelectorAll('button');
+            
+            buttons[0].style.display = teamNotes.length >= 2 ? 'inline-block' : 'none'; // Prev
+            buttons[1].style.display = teamNotes.length > 0 ? 'inline-block' : 'none'; // Edit
+            buttons[3].style.display = teamNotes.length >= 2 ? 'inline-block' : 'none'; // Next
         }
 
         function prevNote() {
@@ -821,20 +747,6 @@
             }
         }
 
-        function editMatch(matchId) {
-            const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-            const matchToEdit = savedMatches.find(match => match.id === matchId);
-
-            if (matchToEdit) {
-                localStorage.setItem("selectedTeam", matchToEdit.team);
-                localStorage.setItem("selectedDate", matchToEdit.date);
-                localStorage.setItem("editMatchId", matchToEdit.id);
-                window.location.href = "blania.html";
-            } else {
-                alert("Mecz nie został znaleziony.");
-            }
-        }
-
         function moveCalendar(days) {
             if (days === 1) {
                 currentWeekStart.setDate(currentWeekStart.getDate() + 5);
@@ -853,7 +765,7 @@
                 day.setDate(currentWeekStart.getDate() + i);
 
                 const dayElement = document.createElement('div');
-                dayElement.classList.add('calendar-day');
+                dayElement.className = 'calendar-day';
                 if (day < new Date()) dayElement.classList.add('past');
                 if (day.toDateString() === new Date().toDateString()) dayElement.classList.add('current');
 
@@ -878,10 +790,8 @@
                     noEventsText.style.color = '#666';
                     eventsList.appendChild(noEventsText);
                 }
-
                 calendarWeek.appendChild(dayElement);
             }
-
             loadEvents();
         }
 
@@ -906,9 +816,7 @@
                         eventItem.className = 'event-item';
                         eventItem.setAttribute('data-event-id', event.id);
 
-                        eventItem.onclick = function () {
-                            editEvent(event.id);
-                        };
+                        eventItem.addEventListener('click', () => editEvent(event.id));
 
                         const icon = document.createElement('div');
                         icon.className = 'event-icon';
@@ -965,36 +873,31 @@
 
                 const actionCell = document.createElement("td");
                 const actionContainer = document.createElement("div");
-                actionContainer.classList.add("action-container");
+                actionContainer.className = "action-container";
 
                 const editButton = document.createElement("button");
                 editButton.innerHTML = '<img src="edit.png" alt="Edytuj" class="action-icon">';
-                editButton.classList.add("action-btn", "edit-btn");
-                editButton.onclick = function () {
-                    editMatch(match.id);
-                };
+                editButton.className = "action-btn edit-btn";
+                editButton.addEventListener('click', () => editMatch(match.id));
                 actionContainer.appendChild(editButton);
 
                 const deleteButton = document.createElement("button");
                 deleteButton.innerHTML = '<img src="trash.png" alt="Usuń" class="action-icon">';
-                deleteButton.classList.add("action-btn", "delete-btn");
-                deleteButton.onclick = function () {
-                    const confirmDelete = confirm("Czy na pewno chcesz usunąć ten mecz?");
-                    if (confirmDelete) {
+                deleteButton.className = "action-btn delete-btn";
+                deleteButton.addEventListener('click', () => {
+                    if (confirm("Czy na pewno chcesz usunąć ten mecz?")) {
                         savedMatches = savedMatches.filter(m => m.id !== match.id);
                         localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
                         loadSavedMatches();
                     }
-                };
+                });
                 actionContainer.appendChild(deleteButton);
 
-                if (match.streamLink && match.streamLink.trim() !== "") {
+                if (match.streamLink?.trim()) {
                     const youtubeButton = document.createElement("button");
                     youtubeButton.innerHTML = '<img src="youtube.png" alt="YouTube" class="action-icon">';
-                    youtubeButton.classList.add("action-btn", "yt-btn");
-                    youtubeButton.onclick = function() {
-                        window.open(match.streamLink, "_blank"); 
-                    };
+                    youtubeButton.className = "action-btn yt-btn";
+                    youtubeButton.addEventListener('click', () => window.open(match.streamLink, "_blank"));
                     actionContainer.appendChild(youtubeButton);
                 }
 
@@ -1003,13 +906,7 @@
                 tableBody.appendChild(row);
             });
 
-            const pagination = document.getElementById("pagination");
-            if (savedMatches.length > recordsPerPage) {
-                pagination.style.display = 'flex';
-            } else {
-                pagination.style.display = 'none';
-            }
-
+            document.getElementById("pagination").style.display = savedMatches.length > recordsPerPage ? 'flex' : 'none';
             document.getElementById("prev-btn").disabled = currentPage === 1;
             document.getElementById("next-btn").disabled = currentPage * recordsPerPage >= savedMatches.length;
         }
@@ -1019,23 +916,73 @@
             loadSavedMatches();
         }
 
+        function addEvent() {
+            if (!checkLoginStatus()) {
+                alert("Proszę zalogować się przez Google przed dodaniem wydarzenia");
+                return;
+            }
+            
+            const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
+            localStorage.setItem("selectedDate", selectedDate);
+            window.location.href = "add-event.html";
+        }
+
+        async function addEventToGoogleCalendar(event) {
+            try {
+                if (!checkLoginStatus()) {
+                    throw new Error("Proszę zalogować się przez Google");
+                }
+
+                let accessToken = localStorage.getItem('googleAccessToken');
+                if (!accessToken) {
+                    accessToken = await authorize();
+                }
+
+                const startDate = new Date(event.date);
+                if (isNaN(startDate.getTime())) {
+                    throw new Error("Nieprawidłowy format daty");
+                }
+
+                const endDate = new Date(startDate.getTime() + (event.duration || 60) * 60 * 1000);
+
+                const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        summary: event.name,
+                        location: event.location || '',
+                        description: event.notes || '',
+                        start: { dateTime: startDate.toISOString(), timeZone: 'Europe/Warsaw' },
+                        end: { dateTime: endDate.toISOString(), timeZone: 'Europe/Warsaw' },
+                        reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: event.reminder || 30 }] }
+                    }),
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem('googleAccessToken');
+                        return addEventToGoogleCalendar(event);
+                    }
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || "Błąd podczas dodawania wydarzenia");
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Błąd:", error);
+                throw error;
+            }
+        }
+
         // Inicjalizacja strony
-        window.onload = function () {
+        window.addEventListener('load', () => {
             setTodayDate();
 
-            // Sprawdź czy użytkownik jest zalogowany
             const user = JSON.parse(localStorage.getItem('googleUser'));
-            if (user) {
-                updateUserUI(user);
-            } else {
-                // Inicjalizuj przycisk Google tylko jeśli użytkownik nie jest zalogowany
-                if (window.google && google.accounts.id) {
-                    google.accounts.id.renderButton(
-                        document.getElementById("google-login-button"),
-                        { theme: "outline", size: "large" }
-                    );
-                }
-            }
+            updateUserUI(user);
 
             const savedTeam = localStorage.getItem('currentTeam');
             if (savedTeam) {
@@ -1049,8 +996,7 @@
             generateCalendar();
             loadSavedMatches();
             loadNotes();
-            updateNotesNavigation();
-        };
+        });
     </script>
 </body>
 </html>
