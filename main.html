@@ -423,17 +423,17 @@
 </head>
 <body>
     <div class="google-auth-container">
-        <div id="user-info">
-            Zalogowany jako: <span id="user-name"></span>
-            <button id="logout-btn">Wyloguj</button>
-        </div>
-        <div id="g_id_onload"
-             data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div id="google-login-button"></div>
+    <div id="user-info">
+        Zalogowany jako: <span id="user-name"></span>
+        <button id="logout-btn">Wyloguj</button>
     </div>
+    <div id="g_id_onload"
+         data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div id="google-login-button" style="display: none;"></div>
+</div>
 
     <header>
         <h2>Mój planner:</h2>
@@ -583,32 +583,28 @@
                 handleAuthError('unknown_error');
             }
         }
-
+        
         function updateUserUI(user) {
-            const userInfo = document.getElementById('user-info');
-            const userName = document.getElementById('user-name');
-            const loginButton = document.getElementById('google-login-button');
-            
-            if (user) {
-                userName.textContent = user.name || user.email;
-                userInfo.style.display = 'block';
-                
-                if (window.google && google.accounts.id) {
-                    google.accounts.id.renderButton(
-                        loginButton,
-                        { theme: "outline", size: "large", width: "0" }
-                    );
-                }
-            } else {
-                userInfo.style.display = 'none';
-                if (window.google && google.accounts.id) {
-                    google.accounts.id.renderButton(
-                        loginButton,
-                        { theme: "outline", size: "large" }
-                    );
-                }
-            }
+    const userInfo = document.getElementById('user-info');
+    const userName = document.getElementById('user-name');
+    const loginButton = document.getElementById('google-login-button');
+    
+    if (user) {
+        userName.textContent = user.name || user.email;
+        userInfo.style.display = 'block';
+        loginButton.style.display = 'none';
+    } else {
+        userInfo.style.display = 'none';
+        loginButton.style.display = 'block';
+        
+        if (window.google && google.accounts.id) {
+            google.accounts.id.renderButton(
+                loginButton,
+                { theme: "outline", size: "large" }
+            );
         }
+    }
+}
 
         function handleAuthError(error) {
             console.error('Błąd autoryzacji:', error);
