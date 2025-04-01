@@ -7,17 +7,18 @@
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' https://accounts.google.com https://cdnjs.cloudflare.com 'unsafe-inline';
-        style-src 'self' https://accounts.google.com https://cdnjs.cloudflare.com 'unsafe-inline';
+        script-src 'self' https://accounts.google.com https://cdnjs.cloudflare.com;
+        style-src 'self' https://accounts.google.com https://cdnjs.cloudflare.com https://fonts.googleapis.com 'unsafe-inline';
         font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
         img-src 'self' data: https:;
         connect-src 'self' https://www.googleapis.com;
         frame-src https://accounts.google.com;
     ">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
     .google-auth-container {
         position: absolute;
         top: 20px;
@@ -423,17 +424,17 @@
 </head>
 <body>
     <div class="google-auth-container">
-    <div id="user-info">
-        Zalogowany jako: <span id="user-name"></span>
-        <button id="logout-btn">Wyloguj</button>
+        <div id="user-info">
+            Zalogowany jako: <span id="user-name"></span>
+            <button id="logout-btn">Wyloguj</button>
+        </div>
+        <div id="g_id_onload"
+             data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div id="google-login-button" style="display: none;"></div>
     </div>
-    <div id="g_id_onload"
-         data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
-    </div>
-    <div id="google-login-button" style="display: none;"></div>
-</div>
 
     <header>
         <h2>Mój planner:</h2>
@@ -565,7 +566,7 @@
             try {
                 if (response.error) {
                     handleAuthError(response.error);
-                    return;
+                    return false;
                 }
                 
                 const user = decodeJwt(response.credential);
@@ -577,34 +578,45 @@
                 authorize().catch(error => {
                     console.error("Błąd autoryzacji:", error);
                     handleAuthError(error);
+                    return false;
                 });
+                
+                return true;
             } catch (error) {
                 console.error("Błąd przetwarzania odpowiedzi:", error);
                 handleAuthError('unknown_error');
+                return false;
             }
         }
-        
+
         function updateUserUI(user) {
-    const userInfo = document.getElementById('user-info');
-    const userName = document.getElementById('user-name');
-    const loginButton = document.getElementById('google-login-button');
-    
-    if (user) {
-        userName.textContent = user.name || user.email;
-        userInfo.style.display = 'block';
-        loginButton.style.display = 'none';
-    } else {
-        userInfo.style.display = 'none';
-        loginButton.style.display = 'block';
-        
-        if (window.google && google.accounts.id) {
-            google.accounts.id.renderButton(
-                loginButton,
-                { theme: "outline", size: "large" }
-            );
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-name');
+            const loginButton = document.getElementById('google-login-button');
+            
+            if (user) {
+                userName.textContent = user.name || user.email;
+                userInfo.style.display = 'block';
+                loginButton.style.display = 'none';
+                
+                if (window.google && google.accounts.id) {
+                    google.accounts.id.renderButton(
+                        loginButton,
+                        { theme: "outline", size: "large", width: "0" }
+                    );
+                }
+            } else {
+                userInfo.style.display = 'none';
+                loginButton.style.display = 'block';
+                
+                if (window.google && google.accounts.id) {
+                    google.accounts.id.renderButton(
+                        loginButton,
+                        { theme: "outline", size: "large" }
+                    );
+                }
+            }
         }
-    }
-}
 
         function handleAuthError(error) {
             console.error('Błąd autoryzacji:', error);
@@ -621,6 +633,14 @@
             localStorage.removeItem('googleUser');
             localStorage.removeItem('googleAccessToken');
             updateUserUI(null);
+            
+            if (window.opener) {
+                try {
+                    window.opener.postMessage('auth-logout', '*');
+                } catch (e) {
+                    console.warn("Could not send postMessage to opener:", e);
+                }
+            }
         }
 
         async function authorize() {
@@ -1004,6 +1024,18 @@
             document.querySelector('.btn-edit-note').addEventListener('click', editNote);
             document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
             document.getElementById('next-btn').addEventListener('click', () => changePage(1));
+
+            // Obsługa komunikacji między oknami
+            window.addEventListener('message', (event) => {
+                if (event.data === 'auth-check') {
+                    const user = JSON.parse(localStorage.getItem('googleUser'));
+                    if (user) {
+                        event.source.postMessage('auth-valid', '*');
+                    } else {
+                        event.source.postMessage('auth-invalid', '*');
+                    }
+                }
+            });
         });
     </script>
 </body>
