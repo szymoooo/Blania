@@ -525,7 +525,7 @@
     &copy; 2023 Mecze Blanki. Wszelkie prawa zastrzeżone.
 </footer>
 
-<script>
+ <script>
     // Słownik z logo drużyn
     const logos = {
         'BAT Sierakowice': 'BAT Sierakowice.png',
@@ -550,16 +550,47 @@
     const recordsPerPage = 5;
 
     // Funkcje do obsługi logowania Google
+    function decodeJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(atob(base64));
+    }
+
+    function checkLoginStatus() {
+        const user = JSON.parse(localStorage.getItem('googleUser'));
+        if (!user) return false;
+        
+        const tokenExpiration = user.exp * 1000;
+        if (Date.now() > tokenExpiration) {
+            localStorage.removeItem('googleUser');
+            localStorage.removeItem('googleAccessToken');
+            return false;
+        }
+        return true;
+    }
+
     function handleCredentialResponse(response) {
         const user = decodeJwt(response.credential);
         console.log("Zalogowany użytkownik:", user);
         localStorage.setItem('googleUser', JSON.stringify(user));
         
-        // Aktualizuj UI
         document.getElementById('user-info').style.display = 'block';
         document.getElementById('user-name').textContent = user.name;
         document.getElementById('logout-btn').style.display = 'inline-block';
         
+        authorize().catch(error => {
+            console.error("Błąd autoryzacji:", error);
+            handleAuthError(error);
+        });
+    }
+
+    function logout() {
+        localStorage.removeItem('googleUser');
+        localStorage.removeItem('googleAccessToken');
+        document.getElementById('user-info').style.display = 'none';
+        window.location.reload();
+    }
+
     // Autoryzacja do Google Calendar API
     async function authorize() {
         return new Promise((resolve, reject) => {
@@ -592,26 +623,17 @@
         
         alert(message);
     }
-   
+
     // Dodawanie wydarzenia do Google Calendar
     async function addEventToGoogleCalendar(event) {
         try {
             if (!checkLoginStatus()) {
-                alert("Proszę zalogować się przez Google");
-                return null;
+                throw new Error("Proszę zalogować się przez Google");
             }
 
             let accessToken = localStorage.getItem('googleAccessToken');
             if (!accessToken) {
-                const authorized = await authorize();
-                if (!authorized) {
-                    throw new Error("Autoryzacja nie powiodła się");
-                }
-                accessToken = localStorage.getItem('googleAccessToken');
-            }
-
-            if (!event.date || !event.name) {
-                throw new Error("Wydarzenie musi mieć datę i nazwę");
+                accessToken = await authorize();
             }
 
             const startDate = new Date(event.date);
@@ -621,33 +643,20 @@
 
             const endDate = new Date(startDate.getTime() + (event.duration || 60) * 60 * 1000);
 
-            const eventDetails = {
-                summary: event.name,
-                location: event.location || '',
-                description: event.notes || '',
-                start: {
-                    dateTime: startDate.toISOString(),
-                    timeZone: 'Europe/Warsaw',
-                },
-                end: {
-                    dateTime: endDate.toISOString(),
-                    timeZone: 'Europe/Warsaw',
-                },
-                reminders: {
-                    useDefault: false,
-                    overrides: [
-                        { method: 'popup', minutes: event.reminder || 30 },
-                    ],
-                },
-            };
-
             const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(eventDetails),
+                body: JSON.stringify({
+                    summary: event.name,
+                    location: event.location || '',
+                    description: event.notes || '',
+                    start: { dateTime: startDate.toISOString(), timeZone: 'Europe/Warsaw' },
+                    end: { dateTime: endDate.toISOString(), timeZone: 'Europe/Warsaw' },
+                    reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: event.reminder || 30 }] }
+                }),
             });
 
             if (!response.ok) {
@@ -659,9 +668,7 @@
                 throw new Error(errorData.error?.message || "Błąd podczas dodawania wydarzenia");
             }
 
-            const data = await response.json();
-            console.log("Wydarzenie dodane:", data);
-            return data;
+            return await response.json();
         } catch (error) {
             console.error("Błąd:", error);
             throw error;
@@ -784,6 +791,20 @@
             localStorage.setItem('currentNoteIndex', currentNoteIndex);
             localStorage.setItem('noteToEdit', JSON.stringify(note));
             window.location.href = 'notes-form.html';
+        }
+    }
+
+    function editMatch(matchId) {
+        const savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
+        const matchToEdit = savedMatches.find(match => match.id === matchId);
+
+        if (matchToEdit) {
+            localStorage.setItem("selectedTeam", matchToEdit.team);
+            localStorage.setItem("selectedDate", matchToEdit.date);
+            localStorage.setItem("editMatchId", matchToEdit.id);
+            window.location.href = "blania.html";
+        } else {
+            alert("Mecz nie został znaleziony.");
         }
     }
 
@@ -998,5 +1019,6 @@
         updateNotesNavigation();
     };
 </script>
+  
 </body>
 </html>
