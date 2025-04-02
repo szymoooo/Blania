@@ -19,8 +19,9 @@ let currentTeam = 'BAT Sierakowice';
 let currentNoteIndex = 0;
 let currentPage = 1;
 const recordsPerPage = 5;
+let googleAuthInitialized = false;
 
-// Bezpieczne funkcje pomocnicze
+// Funkcje pomocnicze
 function safeJsonParse(jsonString) {
     try {
         return JSON.parse(jsonString);
@@ -41,8 +42,13 @@ function decodeJwt(token) {
     }
 }
 
-// Logika logowania Google
-window.handleCredentialResponse = function(response) {
+function handleAuthError(error) {
+    console.error('Błąd autoryzacji:', error);
+    alert('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
+}
+
+// Logika Google Auth
+window.handleGoogleAuth = function(response) {
     if (response.error) {
         handleAuthError(response.error);
         return;
@@ -59,71 +65,68 @@ window.handleCredentialResponse = function(response) {
     authorize().catch(handleAuthError);
 };
 
-// W funkcji updateUserUI:
+async function initializeGoogleAuth() {
+    return new Promise((resolve) => {
+        const checkGoogle = () => {
+            if (window.google?.accounts?.id) {
+                google.accounts.id.initialize({
+                    client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
+                    callback: handleCredentialResponse
+                });
+                googleAuthInitialized = true;
+                resolve(true);
+            } else {
+                setTimeout(checkGoogle, 100);
+            }
+        };
+        checkGoogle();
+    });
+}
+
+function renderGoogleButton() {
+    if (!googleAuthInitialized) return;
+    
+    const buttonContainer = document.getElementById('google-login-button');
+    if (!buttonContainer) return;
+
+    buttonContainer.innerHTML = '';
+    
+    google.accounts.id.renderButton(
+        buttonContainer,
+        {
+            type: 'standard',
+            theme: 'outline',
+            size: 'large',
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: 300
+        }
+    );
+}
+
 function updateUserUI(user) {
     const userInfo = document.getElementById('user-info');
     const userName = document.getElementById('user-name');
     const loginButton = document.getElementById('google-login-button');
-    
-    // Wyczyść kontener przed renderowaniem
-    loginButton.innerHTML = '';
-    
+
     if (user) {
         userName.textContent = user.name || user.email;
-        userInfo.classList.add('display-block');
         userInfo.classList.remove('display-none');
+        userInfo.classList.add('display-block');
         loginButton.classList.add('display-none');
-        
-        if (window.google?.accounts?.id) {
-            // Dodaj opóźnienie dla pewności, że GIS jest zainicjalizowany
-            setTimeout(() => {
-                google.accounts.id.renderButton(
-                    loginButton,
-                    { 
-                        theme: "outline", 
-                        size: "large",
-                        width: "0"
-                    }
-                );
-            }, 100);
-        }
     } else {
         userInfo.classList.add('display-none');
         userInfo.classList.remove('display-block');
         loginButton.classList.remove('display-none');
-        
-        if (window.google?.accounts?.id) {
-            // Dodaj opóźnienie dla pewności, że GIS jest zainicjalizowany
-            setTimeout(() => {
-                google.accounts.id.renderButton(
-                    loginButton,
-                    { 
-                        theme: "outline", 
-                        size: "large",
-                        width: "250" // Standardowa szerokość
-                    }
-                );
-            }, 100);
-        }
+        renderGoogleButton();
     }
-}
-
-// W funkcji initializeApp dodaj inicjalizację GIS:
-function initializeApp() {
-    // Inicjalizacja Google Identity Services
-    if (window.google?.accounts?.id) {
-        google.accounts.id.initialize({
-            client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-            callback: handleCredentialResponse
-        });
-    }
-
-function handleAuthError(error) {
-    console.error('Błąd autoryzacji:', error);
-    alert('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
 }
 
 function logout() {
+    if (window.google && window.google.accounts) {
+        google.accounts.id.disableAutoSelect();
+    }
     localStorage.removeItem('googleUser');
     localStorage.removeItem('googleAccessToken');
     updateUserUI(null);
@@ -153,7 +156,7 @@ async function authorize() {
     });
 }
 
-// Logika aplikacji
+// Logika drużyn i notatek
 function changeLogo() {
     const teamSelector = document.getElementById('team-selector');
     const logo = document.getElementById('team-logo');
@@ -184,12 +187,7 @@ function startGame() {
     window.location.href = "blania.html";
 }
 
-function openNotesForm() {
-    localStorage.setItem('currentTeam', currentTeam);
-    localStorage.removeItem('currentNoteIndex');
-    window.location.href = 'notes-form.html';
-}
-
+// Logika notatek
 function loadNotes() {
     const notesDisplay = document.getElementById('notes-display');
     const teamNotes = notes[currentTeam] || [];
@@ -235,6 +233,12 @@ function nextNote() {
     }
 }
 
+function openNotesForm() {
+    localStorage.setItem('currentTeam', currentTeam);
+    localStorage.removeItem('currentNoteIndex');
+    window.location.href = 'notes-form.html';
+}
+
 function editNote() {
     const teamNotes = notes[currentTeam] || [];
     if (teamNotes.length > 0) {
@@ -246,7 +250,7 @@ function editNote() {
     }
 }
 
-// Kalendarz i wydarzenia
+// Logika kalendarza
 function moveCalendar(days) {
     currentWeekStart.setDate(currentWeekStart.getDate() + (days * 5));
     generateCalendar();
@@ -351,7 +355,18 @@ function editEvent(eventId) {
     }
 }
 
-// Statystyki i mecze
+function addEvent() {
+    if (!checkLoginStatus()) {
+        alert("Proszę zalogować się przez Google przed dodaniem wydarzenia");
+        return;
+    }
+    
+    const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
+    localStorage.setItem("selectedDate", selectedDate);
+    window.location.href = "add-event.html";
+}
+
+// Logika statystyk
 function loadSavedMatches() {
     const tableBody = document.querySelector("#matches-table tbody");
     let savedMatches = safeJsonParse(localStorage.getItem("savedMatches")) || [];
@@ -416,15 +431,32 @@ function changePage(direction) {
     loadSavedMatches();
 }
 
-function addEvent() {
-    if (!checkLoginStatus()) {
-        alert("Proszę zalogować się przez Google przed dodaniem wydarzenia");
-        return;
+function editMatch(matchId) {
+    const savedMatches = safeJsonParse(localStorage.getItem("savedMatches")) || [];
+    const matchToEdit = savedMatches.find(match => match.id === matchId);
+
+    if (matchToEdit) {
+        localStorage.setItem("selectedTeam", matchToEdit.team);
+        localStorage.setItem("selectedDate", matchToEdit.date);
+        localStorage.setItem("editMatchId", matchToEdit.id);
+        window.location.href = "blania.html";
+    } else {
+        alert("Mecz nie został znaleziony.");
     }
+}
+
+// Funkcje pomocnicze
+function checkLoginStatus() {
+    const user = safeJsonParse(localStorage.getItem('googleUser'));
+    if (!user) return false;
     
-    const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
-    localStorage.setItem("selectedDate", selectedDate);
-    window.location.href = "add-event.html";
+    const tokenExpiration = user.exp * 1000;
+    if (Date.now() > tokenExpiration) {
+        localStorage.removeItem('googleUser');
+        localStorage.removeItem('googleAccessToken');
+        return false;
+    }
+    return true;
 }
 
 async function addEventToGoogleCalendar(event) {
@@ -478,25 +510,14 @@ async function addEventToGoogleCalendar(event) {
 }
 
 // Inicjalizacja aplikacji
-function checkLoginStatus() {
-    const user = safeJsonParse(localStorage.getItem('googleUser'));
-    if (!user) return false;
+async function initializeApp() {
+    await initializeGoogleAuth();
     
-    const tokenExpiration = user.exp * 1000;
-    if (Date.now() > tokenExpiration) {
-        localStorage.removeItem('googleUser');
-        localStorage.removeItem('googleAccessToken');
-        return false;
-    }
-    return true;
-}
-
-function initializeApp() {
-    setTodayDate();
-
-    const user = safeJsonParse(localStorage.getItem('googleUser'));
+    const user = JSON.parse(localStorage.getItem('googleUser'));
     updateUserUI(user);
 
+    setTodayDate();
+    
     const savedTeam = localStorage.getItem('currentTeam');
     if (savedTeam) {
         currentTeam = savedTeam;
@@ -525,5 +546,9 @@ function initializeApp() {
     document.getElementById('next-btn').addEventListener('click', () => changePage(1));
 }
 
-// Start aplikacji po załadowaniu DOM
-document.addEventListener('DOMContentLoaded', initializeApp);
+// Start aplikacji
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp().catch(error => {
+        console.error('Błąd inicjalizacji aplikacji:', error);
+    });
+});
