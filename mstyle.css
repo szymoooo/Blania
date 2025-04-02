@@ -18,18 +18,25 @@
     z-index: 1000;
 }
 
-/* Dodaj te style dla przycisku Google */
-#google-login-button {
-    min-height: 40px;
-    min-width: 250px;
-    transition: opacity 0.3s;
-}
 
 #google-login-button iframe {
     width: 100% !important;
 }
+#google-login-button {
+    min-width: 300px;
+    min-height: 50px;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+}
+
+#google-login-button > div {
+    width: 100% !important;
+    height: 50px !important;
+}
 
 #user-info {
+    display: none;
     position: absolute;
     top: 20px;
     right: 20px;
