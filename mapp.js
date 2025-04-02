@@ -59,38 +59,64 @@ window.handleCredentialResponse = function(response) {
     authorize().catch(handleAuthError);
 };
 
+// W funkcji updateUserUI:
 function updateUserUI(user) {
     const userInfo = document.getElementById('user-info');
     const userName = document.getElementById('user-name');
     const loginButton = document.getElementById('google-login-button');
+    
+    // Wyczyść kontener przed renderowaniem
+    loginButton.innerHTML = '';
     
     if (user) {
         userName.textContent = user.name || user.email;
         userInfo.classList.add('display-block');
         userInfo.classList.remove('display-none');
         loginButton.classList.add('display-none');
-        loginButton.classList.remove('display-block');
         
         if (window.google?.accounts?.id) {
-            google.accounts.id.renderButton(
-                loginButton,
-                { theme: "outline", size: "large", width: "0" }
-            );
+            // Dodaj opóźnienie dla pewności, że GIS jest zainicjalizowany
+            setTimeout(() => {
+                google.accounts.id.renderButton(
+                    loginButton,
+                    { 
+                        theme: "outline", 
+                        size: "large",
+                        width: "0"
+                    }
+                );
+            }, 100);
         }
     } else {
         userInfo.classList.add('display-none');
         userInfo.classList.remove('display-block');
-        loginButton.classList.add('display-block');
         loginButton.classList.remove('display-none');
         
         if (window.google?.accounts?.id) {
-            google.accounts.id.renderButton(
-                loginButton,
-                { theme: "outline", size: "large" }
-            );
+            // Dodaj opóźnienie dla pewności, że GIS jest zainicjalizowany
+            setTimeout(() => {
+                google.accounts.id.renderButton(
+                    loginButton,
+                    { 
+                        theme: "outline", 
+                        size: "large",
+                        width: "250" // Standardowa szerokość
+                    }
+                );
+            }, 100);
         }
     }
 }
+
+// W funkcji initializeApp dodaj inicjalizację GIS:
+function initializeApp() {
+    // Inicjalizacja Google Identity Services
+    if (window.google?.accounts?.id) {
+        google.accounts.id.initialize({
+            client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
+            callback: handleCredentialResponse
+        });
+    }
 
 function handleAuthError(error) {
     console.error('Błąd autoryzacji:', error);
