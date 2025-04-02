@@ -71,7 +71,7 @@ async function initializeGoogleAuth() {
             if (window.google?.accounts?.id) {
                 google.accounts.id.initialize({
                     client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-                    callback: handleCredentialResponse
+                    callback: window.handleCredentialResponse
                 });
                 googleAuthInitialized = true;
                 resolve(true);
@@ -187,7 +187,6 @@ function startGame() {
     window.location.href = "blania.html";
 }
 
-// Logika notatek
 function loadNotes() {
     const notesDisplay = document.getElementById('notes-display');
     const teamNotes = notes[currentTeam] || [];
