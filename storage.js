@@ -276,6 +276,54 @@ class StorageManager {
             this.keys.NOTE_TO_EDIT
         ]);
     }
+
+    /**
+     * Ustawia ID wydarzenia do edycji
+     * @param {number} eventId - ID wydarzenia
+     */
+    setEditEventId(eventId) {
+        this.set(this.keys.EDIT_EVENT_ID, eventId);
+    }
+
+    /**
+     * Pobiera ID wydarzenia do edycji
+     * @returns {number|null} ID wydarzenia lub null
+     */
+    getEditEventId() {
+        return this.get(this.keys.EDIT_EVENT_ID, null);
+    }
+
+    /**
+     * Ustawia ID meczu do edycji
+     * @param {number} matchId - ID meczu
+     */
+    setEditMatchId(matchId) {
+        this.set(this.keys.EDIT_MATCH_ID, matchId);
+    }
+
+    /**
+     * Pobiera ID meczu do edycji
+     * @returns {number|null} ID meczu lub null
+     */
+    getEditMatchId() {
+        return this.get(this.keys.EDIT_MATCH_ID, null);
+    }
+
+    /**
+     * Ustawia ID notatki do edycji
+     * @param {number} noteId - ID notatki
+     */
+    setNoteToEdit(noteId) {
+        this.set(this.keys.NOTE_TO_EDIT, noteId);
+    }
+
+    /**
+     * Pobiera ID notatki do edycji
+     * @returns {number|null} ID notatki lub null
+     */
+    getNoteToEdit() {
+        return this.get(this.keys.NOTE_TO_EDIT, null);
+    }
 }
 
 // Utwórz globalną instancję

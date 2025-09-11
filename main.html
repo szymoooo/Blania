@@ -302,6 +302,89 @@
                 pagination.style.display = 'flex';
             }
         }
+
+        // Funkcje edycji i usuwania wydarzeń
+        function editEvent(eventId) {
+            console.log('✏️ Edycja wydarzenia:', eventId);
+            storage.setEditEventId(eventId);
+            window.location.href = 'add-event.html';
+        }
+
+        function deleteEvent(eventId) {
+            console.log('🗑️ Usuwanie wydarzenia:', eventId);
+            if (confirm('Czy na pewno chcesz usunąć to wydarzenie?')) {
+                const events = storage.getSavedEvents();
+                const updatedEvents = events.filter(event => event.id !== eventId);
+                storage.saveEvents(updatedEvents);
+                loadEvents(); // Odśwież listę
+            }
+        }
+
+        // Funkcje edycji i usuwania meczów
+        function editMatch(matchId) {
+            console.log('✏️ Edycja meczu:', matchId);
+            storage.setEditMatchId(matchId);
+            window.location.href = 'blania.html';
+        }
+
+        function deleteMatch(matchId) {
+            console.log('🗑️ Usuwanie meczu:', matchId);
+            if (confirm('Czy na pewno chcesz usunąć ten mecz?')) {
+                const matches = storage.getSavedMatches();
+                const updatedMatches = matches.filter(match => match.id !== matchId);
+                storage.saveMatches(updatedMatches);
+                loadMatches(); // Odśwież listę
+            }
+        }
+
+        // Funkcje edycji i usuwania notatek
+        function editNote(noteId) {
+            console.log('✏️ Edycja notatki:', noteId);
+            storage.setNoteToEdit(noteId);
+            window.location.href = 'notes-form.html';
+        }
+
+        function deleteNote(noteId) {
+            console.log('🗑️ Usuwanie notatki:', noteId);
+            if (confirm('Czy na pewno chcesz usunąć tę notatkę?')) {
+                const notes = storage.getNotes();
+                const updatedNotes = notes.filter(note => note.id !== noteId);
+                storage.saveNotes(updatedNotes);
+                loadNotes(); // Odśwież listę
+            }
+        }
+
+        // Funkcja sprawdzania duplikatów wydarzeń
+        function checkForDuplicateEvent(newEvent) {
+            const events = storage.getSavedEvents();
+            return events.some(event => 
+                event.name === newEvent.name && 
+                event.date === newEvent.date
+            );
+        }
+
+        // Funkcja walidacji daty
+        function validateDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date >= today;
+        }
+
+        // Funkcja obsługi paginacji
+        function handlePagination(direction) {
+            const currentPage = parseInt(localStorage.getItem('currentPage') || '0');
+            const recordsPerPage = 5;
+            const totalRecords = storage.getSavedMatches().length;
+            const totalPages = Math.ceil(totalRecords / recordsPerPage);
+            
+            let newPage = currentPage + direction;
+            if (newPage < 0) newPage = 0;
+            if (newPage >= totalPages) newPage = totalPages - 1;
+            
+            localStorage.setItem('currentPage', newPage);
+            loadMatches();
+        }
     </script>
     
     <!-- Skrypty JavaScript - na końcu strony -->
