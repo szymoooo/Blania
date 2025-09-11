@@ -28,32 +28,21 @@
             <!-- Nazwa wydarzenia -->
             <div class="form-group">
                 <label for="event-name">Nazwa wydarzenia:</label>
-                <input type="text" id="event-name" name="event-name" required>
-                <select id="team-selector" class="team-selector uniform-width" style="display: none;" onchange="updateEventName()">
-                    <option value="BAT Sierakowice">BAT Sierakowice</option>
-                    <option value="BAT Kartuzy">BAT Kartuzy</option>
-                    <option value="Bryza Pruszcz Gd">Bryza Pruszcz Gd</option>
-                    <option value="Elbląg">Elbląg</option>
-                    <option value="Pruszcz Gdański 1">Pruszcz Gdański 1</option>
-                    <option value="Pruszcz Gdański 2">Pruszcz Gdański 2</option>
-                    <option value="BK VLCI Žďár">BK VLCI Žďár</option>
-                    <option value="BKM Žilina">BKM Žilina</option>
-                    <option value="MOSiR Bochnia">MOSiR Bochnia</option>
-                    <option value="UKS ŻAK Nowy Sącz">UKS ŻAK Nowy Sącz</option>
-                    <option value="Young Angels Košice">Young Angels Košice</option>
+                <select id="event-name" name="event-name" required>
+                    <option value="">Wybierz drużynę</option>
                 </select>
             </div>
 
             <!-- Data -->
             <div class="form-group">
                 <label for="event-date">Data:</label>
-                <input type="date" id="event-date" name="event-date" required onchange="setDefaultTime()">
+                <input type="date" id="event-date" name="event-date" required>
             </div>
 
             <!-- Godzina -->
             <div class="form-group">
                 <label for="event-time">Godzina:</label>
-                <input type="time" id="event-time" name="event-time" step="900" required> <!-- Krok co 15 minut -->
+                <input type="time" id="event-time" name="event-time" value="10:30">
             </div>
 
             <!-- Lokalizacja -->
@@ -64,13 +53,13 @@
                     <option value="Gdynia, ul. Wiczlińska 50a - Microsoft">Gdynia, ul. Wiczlińska 50a - Microsoft</option>
                     <option value="Gdynia, ul. Kopernika 34 - Maku">Gdynia, ul. Kopernika 34 - Maku</option>
                     <option value="Gdynia, ul. Olimpijska 5/9 - GCS">Gdynia, ul. Olimpijska 5/9 - GCS</option>
-                    <option value="Sopot, ul. Książąt Pomorskich 16-18 ">Sopot, ul. Książąt Pomorskich 16-18 </option>
+                    <option value="Sopot, ul. Książąt Pomorskich 16-18">Sopot, ul. Książąt Pomorskich 16-18</option>
                     <option value="Mecz wyjazdowy">Mecz wyjazdowy</option>
-                    <option value="Dom">Domek</option>
+                    <option value="Dom">Dom</option>
                 </select>
             </div>
 
-            <!-- Powtarzanie cykliczne -->
+            <!-- Powtarzanie -->
             <div class="form-group">
                 <div class="checkbox-group">
                     <input type="checkbox" id="event-repeat" name="event-repeat">
@@ -86,8 +75,8 @@
 
             <!-- Przypomnienie -->
             <div class="form-group">
-                <label for="event-reminder">Przypomnienie:</label>
-                <select id="event-reminder" name="event-reminder">
+                <label for="reminder">Przypomnienie:</label>
+                <select id="reminder" name="reminder">
                     <option value="0">Brak przypomnienia</option>
                     <option value="5">5 minut przed</option>
                     <option value="15">15 minut przed</option>
@@ -97,7 +86,7 @@
                 </select>
             </div>
 
-            <!-- Przyciski akcji -->
+            <!-- Przyciski -->
             <div class="form-actions">
                 <button type="button" onclick="cancelEvent()">Anuluj</button>
                 <button type="button" onclick="saveEvent()">Zapisz</button>
@@ -105,6 +94,9 @@
         </form>
     </div>
 
+    <!-- Skrypty JavaScript - na końcu strony -->
+    <script src="config.js"></script>
+    <script src="storage.js"></script>
     <script src="eventHandlers.js"></script>
     <script>
         // Wczytaj edytowane wydarzenie (jeśli istnieje)
@@ -124,7 +116,7 @@
             document.getElementById('event-location').value = editEvent.location;
             document.getElementById('event-repeat').checked = editEvent.repeat;
             document.getElementById('event-notes').value = editEvent.notes;
-            document.getElementById('event-reminder').value = editEvent.reminder;
+            document.getElementById('reminder').value = editEvent.reminder;
             document.getElementById('event-type').value = editEvent.type;
         }
 
@@ -132,13 +124,37 @@
         const selectedDate = storage.getSelectedDate();
         if (selectedDate) {
             document.getElementById('event-date').value = selectedDate;
-            setDefaultTime();
         }
 
-        // Inicjalizacja formularza
-        handleEventTypeChange();
-        setDefaultTime();
-        
+        // Funkcja obsługi zmiany typu wydarzenia
+        function handleEventTypeChange() {
+            const eventType = document.getElementById('event-type').value;
+            const eventNameSelect = document.getElementById('event-name');
+            
+            // Wyczyść poprzednie opcje
+            eventNameSelect.innerHTML = '';
+            
+            if (eventType === 'mecz-ligowy' || eventType === 'mecz-sparingowy') {
+                // Opcje drużyn dla meczów
+                const teams = ['BAT Sierakowice', 'BAT Kartuzy', 'Bryza Pruszcz Gd', 'Elbląg', 'Pruszcz Gdański 1', 'Pruszcz Gdański 2', 'BK VLCI Žďár', 'BKM Žilina', 'MOSiR Bochnia', 'UKS ŻAK Nowy Sącz', 'Young Angels Košice'];
+                teams.forEach(team => {
+                    const option = document.createElement('option');
+                    option.value = team;
+                    option.textContent = team;
+                    eventNameSelect.appendChild(option);
+                });
+            } else {
+                // Opcje dla innych typów wydarzeń
+                const options = ['Trening', 'Fizjoterapeuta', 'Turniej', 'Obóz', 'Bus'];
+                options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    eventNameSelect.appendChild(optionElement);
+                });
+            }
+        }
+
         // Funkcja zapisywania wydarzenia
         function saveEvent() {
             console.log('💾 Przycisk "Zapisz wydarzenie" został kliknięty!');
@@ -185,9 +201,5 @@
             window.location.href = 'main.html';
         }
     </script>
-    
-    <!-- Skrypty JavaScript - na końcu strony -->
-    <script src="config.js"></script>
-    <script src="storage.js"></script>
 </body>
 </html>
