@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wydarzenia - Blania Admin</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --accent: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .events-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .events-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .add-event-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .add-event-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .event-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+            border-left: 5px solid;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .event-card.mecz {
+            border-left-color: #dc3545;
+        }
+        
+        .event-card.turniej {
+            border-left-color: #6f42c1;
+        }
+        
+        .event-card.trening {
+            border-left-color: #28a745;
+        }
+        
+        .event-card.silownia {
+            border-left-color: #fd7e14;
+        }
+        
+        .event-card.spotkanie {
+            border-left-color: #20c997;
+        }
+        
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .event-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .event-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .event-type-badge.mecz {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .event-type-badge.turniej {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        .event-type-badge.trening {
+            background: #28a745;
+            color: white;
+        }
+        
+        .event-type-badge.silownia {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .event-type-badge.spotkanie {
+            background: #20c997;
+            color: white;
+        }
+        
+        .event-details {
+            margin-bottom: 15px;
+        }
+        
+        .event-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .event-detail i {
+            width: 20px;
+            margin-right: 10px;
+            color: #6b7280;
+        }
+        
+        .event-detail-value {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .event-participants {
+            margin-bottom: 15px;
+        }
+        
+        .participants-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .participants-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .participant-tag {
+            background: var(--light);
+            color: var(--dark);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .event-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .participants-btn {
+            background: var(--success);
+            color: white;
+        }
+        
+        .participants-btn:hover {
+            background: #218838;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-select {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .form-checkbox input {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .participants-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .participant-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .participant-checkbox:hover {
+            border-color: var(--primary);
+            background: #f8f9fa;
+        }
+        
+        .participant-checkbox.checked {
+            border-color: var(--primary);
+            background: #e3f2fd;
+        }
+        
+        .participant-checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .participant-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .participant-name {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--dark);
+        }
+        
+        .participant-position {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .back-btn {
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsywność */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .participants-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="events-container">
+        <a href="admin.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Powrót do panelu admin
+        </a>
+        
+        <div class="events-header">
+            <h1 class="events-title">Wydarzenia</h1>
+            <button class="add-event-btn" onclick="openAddEventModal()">
+                <i class="fas fa-plus"></i> Dodaj wydarzenie
+            </button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Szukaj wydarzenia..." onkeyup="filterEvents()">
+            <select class="filter-select" id="typeFilter" onchange="filterEvents()">
+                <option value="">Wszystkie typy</option>
+                <option value="mecz">Mecz</option>
+                <option value="turniej">Turniej</option>
+                <option value="trening">Trening</option>
+                <option value="silownia">Siłownia</option>
+                <option value="spotkanie">Spotkanie organizacyjne</option>
+            </select>
+        </div>
+        
+        <div class="events-grid" id="eventsGrid">
+            <!-- Wydarzenia będą dodane przez JavaScript -->
+        </div>
+        
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-calendar-alt"></i>
+            <h3>Brak wydarzeń</h3>
+            <p>Dodaj pierwsze wydarzenie do swojego kalendarza!</p>
+            <button class="add-event-btn" onclick="openAddEventModal()">
+                <i class="fas fa-plus"></i> Dodaj wydarzenie
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal dodawania/edycji wydarzenia -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Dodaj wydarzenie</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="eventForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="eventName">Nazwa wydarzenia *</label>
+                        <input type="text" class="form-input" id="eventName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="eventType">Typ wydarzenia *</label>
+                        <select class="form-select" id="eventType" required onchange="updateEventColor()">
+                            <option value="">Wybierz typ</option>
+                            <option value="mecz">Mecz</option>
+                            <option value="turniej">Turniej</option>
+                            <option value="trening">Trening</option>
+                            <option value="silownia">Siłownia</option>
+                            <option value="spotkanie">Spotkanie organizacyjne</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="eventDate">Data *</label>
+                        <input type="date" class="form-input" id="eventDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="eventTime">Godzina *</label>
+                        <input type="time" class="form-input" id="eventTime" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="eventLocation">Lokalizacja *</label>
+                        <input type="text" class="form-input" id="eventLocation" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="eventNotes">Notatki</label>
+                        <textarea class="form-input" id="eventNotes" rows="3" placeholder="Dodatkowe informacje..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="eventRepeat">
+                    <label for="eventRepeat">Powtarzaj co tydzień (16 tygodni)</label>
+                </div>
+                
+                <div class="participants-section">
+                    <h3>Uczestnicy wydarzenia</h3>
+                    <p>Wybierz zawodników, którzy będą uczestniczyć w tym wydarzeniu:</p>
+                    <div class="participants-grid" id="participantsGrid">
+                        <!-- Uczestnicy będą dodani przez JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Dodaj wydarzenie</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let events = [];
+        let players = [];
+        let editingEventId = null;
+        
+        // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEvents();
+            loadPlayers();
+            renderEvents();
+        });
+        
+        // Ładowanie wydarzeń z localStorage
+        function loadEvents() {
+            const savedEvents = localStorage.getItem('savedEvents');
+            events = savedEvents ? JSON.parse(savedEvents) : [];
+        }
+        
+        // Ładowanie zawodników z localStorage
+        function loadPlayers() {
+            const savedPlayers = localStorage.getItem('basketballPlayers');
+            players = savedPlayers ? JSON.parse(savedPlayers) : [];
+        }
+        
+        // Zapisywanie wydarzeń do localStorage
+        function saveEvents() {
+            localStorage.setItem('savedEvents', JSON.stringify(events));
+        }
+        
+        // Renderowanie listy wydarzeń
+        function renderEvents() {
+            const eventsGrid = document.getElementById('eventsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (events.length === 0) {
+                eventsGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            eventsGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            eventsGrid.innerHTML = events.map(event => `
+                <div class="event-card ${event.type}">
+                    <div class="event-header">
+                        <h3 class="event-title">${event.name}</h3>
+                        <span class="event-type-badge ${event.type}">${getTypeName(event.type)}</span>
+                    </div>
+                    
+                    <div class="event-details">
+                        <div class="event-detail">
+                            <i class="fas fa-calendar"></i>
+                            <span class="event-detail-value">${formatDate(event.date)}</span>
+                        </div>
+                        
+                        <div class="event-detail">
+                            <i class="fas fa-clock"></i>
+                            <span class="event-detail-value">${formatTime(event.date)}</span>
+                        </div>
+                        
+                        <div class="event-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="event-detail-value">${event.location}</span>
+                        </div>
+                        
+                        ${event.notes ? `
+                        <div class="event-detail">
+                            <i class="fas fa-sticky-note"></i>
+                            <span class="event-detail-value">${event.notes}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${event.participants && event.participants.length > 0 ? `
+                    <div class="event-participants">
+                        <div class="participants-title">Uczestnicy (${event.participants.length}):</div>
+                        <div class="participants-list">
+                            ${event.participants.map(participantId => {
+                                const participant = players.find(p => p.id === participantId);
+                                return participant ? `<span class="participant-tag">${participant.firstName} ${participant.lastName}</span>` : '';
+                            }).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="event-actions">
+                        <button class="action-btn participants-btn" onclick="manageParticipants('${event.id}')">
+                            <i class="fas fa-users"></i> Uczestnicy
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editEvent('${event.id}')">
+                            <i class="fas fa-edit"></i> Edytuj
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteEvent('${event.id}')">
+                            <i class="fas fa-trash"></i> Usuń
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filtrowanie wydarzeń
+        function filterEvents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            const filteredEvents = events.filter(event => {
+                const matchesSearch = event.name.toLowerCase().includes(searchTerm) || 
+                                    event.location.toLowerCase().includes(searchTerm);
+                const matchesType = !typeFilter || event.type === typeFilter;
+                return matchesSearch && matchesType;
+            });
+            
+            // Tymczasowo zastąp listę wydarzeń
+            const originalEvents = events;
+            events = filteredEvents;
+            renderEvents();
+            events = originalEvents;
+        }
+        
+        // Otwórz modal dodawania
+        function openAddEventModal() {
+            editingEventId = null;
+            document.getElementById('modalTitle').textContent = 'Dodaj wydarzenie';
+            document.getElementById('submitBtn').textContent = 'Dodaj wydarzenie';
+            document.getElementById('eventForm').reset();
+            loadParticipants();
+            document.getElementById('eventModal').style.display = 'block';
+        }
+        
+        // Edytuj wydarzenie
+        function editEvent(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            editingEventId = eventId;
+            document.getElementById('modalTitle').textContent = 'Edytuj wydarzenie';
+            document.getElementById('submitBtn').textContent = 'Zapisz zmiany';
+            
+            // Wypełnij formularz
+            document.getElementById('eventName').value = event.name;
+            document.getElementById('eventType').value = event.type;
+            document.getElementById('eventDate').value = event.date.split('T')[0];
+            document.getElementById('eventTime').value = event.date.split('T')[1].substring(0, 5);
+            document.getElementById('eventLocation').value = event.location;
+            document.getElementById('eventNotes').value = event.notes || '';
+            document.getElementById('eventRepeat').checked = event.repeat || false;
+            
+            loadParticipants(event.participants || []);
+            document.getElementById('eventModal').style.display = 'block';
+        }
+        
+        // Usuń wydarzenie
+        function deleteEvent(eventId) {
+            if (confirm('Czy na pewno chcesz usunąć to wydarzenie?')) {
+                events = events.filter(e => e.id !== eventId);
+                saveEvents();
+                renderEvents();
+            }
+        }
+        
+        // Zarządzaj uczestnikami
+        function manageParticipants(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+            
+            editingEventId = eventId;
+            document.getElementById('modalTitle').textContent = 'Zarządzaj uczestnikami';
+            document.getElementById('submitBtn').textContent = 'Zapisz uczestników';
+            
+            // Wypełnij formularz
+            document.getElementById('eventName').value = event.name;
+            document.getElementById('eventType').value = event.type;
+            document.getElementById('eventDate').value = event.date.split('T')[0];
+            document.getElementById('eventTime').value = event.date.split('T')[1].substring(0, 5);
+            document.getElementById('eventLocation').value = event.location;
+            document.getElementById('eventNotes').value = event.notes || '';
+            document.getElementById('eventRepeat').checked = event.repeat || false;
+            
+            loadParticipants(event.participants || []);
+            document.getElementById('eventModal').style.display = 'block';
+        }
+        
+        // Ładowanie uczestników
+        function loadParticipants(selectedParticipants = []) {
+            const participantsGrid = document.getElementById('participantsGrid');
+            
+            participantsGrid.innerHTML = players.map(player => `
+                <div class="participant-checkbox ${selectedParticipants.includes(player.id) ? 'checked' : ''}" onclick="toggleParticipant('${player.id}')">
+                    <input type="checkbox" ${selectedParticipants.includes(player.id) ? 'checked' : ''} onchange="toggleParticipant('${player.id}')">
+                    <div class="participant-info">
+                        <div class="participant-name">${player.firstName} ${player.lastName}</div>
+                        <div class="participant-position">#${player.jerseyNumber} - ${getPositionName(player.position)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Przełącz uczestnika
+        function toggleParticipant(playerId) {
+            const checkbox = document.querySelector(`input[value="${playerId}"]`);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                const container = checkbox.closest('.participant-checkbox');
+                container.classList.toggle('checked', checkbox.checked);
+            }
+        }
+        
+        // Zamknij modal
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+        }
+        
+        // Obsługa formularza
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('eventName').value.trim(),
+                type: document.getElementById('eventType').value,
+                date: document.getElementById('eventDate').value + 'T' + document.getElementById('eventTime').value,
+                location: document.getElementById('eventLocation').value.trim(),
+                notes: document.getElementById('eventNotes').value.trim(),
+                repeat: document.getElementById('eventRepeat').checked
+            };
+            
+            // Pobierz wybranych uczestników
+            const selectedParticipants = Array.from(document.querySelectorAll('#participantsGrid input:checked'))
+                .map(input => input.value);
+            
+            if (editingEventId) {
+                // Edycja
+                const eventIndex = events.findIndex(e => e.id === editingEventId);
+                events[eventIndex] = { ...events[eventIndex], ...formData, participants: selectedParticipants };
+            } else {
+                // Dodawanie
+                const newEvent = {
+                    id: Date.now().toString(),
+                    ...formData,
+                    participants: selectedParticipants,
+                    createdAt: new Date().toISOString()
+                };
+                events.push(newEvent);
+            }
+            
+            saveEvents();
+            renderEvents();
+            closeModal();
+        });
+        
+        // Funkcje pomocnicze
+        function getTypeName(type) {
+            const types = {
+                'mecz': 'Mecz',
+                'turniej': 'Turniej',
+                'trening': 'Trening',
+                'silownia': 'Siłownia',
+                'spotkanie': 'Spotkanie'
+            };
+            return types[type] || type;
+        }
+        
+        function getPositionName(position) {
+            const positions = {
+                'PG': 'Rozgrywający',
+                'SG': 'Rzucający obrońca',
+                'SF': 'Niski skrzydłowy',
+                'PF': 'Silny skrzydłowy',
+                'C': 'Środkowy'
+            };
+            return positions[position] || position;
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pl-PL');
+        }
+        
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Zamknij modal po kliknięciu poza nim
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
