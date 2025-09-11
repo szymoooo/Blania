@@ -25,16 +25,23 @@ class PerformanceOptimizer {
     }
     
     convertImagesToWebP() {
-        if (!this.supportsWebP()) return;
+        if (!this.supportsWebP()) {
+            console.log('⚠️ Przeglądarka nie obsługuje WebP');
+            return;
+        }
         
         const images = document.querySelectorAll('img[src$=".png"]');
+        console.log(`🔄 Konwersja ${images.length} obrazów PNG do WebP`);
+        
         images.forEach(img => {
-            const webpSrc = img.src.replace('.png', '.webp');
+            const webpSrc = img.src.replace('.png', '.webp').replace(/\/([^\/]+)$/, '/webp/$1');
             this.preloadImage(webpSrc).then(() => {
+                console.log(`✅ WebP: ${img.src} → ${webpSrc}`);
                 img.src = webpSrc;
+                img.classList.add('webp-optimized');
             }).catch(() => {
                 // Fallback to original PNG if WebP fails
-                console.log('WebP not available, using PNG');
+                console.log(`⚠️ WebP nie dostępne dla ${img.src}, używam PNG`);
             });
         });
     }
@@ -221,10 +228,10 @@ class PerformanceOptimizer {
         this.throttleTimers.forEach(timer => clearTimeout(timer));
         this.throttleTimers.clear();
         
-        // Force garbage collection if available
-        if (window.gc) {
-            window.gc();
-        }
+        // Force garbage collection if available (disabled for CSP compatibility)
+        // if (window.gc) {
+        //     window.gc();
+        // }
     }
     
     // ===== PERFORMANCE MONITORING =====

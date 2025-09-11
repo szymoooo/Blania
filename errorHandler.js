@@ -260,13 +260,29 @@ class ErrorHandler {
         // Create error notification
         const notification = document.createElement('div');
         notification.className = `error-notification error-notification--${type}`;
-        notification.innerHTML = `
-            <div class="error-notification__content">
-                <span class="error-notification__icon">⚠️</span>
-                <span class="error-notification__message">${message}</span>
-                <button class="error-notification__close" onclick="this.parentElement.parentElement.remove()">×</button>
-            </div>
-        `;
+        
+        const content = document.createElement('div');
+        content.className = 'error-notification__content';
+        
+        const icon = document.createElement('span');
+        icon.className = 'error-notification__icon';
+        icon.textContent = '⚠️';
+        
+        const messageSpan = document.createElement('span');
+        messageSpan.className = 'error-notification__message';
+        messageSpan.textContent = message;
+        
+        const closeButton = document.createElement('button');
+        closeButton.className = 'error-notification__close';
+        closeButton.textContent = '×';
+        closeButton.addEventListener('click', () => {
+            notification.remove();
+        });
+        
+        content.appendChild(icon);
+        content.appendChild(messageSpan);
+        content.appendChild(closeButton);
+        notification.appendChild(content);
         
         // Add styles if not already added
         if (!document.getElementById('error-notification-styles')) {

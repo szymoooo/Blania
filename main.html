@@ -3,44 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self';">
     <title>Mecze Blanki</title>
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self';
-        script-src 'self' https://accounts.google.com https://cdnjs.cloudflare.com;
-        style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdnjs.cloudflare.com https://fonts.googleapis.com;
-        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
-        img-src 'self' data: https:;
-        connect-src 'self' https://www.googleapis.com;
-        frame-src https://accounts.google.com;
-    ">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <script>
-        function handleCredentialResponse(response) {
-            if (window.handleGoogleAuth) {
-                window.handleGoogleAuth(response);
-            } else {
-                console.error('Funkcja handleGoogleAuth nie została zdefiniowana');
-            }
+    <link rel="stylesheet" href="styles.css?v=3.0">
+    <style>
+        /* Fallback CSS - podstawowe style */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-    </script>
+        
+        .calendar-container {
+            width: 1200px;
+            margin: 20px auto;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border: 2px solid #0078d7;
+            position: relative;
+            padding-bottom: 80px;
+        }
+        
+        .team-and-notes-container {
+            display: flex;
+            gap: 20px;
+            width: 1200px;
+            margin: 20px auto;
+            position: relative;
+        }
+        
+        .team-selection-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            width: 600px;
+            height: 320px;
+            border: 2px solid #0078d7;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        
+        .scouting-notes {
+            width: 600px;
+            height: 330px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 2px solid #0078d7;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        
+        button, .primary-btn, .btn-prev-calendar, .btn-next-calendar, 
+        .btn-add-event, .btn-start-game, .btn-prev-note, .btn-next-note, 
+        .btn-add-note, .btn-edit-note, .btn-prev-stats, .btn-next-stats {
+            font-size: 16px;
+            padding: 10px 18px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-add-event { background-color: #28a745; }
+        .btn-start-game { background-color: #dc3545; }
+        .btn-edit-note { background-color: #ffc107; color: black; }
+        
+        button:hover, .primary-btn:hover, .btn-prev-calendar:hover, 
+        .btn-next-calendar:hover, .btn-add-event:hover, .btn-start-game:hover, 
+        .btn-prev-note:hover, .btn-next-note:hover, .btn-add-note:hover, 
+        .btn-edit-note:hover, .btn-prev-stats:hover, .btn-next-stats:hover {
+            background-color: #005bb5;
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 <body>
-    <div class="google-auth-container">
-        <div id="user-info" class="display-none">
-            Zalogowany jako: <span id="user-name"></span>
-            <button id="logout-btn">Wyloguj</button>
-        </div>
-        <div id="g_id_onload"
-             data-client_id="148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div id="google-login-button" class="display-none"></div>
-    </div>
 
     <header>
         <h2>Mój planner:</h2>
@@ -127,7 +183,6 @@
         &copy; 2023 Mecze Blanki. Wszelkie prawa zastrzeżone.
     </footer>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="config.js"></script>
     <script src="storage.js"></script>
     <script src="stateManager.js"></script>
@@ -135,5 +190,16 @@
     <script src="performance.js"></script>
     <script src="eventHandlers.js"></script>
     <script src="app.js"></script>
+    <script>
+        // Inicjalizuj event handlery po załadowaniu DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.eventHandlers) {
+                window.eventHandlers.initMainHandlers();
+                console.log('✅ Event handlery zainicjalizowane');
+            } else {
+                console.error('❌ Event handlery nie są dostępne');
+            }
+        });
+    </script>
 </body>
 </html>

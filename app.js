@@ -32,17 +32,22 @@ function handleAuthError(error) {
 }
 
 window.handleGoogleAuth = function(response) {
+    console.log('handleGoogleAuth called with:', response);
+    
     if (response.error) {
+        console.error('Google Auth error:', response.error);
         handleAuthError(response.error);
         return;
     }
     
     const user = decodeJwt(response.credential);
     if (!user) {
+        console.error('Failed to decode JWT');
         handleAuthError('invalid_token');
         return;
     }
     
+    console.log('Google Auth successful, user:', user);
     storage.setGoogleUser(user);
     updateUserUI(user);
     authorize().catch(handleAuthError);
@@ -156,8 +161,11 @@ function setTodayDate() {
 }
 
 function startGame() {
+    console.log('🎮 Przycisk "Gramy" został kliknięty!');
     const team = document.getElementById('team-selector').value;
     const date = document.getElementById('game-date').value;
+
+    console.log('Zespół:', team, 'Data:', date);
 
     if (!date) {
         alert("Proszę wybrać datę meczu!");
@@ -202,41 +210,63 @@ function updateNotesNavigation() {
 }
 
 function prevNote() {
+    console.log('⬅️ Przycisk "Poprzednia" notatka został kliknięty!');
+    console.log('Aktualny indeks:', currentNoteIndex);
     if (currentNoteIndex > 0) {
         currentNoteIndex--;
+        console.log('Nowy indeks:', currentNoteIndex);
         loadNotes();
+    } else {
+        console.log('❌ Już jesteś na pierwszej notatce');
     }
 }
 
 function nextNote() {
+    console.log('➡️ Przycisk "Następna" notatka został kliknięty!');
     const teamNotes = storage.getTeamNotes(currentTeam);
+    console.log('Aktualny indeks:', currentNoteIndex, 'Liczba notatek:', teamNotes.length);
     if (currentNoteIndex < teamNotes.length - 1) {
         currentNoteIndex++;
+        console.log('Nowy indeks:', currentNoteIndex);
         loadNotes();
+    } else {
+        console.log('❌ Już jesteś na ostatniej notatce');
     }
 }
 
 function openNotesForm() {
+    console.log('📝 Przycisk "Dodaj" notatkę został kliknięty!');
+    console.log('Aktualny zespół:', currentTeam);
     storage.setCurrentTeam(currentTeam);
     storage.remove(storage.keys.CURRENT_NOTE_INDEX);
     window.location.href = 'notes-form.html';
 }
 
 function editNote() {
+    console.log('✏️ Przycisk "Edytuj" notatkę został kliknięty!');
     const teamNotes = storage.getTeamNotes(currentTeam);
+    console.log('Liczba notatek dla zespołu', currentTeam, ':', teamNotes.length);
+    console.log('Aktualny indeks notatki:', currentNoteIndex);
+    
     if (teamNotes.length > 0) {
         const note = teamNotes[currentNoteIndex];
+        console.log('Edytowana notatka:', note);
         storage.setCurrentTeam(currentTeam);
         storage.setCurrentNoteIndex(currentNoteIndex);
         storage.setNoteToEdit(note);
         window.location.href = 'notes-form.html';
+    } else {
+        console.log('❌ Brak notatek do edycji');
     }
 }
 
 // ===== CALENDAR FUNCTIONS =====
 
 function moveCalendar(days) {
+    console.log('📅 Nawigacja kalendarza:', days > 0 ? 'Następna' : 'Poprzednia', 'tydzień');
+    console.log('Aktualna data początku tygodnia:', currentWeekStart);
     currentWeekStart.setDate(currentWeekStart.getDate() + (days * AppConfig.CALENDAR.DAYS_PER_WEEK));
+    console.log('Nowa data początku tygodnia:', currentWeekStart);
     generateCalendar();
 }
 
@@ -332,10 +362,13 @@ function editEvent(eventId) {
 }
 
 function addEvent() {
+    console.log('📅 Przycisk "Dodaj wydarzenie" został kliknięty!');
     if (!checkLoginStatus()) {
+        console.log('❌ Użytkownik nie jest zalogowany');
         alert("Proszę zalogować się przez Google przed dodaniem wydarzenia");
         return;
     }
+    console.log('✅ Użytkownik jest zalogowany, przekierowuję do add-event.html');
     
     const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
     storage.setSelectedDate(selectedDate);

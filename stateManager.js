@@ -124,30 +124,30 @@ class StateManager {
     dispatch(action, payload = null) {
         const middlewareResult = this.applyMiddleware({ action, payload }, this.state);
         
-        switch (middlewareResult.action) {
+        switch (action) {
             // User actions
             case 'LOGIN':
-                this.handleLogin(middlewareResult.payload);
+                this.handleLogin(payload);
                 break;
             case 'LOGOUT':
                 this.handleLogout();
                 break;
             case 'SET_ACCESS_TOKEN':
-                this.handleSetAccessToken(middlewareResult.payload);
+                this.handleSetAccessToken(payload);
                 break;
                 
             // UI actions
             case 'SET_CURRENT_PAGE':
-                this.handleSetCurrentPage(middlewareResult.payload);
+                this.handleSetCurrentPage(payload);
                 break;
             case 'SET_CURRENT_TEAM':
-                this.handleSetCurrentTeam(middlewareResult.payload);
+                this.handleSetCurrentTeam(payload);
                 break;
             case 'SET_LOADING':
-                this.handleSetLoading(middlewareResult.payload);
+                this.handleSetLoading(payload);
                 break;
             case 'SET_ERROR':
-                this.handleSetError(middlewareResult.payload);
+                this.handleSetError(payload);
                 break;
             case 'CLEAR_ERROR':
                 this.handleClearError();
@@ -155,51 +155,51 @@ class StateManager {
                 
             // Data actions
             case 'LOAD_MATCHES':
-                this.handleLoadMatches(middlewareResult.payload);
+                this.handleLoadMatches(payload);
                 break;
             case 'ADD_MATCH':
-                this.handleAddMatch(middlewareResult.payload);
+                this.handleAddMatch(payload);
                 break;
             case 'UPDATE_MATCH':
-                this.handleUpdateMatch(middlewareResult.payload);
+                this.handleUpdateMatch(payload);
                 break;
             case 'DELETE_MATCH':
-                this.handleDeleteMatch(middlewareResult.payload);
+                this.handleDeleteMatch(payload);
                 break;
             case 'LOAD_EVENTS':
-                this.handleLoadEvents(middlewareResult.payload);
+                this.handleLoadEvents(payload);
                 break;
             case 'ADD_EVENT':
-                this.handleAddEvent(middlewareResult.payload);
+                this.handleAddEvent(payload);
                 break;
             case 'UPDATE_EVENT':
-                this.handleUpdateEvent(middlewareResult.payload);
+                this.handleUpdateEvent(payload);
                 break;
             case 'DELETE_EVENT':
-                this.handleDeleteEvent(middlewareResult.payload);
+                this.handleDeleteEvent(payload);
                 break;
             case 'LOAD_NOTES':
-                this.handleLoadNotes(middlewareResult.payload);
+                this.handleLoadNotes(payload);
                 break;
             case 'ADD_NOTE':
-                this.handleAddNote(middlewareResult.payload);
+                this.handleAddNote(payload);
                 break;
             case 'UPDATE_NOTE':
-                this.handleUpdateNote(middlewareResult.payload);
+                this.handleUpdateNote(payload);
                 break;
             case 'DELETE_NOTE':
-                this.handleDeleteNote(middlewareResult.payload);
+                this.handleDeleteNote(payload);
                 break;
                 
             // Edit actions
             case 'SET_EDIT_MATCH':
-                this.handleSetEditMatch(middlewareResult.payload);
+                this.handleSetEditMatch(payload);
                 break;
             case 'SET_EDIT_EVENT':
-                this.handleSetEditEvent(middlewareResult.payload);
+                this.handleSetEditEvent(payload);
                 break;
             case 'SET_EDIT_NOTE':
-                this.handleSetEditNote(middlewareResult.payload);
+                this.handleSetEditNote(payload);
                 break;
             case 'CLEAR_EDIT_STATE':
                 this.handleClearEditState();
@@ -537,6 +537,44 @@ class StateManager {
     isTokenExpired() {
         if (!this.state.user.tokenExpiration) return false;
         return Date.now() > this.state.user.tokenExpiration;
+    }
+    
+    // ===== DATA HANDLERS =====
+    
+    handleLoadMatches(matches) {
+        this.setState({
+            data: {
+                ...this.state.data,
+                matches: matches || []
+            }
+        });
+    }
+    
+    handleLoadEvents(events) {
+        this.setState({
+            data: {
+                ...this.state.data,
+                events: events || []
+            }
+        });
+    }
+    
+    handleLoadNotes(notes) {
+        this.setState({
+            data: {
+                ...this.state.data,
+                notes: notes || {}
+            }
+        });
+    }
+    
+    handleSetCurrentTeam(team) {
+        this.setState({
+            ui: {
+                ...this.state.ui,
+                currentTeam: team
+            }
+        });
     }
     
     // ===== INITIALIZATION =====

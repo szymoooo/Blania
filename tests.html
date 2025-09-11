@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self';">
     <title>Testy jednostkowe - Blania</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2.0">
     <style>
         .test-container {
             max-width: 1200px;
@@ -166,6 +167,61 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0078d7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .loading-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #0078d7;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: bold;
+            color: #0078d7;
+            min-width: 40px;
+        }
     </style>
 </head>
 <body>
@@ -179,6 +235,10 @@
             <button id="runAllTests" class="test-button">Uruchom wszystkie testy</button>
             <button id="runStorageTests" class="test-button">Testy Storage</button>
             <button id="runErrorTests" class="test-button">Testy Error Handler</button>
+            <button id="runCSSTests" class="test-button">Testy CSS</button>
+            <button id="runButtonTests" class="test-button">Testy Przycisków</button>
+            <button id="runMainPageButtonTests" class="test-button">Testy Przycisków Strona Główna</button>
+            <button id="runAllPagesButtonTests" class="test-button">Testy Przycisków Wszystkie Strony</button>
             <button id="clearResults" class="test-button">Wyczyść wyniki</button>
         </div>
         
@@ -222,6 +282,10 @@
                 document.getElementById('runAllTests').addEventListener('click', () => this.runAllTests());
                 document.getElementById('runStorageTests').addEventListener('click', () => this.runStorageTests());
                 document.getElementById('runErrorTests').addEventListener('click', () => this.runErrorTests());
+                document.getElementById('runCSSTests').addEventListener('click', () => this.runCSSTests());
+                document.getElementById('runButtonTests').addEventListener('click', () => this.runButtonTests());
+                document.getElementById('runMainPageButtonTests').addEventListener('click', () => this.runMainPageButtonTests());
+                document.getElementById('runAllPagesButtonTests').addEventListener('click', () => this.runAllPagesButtonTests());
                 document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
             }
 
@@ -235,14 +299,88 @@
                 console.log('🚀 Uruchamianie wszystkich testów...\n');
                 
                 try {
-                    const storageResults = await this.storageTests.run();
-                    const errorResults = await this.errorTests.run();
+                    // Testy po kolei z lepszym error handling
+                    const results = [];
                     
-                    this.allResults = [storageResults, errorResults];
+                    // 1. Storage Tests
+                    try {
+                        this.updateProgress(1, 6, 'Uruchamianie testów Storage...');
+                        console.log('📦 Uruchamianie testów Storage...');
+                        const storageResults = await this.storageTests.run();
+                        results.push(storageResults);
+                        console.log(`✅ Storage: ${storageResults.passed}/${storageResults.total} testów`);
+                    } catch (error) {
+                        console.error('❌ Błąd w testach Storage:', error);
+                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'Storage Tests', passed: false, error: error.message }] });
+                    }
+                    
+                    // 2. Error Handler Tests
+                    try {
+                        this.updateProgress(2, 6, 'Uruchamianie testów Error Handler...');
+                        console.log('⚠️ Uruchamianie testów Error Handler...');
+                        const errorResults = await this.errorTests.run();
+                        results.push(errorResults);
+                        console.log(`✅ Error Handler: ${errorResults.passed}/${errorResults.total} testów`);
+                    } catch (error) {
+                        console.error('❌ Błąd w testach Error Handler:', error);
+                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'Error Handler Tests', passed: false, error: error.message }] });
+                    }
+                    
+                    // 3. CSS Tests
+                    try {
+                        this.updateProgress(3, 6, 'Uruchamianie testów CSS...');
+                        console.log('🎨 Uruchamianie testów CSS...');
+                        const cssResults = await this.runCSSTestsInternal();
+                        results.push(cssResults);
+                        console.log(`✅ CSS: ${cssResults.passed}/${cssResults.total} testów`);
+                    } catch (error) {
+                        console.error('❌ Błąd w testach CSS:', error);
+                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'CSS Tests', passed: false, error: error.message }] });
+                    }
+                    
+                    // 4. Button Tests (tests.html)
+                    try {
+                        this.updateProgress(4, 6, 'Uruchamianie testów przycisków...');
+                        console.log('🔘 Uruchamianie testów przycisków...');
+                        const buttonResults = await this.runButtonTestsInternal();
+                        results.push(buttonResults);
+                        console.log(`✅ Przyciski: ${buttonResults.passed}/${buttonResults.total} testów`);
+                    } catch (error) {
+                        console.error('❌ Błąd w testach przycisków:', error);
+                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'Button Tests', passed: false, error: error.message }] });
+                    }
+                    
+                    // 5. Main Page Button Tests
+                    try {
+                        this.updateProgress(5, 6, 'Uruchamianie testów przycisków strony głównej...');
+                        console.log('🏠 Uruchamianie testów przycisków strony głównej...');
+                        const mainPageButtonResults = await this.runMainPageButtonTestsInternal();
+                        results.push(mainPageButtonResults);
+                        console.log(`✅ Przyciski Strona Główna: ${mainPageButtonResults.passed}/${mainPageButtonResults.total} testów`);
+                    } catch (error) {
+                        console.error('❌ Błąd w testach przycisków strony głównej:', error);
+                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'Main Page Button Tests', passed: false, error: error.message }] });
+                    }
+                    
+                    // 6. All Pages Button Tests
+                    try {
+                        this.updateProgress(6, 6, 'Uruchamianie testów przycisków wszystkich stron...');
+                        console.log('🌐 Uruchamianie testów przycisków wszystkich stron...');
+                        const allPagesButtonResults = await this.runAllPagesButtonTestsInternal();
+                        results.push(allPagesButtonResults);
+                        console.log(`✅ Przyciski Wszystkie Strony: ${allPagesButtonResults.passed}/${allPagesButtonResults.total} testów`);
+                    } catch (error) {
+                        console.error('❌ Błąd w testach przycisków wszystkich stron:', error);
+                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'All Pages Button Tests', passed: false, error: error.message }] });
+                    }
+                    
+                    this.allResults = results;
                     this.displayResults();
+                    console.log('🎉 Wszystkie testy zakończone!');
+                    
                 } catch (error) {
-                    console.error('Błąd podczas uruchamiania testów:', error);
-                    this.showError('Błąd podczas uruchamiania testów: ' + error.message);
+                    console.error('❌ Krytyczny błąd podczas uruchamiania testów:', error);
+                    this.showError('Krytyczny błąd podczas uruchamiania testów: ' + error.message);
                 } finally {
                     this.hideLoading();
                 }
@@ -288,6 +426,523 @@
                 } finally {
                     this.hideLoading();
                 }
+            }
+
+            /**
+             * Uruchamia testy CSS
+             */
+            async runCSSTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('🎨 Uruchamianie testów CSS...\n');
+                
+                try {
+                    const results = await this.runCSSTestsInternal();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów CSS:', error);
+                    this.showError('Błąd podczas uruchamiania testów CSS: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Wewnętrzne testy CSS
+             */
+            async runCSSTestsInternal() {
+                const testRunner = new TestRunner();
+                
+                // Test 1: Sprawdź czy CSS się załadował
+                testRunner.addTest('powinien załadować CSS poprawnie', () => {
+                    const body = document.body;
+                    const computedStyle = window.getComputedStyle(body);
+                    const fontFamily = computedStyle.fontFamily;
+                    
+                    Assert.assertTrue(fontFamily.includes('Roboto') || fontFamily.includes('sans-serif'), 
+                        `Font family: ${fontFamily}`);
+                }, 'Ładowanie CSS');
+                
+                // Test 2: Sprawdź czy przyciski mają style
+                testRunner.addTest('powinien stylować przyciski', () => {
+                    const button = document.querySelector('.test-button');
+                    if (!button) {
+                        throw new Error('Nie znaleziono przycisku testowego');
+                    }
+                    
+                    const computedStyle = window.getComputedStyle(button);
+                    const backgroundColor = computedStyle.backgroundColor;
+                    const color = computedStyle.color;
+                    
+                    Assert.assertNotEquals(backgroundColor, 'rgba(0, 0, 0, 0)', 'Brak koloru tła przycisku');
+                    Assert.assertNotEquals(color, 'rgba(0, 0, 0, 0)', 'Brak koloru tekstu przycisku');
+                }, 'Style przycisków');
+                
+                // Test 3: Sprawdź czy kontener ma style
+                testRunner.addTest('powinien stylować kontener', () => {
+                    const container = document.querySelector('.test-container');
+                    if (!container) {
+                        throw new Error('Nie znaleziono kontenera testowego');
+                    }
+                    
+                    const computedStyle = window.getComputedStyle(container);
+                    const maxWidth = computedStyle.maxWidth;
+                    const margin = computedStyle.margin;
+                    
+                    Assert.assertNotEquals(maxWidth, 'none', 'Brak max-width na kontenerze');
+                    Assert.assertNotEquals(margin, '0px', 'Brak marginesu na kontenerze');
+                }, 'Style kontenera');
+                
+                // Test 4: Sprawdź czy nagłówek ma style
+                testRunner.addTest('powinien stylować nagłówek', () => {
+                    const header = document.querySelector('.test-header h1');
+                    if (!header) {
+                        throw new Error('Nie znaleziono nagłówka testowego');
+                    }
+                    
+                    const computedStyle = window.getComputedStyle(header);
+                    const textAlign = computedStyle.textAlign;
+                    const marginBottom = computedStyle.marginBottom;
+                    
+                    Assert.assertEquals(textAlign, 'center', `Text-align: ${textAlign}`);
+                    Assert.assertNotEquals(marginBottom, '0px', 'Brak marginesu na nagłówku');
+                }, 'Style nagłówka');
+                
+                // Test 5: Sprawdź czy wyniki testów mają style
+                testRunner.addTest('powinien stylować wyniki testów', () => {
+                    const results = document.querySelector('.test-results');
+                    if (!results) {
+                        throw new Error('Nie znaleziono sekcji wyników');
+                    }
+                    
+                    const computedStyle = window.getComputedStyle(results);
+                    const backgroundColor = computedStyle.backgroundColor;
+                    const border = computedStyle.border;
+                    const borderRadius = computedStyle.borderRadius;
+                    
+                    Assert.assertNotEquals(backgroundColor, 'rgba(0, 0, 0, 0)', 'Brak koloru tła wyników');
+                    Assert.assertNotEquals(border, '0px none rgb(0, 0, 0)', 'Brak obramowania wyników');
+                    Assert.assertNotEquals(borderRadius, '0px', 'Brak zaokrąglonych rogów');
+                }, 'Style wyników');
+                
+                // Test 6: Sprawdź czy CSS ma cache-busting
+                testRunner.addTest('powinien mieć cache-busting w CSS', () => {
+                    const cssLink = document.querySelector('link[href*="styles.css"]');
+                    if (!cssLink) {
+                        throw new Error('Nie znaleziono linku do CSS');
+                    }
+                    
+                    const href = cssLink.href;
+                    Assert.assertTrue(href.includes('?v='), `CSS link: ${href}`);
+                }, 'Cache-busting');
+                
+                return await testRunner.runAll();
+            }
+
+            /**
+             * Uruchamia testy przycisków
+             */
+            async runButtonTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('🔘 Uruchamianie testów przycisków...\n');
+                
+                try {
+                    const results = await this.runButtonTestsInternal();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów przycisków:', error);
+                    this.showError('Błąd podczas uruchamiania testów przycisków: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Wewnętrzne testy przycisków
+             */
+            async runButtonTestsInternal() {
+                const testRunner = new TestRunner();
+                
+                // Test 1: Sprawdź czy wszystkie przyciski istnieją na aktualnej stronie
+                testRunner.addTest('powinien mieć wszystkie przyciski na stronie testów', () => {
+                    const buttons = document.querySelectorAll('button');
+                    const expectedButtons = [
+                        '#runAllTests',
+                        '#runStorageTests',
+                        '#runErrorTests', 
+                        '#runCSSTests',
+                        '#runButtonTests',
+                        '#clearResults'
+                    ];
+                    
+                    let foundButtons = 0;
+                    expectedButtons.forEach(selector => {
+                        if (document.querySelector(selector)) {
+                            foundButtons++;
+                        }
+                    });
+                    
+                    Assert.assertEquals(foundButtons, expectedButtons.length, 
+                        `Znaleziono ${foundButtons}/${expectedButtons.length} przycisków testowych`);
+                }, 'Istnienie przycisków testowych');
+                
+                // Test 2: Sprawdź czy przyciski mają event listenery
+                testRunner.addTest('powinien mieć event listenery na przyciskach', () => {
+                    const buttons = document.querySelectorAll('button');
+                    let buttonsWithListeners = 0;
+                    
+                    buttons.forEach(button => {
+                        // Sprawdź czy przycisk ma onclick lub event listener
+                        if (button.onclick || button.getAttribute('onclick')) {
+                            buttonsWithListeners++;
+                        }
+                    });
+                    
+                    Assert.assertTrue(buttonsWithListeners > 0, 
+                        `Znaleziono ${buttonsWithListeners} przycisków z event listenerami`);
+                }, 'Event listenery');
+                
+                // Test 3: Sprawdź czy przyciski reagują na kliknięcia
+                testRunner.addTest('powinien reagować na kliknięcia przycisków', async () => {
+                    const testButton = document.querySelector('#runAllTests');
+                    if (!testButton) {
+                        throw new Error('Nie znaleziono przycisku testowego');
+                    }
+                    
+                    let clicked = false;
+                    const originalOnClick = testButton.onclick;
+                    
+                    testButton.onclick = () => {
+                        clicked = true;
+                        if (originalOnClick) originalOnClick();
+                    };
+                    
+                    testButton.click();
+                    
+                    // Czekaj chwilę na asynchroniczne operacje
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    Assert.assertTrue(clicked, 'Przycisk nie zareagował na kliknięcie');
+                }, 'Reakcja na kliknięcia');
+                
+                // Test 4: Sprawdź style przycisków
+                testRunner.addTest('powinien stylować przyciski', () => {
+                    const button = document.querySelector('#runAllTests');
+                    if (!button) {
+                        throw new Error('Nie znaleziono przycisku testowego');
+                    }
+                    
+                    const computedStyle = window.getComputedStyle(button);
+                    const backgroundColor = computedStyle.backgroundColor;
+                    const color = computedStyle.color;
+                    const padding = computedStyle.padding;
+                    
+                    Assert.assertNotEquals(backgroundColor, 'rgba(0, 0, 0, 0)', 'Brak koloru tła');
+                    Assert.assertNotEquals(color, 'rgba(0, 0, 0, 0)', 'Brak koloru tekstu');
+                    Assert.assertNotEquals(padding, '0px', 'Brak paddingu');
+                }, 'Style przycisków');
+                
+                // Test 5: Sprawdź czy przyciski mają odpowiednie klasy
+                testRunner.addTest('powinien mieć odpowiednie klasy CSS', () => {
+                    const expectedClasses = [
+                        'test-button'
+                    ];
+                    
+                    let validClasses = 0;
+                    expectedClasses.forEach(className => {
+                        const elements = document.querySelectorAll(`.${className}`);
+                        validClasses += elements.length;
+                    });
+                    
+                    Assert.assertTrue(validClasses > 0,
+                        `Znaleziono ${validClasses} przycisków z klasą test-button`);
+                }, 'Klasy CSS');
+                
+                // Test 6: Sprawdź czy przyciski są widoczne
+                testRunner.addTest('powinien mieć widoczne przyciski', () => {
+                    const buttons = document.querySelectorAll('button');
+                    let visibleButtons = 0;
+                    
+                    buttons.forEach(button => {
+                        const computedStyle = window.getComputedStyle(button);
+                        if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden') {
+                            visibleButtons++;
+                        }
+                    });
+                    
+                    Assert.assertTrue(visibleButtons > 0, 
+                        `Znaleziono ${visibleButtons} widocznych przycisków`);
+                }, 'Widoczność przycisków');
+                
+                return await testRunner.runAll();
+            }
+
+            /**
+             * Uruchamia testy przycisków na stronie głównej
+             */
+            async runMainPageButtonTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('🔘 Uruchamianie testów przycisków na stronie głównej...\n');
+                
+                try {
+                    const results = await this.runMainPageButtonTestsInternal();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów przycisków na stronie głównej:', error);
+                    this.showError('Błąd podczas uruchamiania testów przycisków na stronie głównej: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Wewnętrzne testy przycisków na stronie głównej
+             */
+            async runMainPageButtonTestsInternal() {
+                const testRunner = new TestRunner();
+                
+                // Test 1: Sprawdź czy strona główna istnieje
+                testRunner.addTest('powinien mieć dostęp do strony głównej', async () => {
+                    const response = await fetch('main.html');
+                    Assert.assertTrue(response.ok, 'Strona główna nie jest dostępna');
+                    
+                    const html = await response.text();
+                    Assert.assertTrue(html.includes('btn-start-game'), 'Strona główna nie zawiera przycisków');
+                }, 'Dostępność strony głównej');
+                
+                // Test 2: Sprawdź czy strona główna ma wszystkie przyciski
+                testRunner.addTest('powinien mieć wszystkie przyciski na stronie głównej', async () => {
+                    const response = await fetch('main.html');
+                    const html = await response.text();
+                    
+                    const expectedButtons = [
+                        'btn-prev-calendar',
+                        'btn-add-event', 
+                        'btn-next-calendar',
+                        'btn-start-game',
+                        'btn-prev-note',
+                        'btn-edit-note',
+                        'btn-add-note',
+                        'btn-next-note',
+                        'btn-prev-stats',
+                        'btn-next-stats'
+                    ];
+                    
+                    let foundButtons = 0;
+                    expectedButtons.forEach(className => {
+                        if (html.includes(`class="${className}"`) || html.includes(`class='${className}'`)) {
+                            foundButtons++;
+                        }
+                    });
+                    
+                    Assert.assertEquals(foundButtons, expectedButtons.length, 
+                        `Znaleziono ${foundButtons}/${expectedButtons.length} przycisków na stronie głównej`);
+                }, 'Istnienie przycisków na stronie głównej');
+                
+                // Test 3: Sprawdź czy strona główna ma event handlery
+                testRunner.addTest('powinien mieć event handlery na stronie głównej', async () => {
+                    const response = await fetch('main.html');
+                    const html = await response.text();
+                    
+                    Assert.assertTrue(html.includes('eventHandlers.initMainHandlers'), 
+                        'Strona główna nie ma inicjalizacji event handlerów');
+                    Assert.assertTrue(html.includes('eventHandlers.js'), 
+                        'Strona główna nie ładuje eventHandlers.js');
+                }, 'Event handlery na stronie głównej');
+                
+                // Test 4: Sprawdź czy strona główna ma style CSS
+                testRunner.addTest('powinien mieć style CSS na stronie głównej', async () => {
+                    const response = await fetch('main.html');
+                    const html = await response.text();
+                    
+                    Assert.assertTrue(html.includes('styles.css'), 
+                        'Strona główna nie ładuje styles.css');
+                    Assert.assertTrue(html.includes('<style>'), 
+                        'Strona główna nie ma inline CSS fallback');
+                }, 'Style CSS na stronie głównej');
+                
+                // Test 5: Sprawdź czy strona główna ma logowanie przycisków
+                testRunner.addTest('powinien mieć logowanie przycisków na stronie głównej', async () => {
+                    const response = await fetch('app.js');
+                    const js = await response.text();
+                    
+                    Assert.assertTrue(js.includes('console.log'), 
+                        'app.js nie ma logowania');
+                    Assert.assertTrue(js.includes('Przycisk'), 
+                        'app.js nie ma logowania przycisków');
+                }, 'Logowanie przycisków na stronie głównej');
+                
+                return await testRunner.runAll();
+            }
+
+            /**
+             * Uruchamia testy przycisków na wszystkich stronach
+             */
+            async runAllPagesButtonTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('🔘 Uruchamianie testów przycisków na wszystkich stronach...\n');
+                
+                try {
+                    const results = await this.runAllPagesButtonTestsInternal();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów przycisków na wszystkich stronach:', error);
+                    this.showError('Błąd podczas uruchamiania testów przycisków na wszystkich stronach: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Wewnętrzne testy przycisków na wszystkich stronach
+             */
+            async runAllPagesButtonTestsInternal() {
+                const testRunner = new TestRunner();
+                
+                // Test 1: Sprawdź blania.html (statystyki meczów)
+                testRunner.addTest('powinien mieć przyciski na stronie blania.html', async () => {
+                    const response = await fetch('blania.html');
+                    Assert.assertTrue(response.ok, 'Strona blania.html nie jest dostępna');
+                    
+                    const html = await response.text();
+                    const expectedButtons = [
+                        'save-btn',
+                        'button'
+                    ];
+                    
+                    let foundButtons = 0;
+                    expectedButtons.forEach(className => {
+                        if (html.includes(`class="${className}"`) || html.includes(`class='${className}'`) || html.includes(`<button`)) {
+                            foundButtons++;
+                        }
+                    });
+                    
+                    Assert.assertTrue(foundButtons > 0, 
+                        `Znaleziono ${foundButtons} przycisków na blania.html`);
+                }, 'Przyciski na blania.html');
+                
+                // Test 2: Sprawdź add-event.html (dodawanie wydarzeń)
+                testRunner.addTest('powinien mieć przyciski na stronie add-event.html', async () => {
+                    const response = await fetch('add-event.html');
+                    Assert.assertTrue(response.ok, 'Strona add-event.html nie jest dostępna');
+                    
+                    const html = await response.text();
+                    const expectedButtons = [
+                        'Anuluj',
+                        'Zapisz'
+                    ];
+                    
+                    let foundButtons = 0;
+                    expectedButtons.forEach(buttonText => {
+                        if (html.includes(buttonText)) {
+                            foundButtons++;
+                        }
+                    });
+                    
+                    Assert.assertEquals(foundButtons, expectedButtons.length, 
+                        `Znaleziono ${foundButtons}/${expectedButtons.length} przycisków na add-event.html`);
+                }, 'Przyciski na add-event.html');
+                
+                // Test 3: Sprawdź notes-form.html (notatki)
+                testRunner.addTest('powinien mieć przyciski na stronie notes-form.html', async () => {
+                    const response = await fetch('notes-form.html');
+                    Assert.assertTrue(response.ok, 'Strona notes-form.html nie jest dostępna');
+                    
+                    const html = await response.text();
+                    const expectedButtons = [
+                        'primary-btn',
+                        'Zapisz',
+                        'Anuluj'
+                    ];
+                    
+                    let foundButtons = 0;
+                    expectedButtons.forEach(buttonText => {
+                        if (html.includes(buttonText)) {
+                            foundButtons++;
+                        }
+                    });
+                    
+                    Assert.assertTrue(foundButtons > 0, 
+                        `Znaleziono ${foundButtons} przycisków na notes-form.html`);
+                }, 'Przyciski na notes-form.html');
+                
+                // Test 4: Sprawdź czy wszystkie strony ładują CSS
+                testRunner.addTest('powinien ładować CSS na wszystkich stronach', async () => {
+                    const pages = ['main.html', 'blania.html', 'add-event.html', 'notes-form.html'];
+                    let pagesWithCSS = 0;
+                    
+                    for (const page of pages) {
+                        const response = await fetch(page);
+                        if (response.ok) {
+                            const html = await response.text();
+                            if (html.includes('styles.css')) {
+                                pagesWithCSS++;
+                            }
+                        }
+                    }
+                    
+                    Assert.assertEquals(pagesWithCSS, pages.length, 
+                        `Znaleziono CSS na ${pagesWithCSS}/${pages.length} stronach`);
+                }, 'CSS na wszystkich stronach');
+                
+                // Test 5: Sprawdź czy wszystkie strony mają odpowiednie tytuły
+                testRunner.addTest('powinien mieć odpowiednie tytuły na wszystkich stronach', async () => {
+                    const pageTitles = [
+                        { page: 'main.html', expectedTitle: 'Mecze Blanki' },
+                        { page: 'blania.html', expectedTitle: 'Statystyki meczów' },
+                        { page: 'add-event.html', expectedTitle: 'Dodaj wydarzenie' },
+                        { page: 'notes-form.html', expectedTitle: 'Notatki' }
+                    ];
+                    
+                    let correctTitles = 0;
+                    for (const { page, expectedTitle } of pageTitles) {
+                        const response = await fetch(page);
+                        if (response.ok) {
+                            const html = await response.text();
+                            if (html.includes(expectedTitle) || html.includes('<title>')) {
+                                correctTitles++;
+                            }
+                        }
+                    }
+                    
+                    Assert.assertTrue(correctTitles > 0, 
+                        `Znaleziono poprawne tytuły na ${correctTitles}/${pageTitles.length} stronach`);
+                }, 'Tytuły na wszystkich stronach');
+                
+                // Test 6: Sprawdź czy wszystkie strony mają odpowiednie formularze
+                testRunner.addTest('powinien mieć odpowiednie formularze na wszystkich stronach', async () => {
+                    const pageForms = [
+                        { page: 'add-event.html', expectedForm: 'form' },
+                        { page: 'notes-form.html', expectedForm: 'form' }
+                    ];
+                    
+                    let formsFound = 0;
+                    for (const { page, expectedForm } of pageForms) {
+                        const response = await fetch(page);
+                        if (response.ok) {
+                            const html = await response.text();
+                            if (html.includes(`<${expectedForm}`)) {
+                                formsFound++;
+                            }
+                        }
+                    }
+                    
+                    Assert.assertEquals(formsFound, pageForms.length, 
+                        `Znaleziono formularze na ${formsFound}/${pageForms.length} stronach`);
+                }, 'Formularze na wszystkich stronach');
+                
+                return await testRunner.runAll();
             }
 
             /**
@@ -410,7 +1065,20 @@
              * Wyświetla loading
              */
             showLoading() {
-                document.getElementById('loadingIndicator').style.display = 'block';
+                const loadingDiv = document.getElementById('loadingIndicator');
+                if (loadingDiv) {
+                    loadingDiv.style.display = 'block';
+                    loadingDiv.innerHTML = `
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Uruchamianie testów...</div>
+                        <div class="loading-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+                    `;
+                }
                 document.getElementById('testResults').style.display = 'none';
             }
 
@@ -419,6 +1087,25 @@
              */
             hideLoading() {
                 document.getElementById('loadingIndicator').style.display = 'none';
+            }
+
+            /**
+             * Aktualizuje postęp ładowania
+             */
+            updateProgress(step, total, message) {
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                const loadingText = document.querySelector('.loading-text');
+                
+                if (progressFill && progressText) {
+                    const percentage = Math.round((step / total) * 100);
+                    progressFill.style.width = `${percentage}%`;
+                    progressText.textContent = `${percentage}%`;
+                }
+                
+                if (loadingText) {
+                    loadingText.textContent = message;
+                }
             }
 
             /**

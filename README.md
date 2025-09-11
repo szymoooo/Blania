@@ -19,7 +19,7 @@ Aplikacja do zarządzania statystykami meczów koszykarskich, planowania wydarze
 ```bash
 # Python 3
 cd "/ścieżka/do/projektu/Blania"
-python3 -m http.server 8000
+python3 -m e http.server 8000
 
 # Node.js
 npx http-server -p 8000
@@ -125,13 +125,14 @@ Aplikacja jest w pełni responsywna i dostosowuje się do:
 3. Sprawdź wyniki w interfejsie
 
 ### Dostępne testy
-- **Storage Tests**: Testy modułu localStorage
-- **Error Handler Tests**: Testy obsługi błędów
+- **Storage Tests**: Testy modułu localStorage (16 testów)
+- **Error Handler Tests**: Testy obsługi błędów (15 testów)
+- **CSS Tests**: Testy ładowania i stylowania CSS (6 testów)
 - **Performance Tests**: Testy optymalizacji wydajności
 
 ### Uruchamianie w konsoli
 ```javascript
-// Uruchom wszystkie testy (31 testów)
+// Uruchom wszystkie testy (37 testów)
 const testManager = new TestManager();
 await testManager.runAllTests();
 
@@ -141,6 +142,9 @@ await storageTests.run();
 
 const errorTests = new ErrorHandlerTests(); // 15 testów
 await errorTests.run();
+
+// Testy CSS (6 testów) - tylko w tests.html
+// Kliknij "Testy CSS" w interfejsie
 ```
 
 ## 🐛 Debugowanie

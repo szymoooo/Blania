@@ -16,6 +16,10 @@ class ErrorHandlerTests {
      * Konfiguruje wszystkie testy
      */
     setupTests() {
+        // Disable error logging during all tests to avoid console spam
+        const originalConsoleError = console.error;
+        const originalConsoleLog = console.log;
+        
         // Testy klasyfikacji błędów
         this.testRunner.addTest('powinien klasyfikować błędy sieci poprawnie', () => {
             const errorHandler = new ErrorHandler();
@@ -117,16 +121,25 @@ class ErrorHandlerTests {
         this.testRunner.addTest('powinien kończyć się niepowodzeniem po max retry', async () => {
             const errorHandler = new ErrorHandler();
             
-            // Simulate max retries reached
-            const retryKey = 'network_test';
-            errorHandler.retryAttempts.set(retryKey, 3); // Max retries reached
+            // Temporarily disable console logging during tests
+            const originalConsoleError = console.error;
+            console.error = () => {}; // Disable console.error
             
-            const error = new Error('Persistent error');
-            error.name = 'NetworkError';
-            const result = errorHandler.handleError(error, { operation: 'test' });
-            
-            Assert.assertFalse(result.shouldRetry);
-            Assert.assertTrue(result.message.includes('Brak połączenia'));
+            try {
+                // Simulate max retries reached
+                const retryKey = 'network_test';
+                errorHandler.retryAttempts.set(retryKey, 3); // Max retries reached
+                
+                const error = new Error('Persistent error');
+                error.name = 'NetworkError';
+                const result = errorHandler.handleError(error, { operation: 'test' });
+                
+                Assert.assertFalse(result.shouldRetry);
+                Assert.assertTrue(result.message.includes('Brak połączenia'));
+            } finally {
+                // Restore console.error
+                console.error = originalConsoleError;
+            }
         }, 'Mechanizm retry');
 
         // Testy logowania błędów
@@ -159,15 +172,24 @@ class ErrorHandlerTests {
         this.testRunner.addTest('powinien czyścić zapisane błędy', () => {
             const errorHandler = new ErrorHandler();
             
-            // Add some test errors
-            errorHandler.logError(new Error('Test 1'));
-            errorHandler.logError(new Error('Test 2'));
+            // Temporarily disable console logging during tests
+            const originalConsoleError = console.error;
+            console.error = () => {}; // Disable console.error
             
-            Assert.assertTrue(errorHandler.getStoredErrors().length > 0);
-            
-            errorHandler.clearStoredErrors();
-            
-            Assert.assertEquals(errorHandler.getStoredErrors().length, 0);
+            try {
+                // Add some test errors (won't be logged to console)
+                errorHandler.logError(new Error('Test Error 1'));
+                errorHandler.logError(new Error('Test Error 2'));
+                
+                Assert.assertTrue(errorHandler.getStoredErrors().length > 0);
+                
+                errorHandler.clearStoredErrors();
+                
+                Assert.assertEquals(errorHandler.getStoredErrors().length, 0);
+            } finally {
+                // Restore console.error
+                console.error = originalConsoleError;
+            }
         }, 'Logowanie błędów');
 
         // Testy notyfikacji
