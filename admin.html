@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Blania</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --accent: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .admin-sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .admin-logo {
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .admin-menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .admin-menu-item:hover, .admin-menu-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .admin-menu-item i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 20px;
+        }
+        
+        /* Main Content */
+        .admin-main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .admin-page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        /* Dashboard */
+        .admin-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .admin-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .admin-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .admin-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+        }
+        
+        .admin-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+            color: var(--primary);
+        }
+        
+        .admin-card-desc {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Modules Grid */
+        .admin-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .admin-module-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .admin-module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .admin-module-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            border-radius: 15px;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 30px;
+        }
+        
+        .admin-module-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .admin-module-desc {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Back to main button */
+        .back-to-main {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .back-to-main:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        /* Responsywność */
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 80px;
+            }
+            
+            .admin-sidebar .menu-text {
+                display: none;
+            }
+            
+            .admin-main-content {
+                margin-left: 80px;
+            }
+            
+            .admin-logo {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-modules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .admin-main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <a href="main.html" class="back-to-main">
+        <i class="fas fa-arrow-left"></i> Powrót do planera
+    </a>
+    
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-logo">BLANIA ADMIN</div>
+            <a href="#" class="admin-menu-item active" data-section="dashboard">
+                <i class="fas fa-home"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-section="users">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Użytkownicy</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-section="events">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="menu-text">Wydarzenia</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-section="venues">
+                <i class="fas fa-building"></i>
+                <span class="menu-text">Sale treningowe</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-section="matches">
+                <i class="fas fa-basketball-ball"></i>
+                <span class="menu-text">Mecze</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-section="statistics">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Statystyki</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span class="menu-text">Ustawienia</span>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main-content">
+            <div class="admin-header">
+                <h1 class="admin-page-title">Panel Administracyjny</h1>
+                <div class="admin-user-info">
+                    <div class="admin-user-avatar">AD</div>
+                    <span>Administrator</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats -->
+            <div class="admin-dashboard">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Wydarzenia</h3>
+                        <div class="admin-card-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                    <div class="admin-card-value" id="totalEvents">0</div>
+                    <p class="admin-card-desc">Wszystkie wydarzenia w systemie</p>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Nadchodzące</h3>
+                        <div class="admin-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="admin-card-value" id="upcomingEvents">0</div>
+                    <p class="admin-card-desc">Wydarzenia w najbliższych 7 dniach</p>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Mecze</h3>
+                        <div class="admin-card-icon">
+                            <i class="fas fa-basketball-ball"></i>
+                        </div>
+                    </div>
+                    <div class="admin-card-value" id="totalMatches">0</div>
+                    <p class="admin-card-desc">Wszystkie mecze w systemie</p>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3 class="admin-card-title">Statystyki</h3>
+                        <div class="admin-card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                    <div class="admin-card-value" id="totalStats">0</div>
+                    <p class="admin-card-desc">Wpisy statystyk</p>
+                </div>
+            </div>
+
+            <!-- Modules Section -->
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Moduły zarządzania</h2>
+            <div class="admin-modules-grid">
+                <div class="admin-module-card" data-module="users">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="admin-module-title">Użytkownicy</h3>
+                    <p class="admin-module-desc">Zarządzaj użytkownikami systemu i ich uprawnieniami</p>
+                </div>
+
+                <div class="admin-module-card" data-module="events">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
+                    <h3 class="admin-module-title">Wydarzenia</h3>
+                    <p class="admin-module-desc">Dodawaj, edytuj i usuwaj wydarzenia w kalendarzu</p>
+                </div>
+
+                <div class="admin-module-card" data-module="venues">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="admin-module-title">Sale treningowe</h3>
+                    <p class="admin-module-desc">Zarządzaj dostępnymi salami i obiektami</p>
+                </div>
+
+                <div class="admin-module-card" data-module="matches">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-basketball-ball"></i>
+                    </div>
+                    <h3 class="admin-module-title">Mecze</h3>
+                    <p class="admin-module-desc">Planuj mecze, dodawaj przeciwników i terminy</p>
+                </div>
+
+                <div class="admin-module-card" data-module="statistics">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="admin-module-title">Statystyki</h3>
+                    <p class="admin-module-desc">Zarządzaj statystykami meczów i zawodników</p>
+                </div>
+
+                <div class="admin-module-card" data-module="reports">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="admin-module-title">Raporty</h3>
+                    <p class="admin-module-desc">Generuj raporty i analizy z systemu</p>
+                </div>
+
+                <div class="admin-module-card" data-module="backup">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 class="admin-module-title">Backup</h3>
+                    <p class="admin-module-desc">Zarządzaj kopiami zapasowymi danych</p>
+                </div>
+
+                <div class="admin-module-card" data-module="settings">
+                    <div class="admin-module-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3 class="admin-module-title">Ustawienia</h3>
+                    <p class="admin-module-desc">Konfiguruj system i parametry aplikacji</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ładowanie danych z localStorage
+        function loadAdminData() {
+            const events = JSON.parse(localStorage.getItem('savedEvents') || '[]');
+            const stats = JSON.parse(localStorage.getItem('matchStats') || '[]');
+            
+            // Aktualizuj statystyki
+            document.getElementById('totalEvents').textContent = events.length;
+            document.getElementById('totalMatches').textContent = stats.length;
+            document.getElementById('totalStats').textContent = stats.length;
+            
+            // Policz nadchodzące wydarzenia (7 dni)
+            const now = new Date();
+            const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            const upcoming = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate >= now && eventDate <= weekFromNow;
+            });
+            
+            document.getElementById('upcomingEvents').textContent = upcoming.length;
+        }
+
+        // Obsługa menu
+        document.querySelectorAll('.admin-menu-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.admin-menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                const section = this.getAttribute('data-section');
+                showSection(section);
+            });
+        });
+
+        // Obsługa modułów
+        document.querySelectorAll('.admin-module-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const module = this.getAttribute('data-module');
+                showModule(module);
+            });
+        });
+
+        // Pokaż sekcję
+        function showSection(section) {
+            console.log('Pokazuję sekcję:', section);
+            // Tutaj można dodać logikę przełączania między sekcjami
+        }
+
+        // Pokaż moduł
+        function showModule(module) {
+            console.log('Otwieram moduł:', module);
+            
+            switch(module) {
+                case 'users':
+                    alert('Moduł użytkowników - w budowie');
+                    break;
+                case 'events':
+                    window.location.href = 'main.html';
+                    break;
+                case 'venues':
+                    alert('Moduł sal treningowych - w budowie');
+                    break;
+                case 'matches':
+                    alert('Moduł meczów - w budowie');
+                    break;
+                case 'statistics':
+                    window.location.href = 'statistics.html';
+                    break;
+                case 'reports':
+                    alert('Moduł raportów - w budowie');
+                    break;
+                case 'backup':
+                    alert('Moduł backup - w budowie');
+                    break;
+                case 'settings':
+                    alert('Moduł ustawień - w budowie');
+                    break;
+            }
+        }
+
+        // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdminData();
+        });
+    </script>
+</body>
+</html>

@@ -463,6 +463,24 @@ button:hover, .primary-btn:hover, .btn-prev-calendar:hover,
     padding: 20px 0;
 }
 
+.admin-btn {
+    background-color: #6c757d !important;
+    color: white !important;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.admin-btn:hover {
+    background-color: #5a6268 !important;
+    transform: translateY(-2px);
+}
+
 .notes-navigation {
     position: absolute;
     bottom: 10px;
