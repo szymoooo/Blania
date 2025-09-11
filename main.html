@@ -255,7 +255,7 @@
                 dayElement.innerHTML = `
                     <h3 data-date="${dateString}">${dayName}, ${dayNumber}.${month}.${year}</h3>
                     <div class="events-container">
-                        <p style="font-style: italic; color: rgb(102, 102, 102);">Dziś regeneracja? Jeśli masz jakiś plan, kliknij '+ Dodaj wydarzenie'.</p>
+                        <!-- Wydarzenia będą dodane przez loadEvents() -->
                     </div>
                 `;
                 
@@ -397,6 +397,14 @@
             // Wyczyść istniejące wydarzenia
             document.querySelectorAll('.event-item').forEach(item => item.remove());
 
+            // Wyczyść tekst "Dziś regeneracja?" ze wszystkich dni
+            document.querySelectorAll('.events-container').forEach(container => {
+                const regenerationText = container.querySelector('.regeneration-text');
+                if (regenerationText) {
+                    regenerationText.remove();
+                }
+            });
+
             savedEvents.forEach(event => {
                 const eventDate = new Date(event.date).toISOString().split('T')[0];
                 document.querySelectorAll('.calendar-day').forEach(dayElement => {
@@ -417,15 +425,57 @@
                         const text = document.createElement('div');
                         text.className = 'event-text';
                         text.innerHTML = `
-                            <strong>${event.date.split('T')[1].substring(0, 5)} ${event.name.substring(0, 20)}${event.name.length > 20 ? '...' : ''}</strong><br>
-                            ${event.name.length > 20 ? `<small>${event.name.substring(20)}</small>` : ''}
+                            <strong>${event.date.split('T')[1].substring(0, 5)} ${event.name}</strong><br>
                             <small>${event.location}</small>
                         `;
                         eventItem.appendChild(text);
 
+                        // Dodaj przyciski edycji i usuwania
+                        const actions = document.createElement('div');
+                        actions.className = 'event-actions';
+                        actions.style.marginTop = '5px';
+                        
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = '✏️';
+                        editBtn.style.marginRight = '5px';
+                        editBtn.style.padding = '2px 5px';
+                        editBtn.style.fontSize = '12px';
+                        editBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            editEvent(event.id);
+                        });
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = '🗑️';
+                        deleteBtn.style.padding = '2px 5px';
+                        deleteBtn.style.fontSize = '12px';
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            deleteEvent(event.id);
+                        });
+                        
+                        actions.appendChild(editBtn);
+                        actions.appendChild(deleteBtn);
+                        eventItem.appendChild(actions);
+
                         dayElement.querySelector('.events-container').appendChild(eventItem);
                     }
                 });
+            });
+
+            // Dodaj tekst "Dziś regeneracja?" tylko do dni bez wydarzeń
+            document.querySelectorAll('.calendar-day').forEach(dayElement => {
+                const eventsContainer = dayElement.querySelector('.events-container');
+                const hasEvents = eventsContainer.querySelector('.event-item');
+                
+                if (!hasEvents) {
+                    const regenerationText = document.createElement('p');
+                    regenerationText.className = 'regeneration-text';
+                    regenerationText.style.fontStyle = 'italic';
+                    regenerationText.style.color = 'rgb(102, 102, 102)';
+                    regenerationText.textContent = 'Dziś regeneracja? Jeśli masz jakiś plan, kliknij \'+ Dodaj wydarzenie\'.';
+                    eventsContainer.appendChild(regenerationText);
+                }
             });
         }
     </script>
