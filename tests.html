@@ -1276,6 +1276,14 @@
                     Assert.assertTrue(hasSaveEvent, 'Brak funkcji saveEvent w add-event.html');
                     Assert.assertTrue(hasCancelEvent, 'Brak funkcji cancelEvent w add-event.html');
                     Assert.assertTrue(hasRedirect, 'Brak przekierowania do main.html');
+                    
+                    // Sprawdź czy strona główna ma element "Mój planner:"
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    const hasPlannerElement = mainHtml.includes('Mój planner:');
+                    
+                    console.log(`🏠 Strona główna - element "Mój planner:": ${hasPlannerElement}`);
+                    Assert.assertTrue(hasPlannerElement, 'Strona główna nie ma elementu "Mój planner:"');
                 }, 'Zapisywanie wydarzenia');
                 
                 // Test 2: Symuluj dodanie notatki
@@ -1306,6 +1314,14 @@
                     Assert.assertTrue(hasCloseNotesForm, 'Brak funkcji closeNotesForm w notes-form.html');
                     Assert.assertTrue(hasRedirect, 'Brak przekierowania do main.html');
                     Assert.assertTrue(hasSetRating, 'Brak funkcji setRating w notes-form.html');
+                    
+                    // Sprawdź czy strona główna ma element "Mój planner:"
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    const hasPlannerElement = mainHtml.includes('Mój planner:');
+                    
+                    console.log(`🏠 Strona główna - element "Mój planner:": ${hasPlannerElement}`);
+                    Assert.assertTrue(hasPlannerElement, 'Strona główna nie ma elementu "Mój planner:"');
                 }, 'Zapisywanie notatki');
                 
                 // Test 3: Symuluj zapisanie statystyk meczu
@@ -1341,6 +1357,14 @@
                     Assert.assertTrue(hasSaveMatch, 'Brak funkcji saveMatch w blania.html');
                     Assert.assertTrue(hasRedirect, 'Brak przekierowania do main.html');
                     Assert.assertTrue(hasChangeStat, 'Brak funkcji changeStat w blania.html');
+                    
+                    // Sprawdź czy strona główna ma element "Mój planner:"
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    const hasPlannerElement = mainHtml.includes('Mój planner:');
+                    
+                    console.log(`🏠 Strona główna - element "Mój planner:": ${hasPlannerElement}`);
+                    Assert.assertTrue(hasPlannerElement, 'Strona główna nie ma elementu "Mój planner:"');
                 }, 'Zapisywanie statystyk meczu');
                 
                 // Test 4: Sprawdź czy storage.js ma wszystkie potrzebne funkcje
@@ -1364,6 +1388,14 @@
                     Assert.assertTrue(hasGetEvents, 'Brak funkcji getEvents w storage.js');
                     Assert.assertTrue(hasGetNotes, 'Brak funkcji getNotes w storage.js');
                     Assert.assertTrue(hasGetMatches, 'Brak funkcji getMatches w storage.js');
+                    
+                    // Sprawdź czy strona główna ma element "Mój planner:"
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    const hasPlannerElement = mainHtml.includes('Mój planner:');
+                    
+                    console.log(`🏠 Strona główna - element "Mój planner:": ${hasPlannerElement}`);
+                    Assert.assertTrue(hasPlannerElement, 'Strona główna nie ma elementu "Mój planner:"');
                 }, 'Funkcje storage');
                 
                 // Test 5: Sprawdź czy dane są wyświetlane na stronie głównej
@@ -1380,6 +1412,12 @@
                     console.log(`📊 Strona główna - loadMatches: ${hasLoadMatches}, loadEvents: ${hasLoadEvents}, loadNotes: ${hasLoadNotes}, generateCalendar: ${hasGenerateCalendar}`);
                     
                     Assert.assertTrue(hasGenerateCalendar, 'Brak funkcji generateCalendar na stronie głównej');
+                    
+                    // Sprawdź czy strona główna ma element "Mój planner:"
+                    const hasPlannerElement = html.includes('Mój planner:');
+                    
+                    console.log(`🏠 Strona główna - element "Mój planner:": ${hasPlannerElement}`);
+                    Assert.assertTrue(hasPlannerElement, 'Strona główna nie ma elementu "Mój planner:"');
                 }, 'Wyświetlanie danych na stronie głównej');
                 
                 return await testRunner.runAll();
