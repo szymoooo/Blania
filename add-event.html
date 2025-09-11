@@ -92,7 +92,7 @@
             <!-- Nazwa wydarzenia -->
             <div class="form-group">
                 <label for="event-name">Nazwa wydarzenia:</label>
-                <input type="text" id="event-name" name="event-name" required>
+                <input type="text" id="event-name" name="event-name" required maxlength="100">
             </div>
 
             <!-- Data -->
@@ -129,7 +129,7 @@
             <!-- Notatki -->
             <div class="form-group">
                 <label for="event-notes">Notatki:</label>
-                <textarea id="event-notes" name="event-notes"></textarea>
+                <textarea id="event-notes" name="event-notes" maxlength="1000"></textarea>
             </div>
 
             <!-- Przyciski akcji -->
@@ -230,6 +230,25 @@
             }
             if (!eventLocation) {
                 alert("Proszę wybrać lokalizację wydarzenia.");
+                return;
+            }
+            
+            // Walidacja daty - sprawdź czy data jest poprawna
+            const eventDateTime = new Date(eventDate + 'T' + eventTime);
+            if (isNaN(eventDateTime.getTime())) {
+                alert("Niepoprawna data lub godzina wydarzenia.");
+                return;
+            }
+            
+            // Walidacja długości nazwy
+            if (eventName.length > 100) {
+                alert("Nazwa wydarzenia nie może być dłuższa niż 100 znaków.");
+                return;
+            }
+            
+            // Walidacja długości notatek
+            if (eventNotes.length > 1000) {
+                alert("Notatki nie mogą być dłuższe niż 1000 znaków.");
                 return;
             }
 

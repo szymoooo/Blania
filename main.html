@@ -434,14 +434,26 @@
                         icon.className = 'event-icon';
                         icon.style.backgroundImage = `url(${eventIcons[event.type]})`;
                         icon.style.backgroundSize = 'cover';
+                        icon.style.width = '32px';
+                        icon.style.height = '32px';
+                        icon.style.backgroundPosition = 'center';
+                        icon.style.backgroundRepeat = 'no-repeat';
                         eventItem.appendChild(icon);
 
                         const text = document.createElement('div');
                         text.className = 'event-text';
-                        text.innerHTML = `
-                            <strong>${event.date.split('T')[1].substring(0, 5)} ${event.name}</strong><br>
-                            <small>${event.location}</small>
-                        `;
+                        // Bezpieczne renderowanie - używamy textContent zamiast innerHTML
+                        const strong = document.createElement('strong');
+                        strong.textContent = `${event.date.split('T')[1].substring(0, 5)} ${event.name}`;
+                        
+                        const br = document.createElement('br');
+                        
+                        const small = document.createElement('small');
+                        small.textContent = event.location;
+                        
+                        text.appendChild(strong);
+                        text.appendChild(br);
+                        text.appendChild(small);
                         eventItem.appendChild(text);
 
                         dayElement.querySelector('.events-container').appendChild(eventItem);

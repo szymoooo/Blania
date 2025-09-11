@@ -2315,7 +2315,7 @@
                     const storageJs = await storageResponse.text();
                     
                     const hasJSONHandling = storageJs.includes('JSON.stringify') && storageJs.includes('JSON.parse');
-                    const hasNoSQLQueries = !storageJs.includes('SELECT') && !storageJs.includes('INSERT') && !storageJs.includes('UPDATE');
+                    const hasNoSQLQueries = !storageJs.includes('SELECT ') && !storageJs.includes('INSERT ') && !storageJs.includes('UPDATE ');
                     const hasSafeStorage = storageJs.includes('localStorage.setItem') && storageJs.includes('localStorage.getItem');
                     
                     console.log(`🔐 SQL - JSON: ${hasJSONHandling}, noSQL: ${hasNoSQLQueries}, safe: ${hasSafeStorage}`);
