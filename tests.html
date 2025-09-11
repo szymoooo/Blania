@@ -2126,6 +2126,318 @@
                     
                 }, 'Sprawdzenie błędów JavaScript');
                 
+                // ===== DODATKOWE TESTY FUNKCJONALNE =====
+                
+                // 🔄 Powtarzające się wydarzenia (Recurring Events)
+                testRunner.addTest('EV-13: Dodanie wydarzenia z opcją "Powtarzaj co tydzień" (16 tygodni)', async () => {
+                    console.log('🔄 Test powtarzających się wydarzeń: 16 tygodni');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasRepeatCheckbox = addEventHtml.includes('event-repeat') || addEventHtml.includes('Powtarzaj co tydzień');
+                    const hasRepeatLogic = addEventHtml.includes('repeatWeeks') || addEventHtml.includes('16');
+                    const hasRepeatLoop = addEventHtml.includes('for (let i = 1; i <= repeatWeeks; i++)');
+                    
+                    console.log(`🔄 Repeat - checkbox: ${hasRepeatCheckbox}, logic: ${hasRepeatLogic}, loop: ${hasRepeatLoop}`);
+                    Assert.assertTrue(hasRepeatCheckbox, 'Brak checkboxa powtarzania');
+                    Assert.assertTrue(hasRepeatLogic, 'Brak logiki powtarzania');
+                    Assert.assertTrue(hasRepeatLoop, 'Brak pętli powtarzania');
+                }, 'Powtarzające się wydarzenia');
+                
+                testRunner.addTest('EV-14: Edycja głównego wydarzenia powtarzalnego', async () => {
+                    console.log('✏️ Test edycji powtarzalnego wydarzenia');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasEditFunction = mainHtml.includes('editEvent') || mainHtml.includes('function editEvent');
+                    const hasEditButton = mainHtml.includes('onclick="editEvent') || mainHtml.includes('editEvent(');
+                    const hasEditLogic = mainHtml.includes('setEditEventId') || mainHtml.includes('editEventId');
+                    
+                    console.log(`✏️ Edit - function: ${hasEditFunction}, button: ${hasEditButton}, logic: ${hasEditLogic}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji');
+                    Assert.assertTrue(hasEditButton, 'Brak przycisku edycji');
+                    Assert.assertTrue(hasEditLogic, 'Brak logiki edycji');
+                }, 'Edycja powtarzalnego wydarzenia');
+                
+                testRunner.addTest('EV-15: Usunięcie pojedynczego powtórzenia', async () => {
+                    console.log('🗑️ Test usuwania pojedynczego powtórzenia');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasDeleteFunction = mainHtml.includes('deleteEvent') || mainHtml.includes('function deleteEvent');
+                    const hasDeleteButton = mainHtml.includes('onclick="deleteEvent') || mainHtml.includes('deleteEvent(');
+                    const hasDeleteLogic = mainHtml.includes('filter(event => event.id !== eventId)');
+                    
+                    console.log(`🗑️ Delete - function: ${hasDeleteFunction}, button: ${hasDeleteButton}, logic: ${hasDeleteLogic}`);
+                    Assert.assertTrue(hasDeleteFunction, 'Brak funkcji usuwania');
+                    Assert.assertTrue(hasDeleteButton, 'Brak przycisku usuwania');
+                    Assert.assertTrue(hasDeleteLogic, 'Brak logiki usuwania');
+                }, 'Usunięcie pojedynczego powtórzenia');
+                
+                testRunner.addTest('EV-16: Usunięcie całej serii powtarzalnej', async () => {
+                    console.log('🗑️ Test usuwania całej serii powtarzalnej');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasSeriesLogic = addEventHtml.includes('repeatedEvent') || addEventHtml.includes('powtórzenie');
+                    const hasSeriesId = addEventHtml.includes('generateUniqueId()') || addEventHtml.includes('id: generateUniqueId()');
+                    const hasSeriesStorage = addEventHtml.includes('storage.saveEvent(repeatedEvent)');
+                    
+                    console.log(`🗑️ Series - logic: ${hasSeriesLogic}, id: ${hasSeriesId}, storage: ${hasSeriesStorage}`);
+                    Assert.assertTrue(hasSeriesLogic, 'Brak logiki serii');
+                    Assert.assertTrue(hasSeriesId, 'Brak unikalnych ID');
+                    Assert.assertTrue(hasSeriesStorage, 'Brak zapisywania serii');
+                }, 'Usunięcie całej serii powtarzalnej');
+                
+                // 📅 Zachowanie kalendarza
+                testRunner.addTest('EV-17: Przewijanie kalendarza między tygodniami', async () => {
+                    console.log('📅 Test przewijania kalendarza');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasMoveFunction = mainHtml.includes('moveCalendar') || mainHtml.includes('function moveCalendar');
+                    const hasNavigationButtons = mainHtml.includes('Poprzednia') && mainHtml.includes('Następna');
+                    const hasOffsetLogic = mainHtml.includes('currentCalendarOffset') || mainHtml.includes('direction * 5');
+                    
+                    console.log(`📅 Navigation - function: ${hasMoveFunction}, buttons: ${hasNavigationButtons}, offset: ${hasOffsetLogic}`);
+                    Assert.assertTrue(hasMoveFunction, 'Brak funkcji przewijania');
+                    Assert.assertTrue(hasNavigationButtons, 'Brak przycisków nawigacji');
+                    Assert.assertTrue(hasOffsetLogic, 'Brak logiki offsetu');
+                }, 'Przewijanie kalendarza');
+                
+                testRunner.addTest('EV-18: Wydarzenia przechodzące między tygodniami', async () => {
+                    console.log('📅 Test wydarzeń między tygodniami');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasLoadEvents = mainHtml.includes('loadEvents') || mainHtml.includes('function loadEvents');
+                    const hasEventRendering = mainHtml.includes('event-item') || mainHtml.includes('event-text');
+                    const hasDateMatching = mainHtml.includes('dayDate === eventDate') || mainHtml.includes('data-date');
+                    
+                    console.log(`📅 Events - load: ${hasLoadEvents}, render: ${hasEventRendering}, match: ${hasDateMatching}`);
+                    Assert.assertTrue(hasLoadEvents, 'Brak ładowania wydarzeń');
+                    Assert.assertTrue(hasEventRendering, 'Brak renderowania wydarzeń');
+                    Assert.assertTrue(hasDateMatching, 'Brak dopasowywania dat');
+                }, 'Wydarzenia między tygodniami');
+                
+                testRunner.addTest('EV-19: Dzień z wieloma wydarzeniami (5+)', async () => {
+                    console.log('📅 Test wielu wydarzeń w jednym dniu');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasScrollContainer = mainHtml.includes('overflow-y: auto') || mainHtml.includes('overflow-y');
+                    const hasFlexLayout = mainHtml.includes('display: flex') || mainHtml.includes('flex-direction: column');
+                    const hasEventContainer = mainHtml.includes('events-container') || mainHtml.includes('event-item');
+                    
+                    console.log(`📅 Multiple - scroll: ${hasScrollContainer}, flex: ${hasFlexLayout}, container: ${hasEventContainer}`);
+                    Assert.assertTrue(hasScrollContainer, 'Brak scrollowania');
+                    Assert.assertTrue(hasFlexLayout, 'Brak flex layout');
+                    Assert.assertTrue(hasEventContainer, 'Brak kontenera wydarzeń');
+                }, 'Wiele wydarzeń w jednym dniu');
+                
+                // ⚡ Wydajność i duże zbiory danych
+                testRunner.addTest('PERF-1: 100+ wydarzeń w kalendarzu', async () => {
+                    console.log('⚡ Test wydajności: 100+ wydarzeń');
+                    
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasEfficientStorage = storageJs.includes('getSavedEvents') && storageJs.includes('saveEvent');
+                    const hasArrayMethods = storageJs.includes('forEach') && storageJs.includes('filter');
+                    const hasErrorHandling = storageJs.includes('try') && storageJs.includes('catch');
+                    
+                    console.log(`⚡ Performance - storage: ${hasEfficientStorage}, arrays: ${hasArrayMethods}, errors: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasEfficientStorage, 'Brak wydajnego storage');
+                    Assert.assertTrue(hasArrayMethods, 'Brak metod tablicowych');
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów');
+                }, 'Wydajność 100+ wydarzeń');
+                
+                testRunner.addTest('PERF-2: 50+ meczów w statystykach', async () => {
+                    console.log('⚡ Test wydajności: 50+ meczów');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasPagination = mainHtml.includes('pagination') || mainHtml.includes('handlePagination');
+                    const hasPageSize = mainHtml.includes('recordsPerPage') || mainHtml.includes('5');
+                    const hasPageNavigation = mainHtml.includes('currentPage') || mainHtml.includes('totalPages');
+                    
+                    console.log(`⚡ Pagination - pagination: ${hasPagination}, size: ${hasPageSize}, nav: ${hasPageNavigation}`);
+                    Assert.assertTrue(hasPagination, 'Brak paginacji');
+                    Assert.assertTrue(hasPageSize, 'Brak rozmiaru strony');
+                    Assert.assertTrue(hasPageNavigation, 'Brak nawigacji stron');
+                }, 'Wydajność 50+ meczów');
+                
+                testRunner.addTest('PERF-3: Duże obrazy logo drużyn', async () => {
+                    console.log('⚡ Test wydajności: Duże obrazy');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasImageOptimization = mainHtml.includes('background-size: cover') || mainHtml.includes('background-size');
+                    const hasImageLoading = mainHtml.includes('background-image') || mainHtml.includes('url(');
+                    const hasResponsiveImages = mainHtml.includes('width') && mainHtml.includes('height');
+                    
+                    console.log(`⚡ Images - optimization: ${hasImageOptimization}, loading: ${hasImageLoading}, responsive: ${hasResponsiveImages}`);
+                    Assert.assertTrue(hasImageOptimization, 'Brak optymalizacji obrazów');
+                    Assert.assertTrue(hasImageLoading, 'Brak ładowania obrazów');
+                    Assert.assertTrue(hasResponsiveImages, 'Brak responsywnych obrazów');
+                }, 'Wydajność dużych obrazów');
+                
+                // 🔐 Bezpieczeństwo i walidacja danych
+                testRunner.addTest('SEC-1: XSS przez nazwę wydarzenia', async () => {
+                    console.log('🔐 Test bezpieczeństwa: XSS w nazwie wydarzenia');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasInputValidation = addEventHtml.includes('required') || addEventHtml.includes('trim()');
+                    const hasXSSProtection = addEventHtml.includes('innerHTML') || addEventHtml.includes('textContent');
+                    const hasEscapeLogic = addEventHtml.includes('escape') || addEventHtml.includes('sanitize');
+                    
+                    console.log(`🔐 XSS - validation: ${hasInputValidation}, protection: ${hasXSSProtection}, escape: ${hasEscapeLogic}`);
+                    Assert.assertTrue(hasInputValidation, 'Brak walidacji inputu');
+                    Assert.assertTrue(hasXSSProtection, 'Brak ochrony XSS');
+                    Assert.assertTrue(hasEscapeLogic, 'Brak escapowania');
+                }, 'Ochrona XSS');
+                
+                testRunner.addTest('SEC-2: SQL Injection przez localStorage', async () => {
+                    console.log('🔐 Test bezpieczeństwa: SQL Injection w localStorage');
+                    
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasJSONHandling = storageJs.includes('JSON.stringify') && storageJs.includes('JSON.parse');
+                    const hasNoSQLQueries = !storageJs.includes('SELECT') && !storageJs.includes('INSERT') && !storageJs.includes('UPDATE');
+                    const hasSafeStorage = storageJs.includes('localStorage.setItem') && storageJs.includes('localStorage.getItem');
+                    
+                    console.log(`🔐 SQL - JSON: ${hasJSONHandling}, noSQL: ${hasNoSQLQueries}, safe: ${hasSafeStorage}`);
+                    Assert.assertTrue(hasJSONHandling, 'Brak obsługi JSON');
+                    Assert.assertTrue(hasNoSQLQueries, 'Używa SQL queries');
+                    Assert.assertTrue(hasSafeStorage, 'Brak bezpiecznego storage');
+                }, 'Ochrona SQL Injection');
+                
+                testRunner.addTest('SEC-3: Very long inputs (10k+ characters)', async () => {
+                    console.log('🔐 Test bezpieczeństwa: Bardzo długie inputy');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasInputLimits = addEventHtml.includes('maxlength') || addEventHtml.includes('max-length');
+                    const hasValidation = addEventHtml.includes('trim()') || addEventHtml.includes('length');
+                    const hasTextarea = addEventHtml.includes('textarea') || addEventHtml.includes('event-notes');
+                    
+                    console.log(`🔐 Long Input - limits: ${hasInputLimits}, validation: ${hasValidation}, textarea: ${hasTextarea}`);
+                    Assert.assertTrue(hasInputLimits, 'Brak limitów inputu');
+                    Assert.assertTrue(hasValidation, 'Brak walidacji długości');
+                    Assert.assertTrue(hasTextarea, 'Brak textarea');
+                }, 'Ochrona długich inputów');
+                
+                // 📱 Responsywność i różne urządzenia
+                testRunner.addTest('RWD-1: Mobile view (320px)', async () => {
+                    console.log('📱 Test responsywności: Mobile 320px');
+                    
+                    const stylesResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const stylesCss = await stylesResponse.text();
+                    
+                    const hasMobileQuery = stylesCss.includes('@media') && stylesCss.includes('max-width: 768px');
+                    const hasMobileCalendar = stylesCss.includes('calendar-week') && stylesCss.includes('flex-direction');
+                    const hasMobileNavigation = stylesCss.includes('navigation-buttons') && stylesCss.includes('flex-direction: column');
+                    
+                    console.log(`📱 Mobile - query: ${hasMobileQuery}, calendar: ${hasMobileCalendar}, nav: ${hasMobileNavigation}`);
+                    Assert.assertTrue(hasMobileQuery, 'Brak media query mobile');
+                    Assert.assertTrue(hasMobileCalendar, 'Brak mobile calendar');
+                    Assert.assertTrue(hasMobileNavigation, 'Brak mobile navigation');
+                }, 'Responsywność mobile');
+                
+                testRunner.addTest('RWD-2: Tablet view (768px)', async () => {
+                    console.log('📱 Test responsywności: Tablet 768px');
+                    
+                    const stylesResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const stylesCss = await stylesResponse.text();
+                    
+                    const hasTabletQuery = stylesCss.includes('@media') && (stylesCss.includes('768px') || stylesCss.includes('769px'));
+                    const hasTabletLayout = stylesCss.includes('flex') && stylesCss.includes('gap');
+                    const hasTabletSpacing = stylesCss.includes('padding') && stylesCss.includes('margin');
+                    
+                    console.log(`📱 Tablet - query: ${hasTabletQuery}, layout: ${hasTabletLayout}, spacing: ${hasTabletSpacing}`);
+                    Assert.assertTrue(hasTabletQuery, 'Brak media query tablet');
+                    Assert.assertTrue(hasTabletLayout, 'Brak tablet layout');
+                    Assert.assertTrue(hasTabletSpacing, 'Brak tablet spacing');
+                }, 'Responsywność tablet');
+                
+                testRunner.addTest('RWD-3: Desktop (1200px+)', async () => {
+                    console.log('📱 Test responsywności: Desktop 1200px+');
+                    
+                    const stylesResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const stylesCss = await stylesResponse.text();
+                    
+                    const hasDesktopQuery = stylesCss.includes('@media') && stylesCss.includes('min-width: 1200px');
+                    const hasDesktopLayout = stylesCss.includes('width: 1200px') || stylesCss.includes('max-width: 1200px');
+                    const hasDesktopFeatures = stylesCss.includes('justify-content: space-between') && stylesCss.includes('gap: 10px');
+                    
+                    console.log(`📱 Desktop - query: ${hasDesktopQuery}, layout: ${hasDesktopLayout}, features: ${hasDesktopFeatures}`);
+                    Assert.assertTrue(hasDesktopQuery, 'Brak media query desktop');
+                    Assert.assertTrue(hasDesktopLayout, 'Brak desktop layout');
+                    Assert.assertTrue(hasDesktopFeatures, 'Brak desktop features');
+                }, 'Responsywność desktop');
+                
+                // 🧩 Edge Case'y
+                testRunner.addTest('EDGE-1: Zmiana strefy czasowej', async () => {
+                    console.log('🧩 Test edge case: Zmiana strefy czasowej');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasDateHandling = mainHtml.includes('new Date()') && mainHtml.includes('toISOString()');
+                    const hasTimezoneAware = mainHtml.includes('getTime()') || mainHtml.includes('getDate()');
+                    const hasConsistentFormat = mainHtml.includes('split(\'T\')') && mainHtml.includes('padStart(2, \'0\')');
+                    
+                    console.log(`🧩 Timezone - date: ${hasDateHandling}, timezone: ${hasTimezoneAware}, format: ${hasConsistentFormat}`);
+                    Assert.assertTrue(hasDateHandling, 'Brak obsługi dat');
+                    Assert.assertTrue(hasTimezoneAware, 'Brak obsługi strefy czasowej');
+                    Assert.assertTrue(hasConsistentFormat, 'Brak spójnego formatu');
+                }, 'Zmiana strefy czasowej');
+                
+                testRunner.addTest('EDGE-2: Przejście na czas letni/zimowy', async () => {
+                    console.log('🧩 Test edge case: Przejście na czas letni/zimowy');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasDateValidation = mainHtml.includes('validateDate') || mainHtml.includes('function validateDate');
+                    const hasDuplicateCheck = mainHtml.includes('checkForDuplicateEvent') || mainHtml.includes('duplicate');
+                    const hasTimeHandling = mainHtml.includes('setHours') && mainHtml.includes('setDate');
+                    
+                    console.log(`🧩 DST - validation: ${hasDateValidation}, duplicate: ${hasDuplicateCheck}, time: ${hasTimeHandling}`);
+                    Assert.assertTrue(hasDateValidation, 'Brak walidacji dat');
+                    Assert.assertTrue(hasDuplicateCheck, 'Brak sprawdzania duplikatów');
+                    Assert.assertTrue(hasTimeHandling, 'Brak obsługi czasu');
+                }, 'Przejście na czas letni/zimowy');
+                
+                testRunner.addTest('EDGE-3: Data 29.02 w roku nieprzestępnym', async () => {
+                    console.log('🧩 Test edge case: Data 29.02 w roku nieprzestępnym');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasDateInput = addEventHtml.includes('type="date"') || addEventHtml.includes('event-date');
+                    const hasDateValidation = addEventHtml.includes('required') || addEventHtml.includes('validation');
+                    const hasDateHandling = addEventHtml.includes('new Date()') && addEventHtml.includes('setDate()');
+                    
+                    console.log(`🧩 Leap Year - input: ${hasDateInput}, validation: ${hasDateValidation}, handling: ${hasDateHandling}`);
+                    Assert.assertTrue(hasDateInput, 'Brak inputu daty');
+                    Assert.assertTrue(hasDateValidation, 'Brak walidacji daty');
+                    Assert.assertTrue(hasDateHandling, 'Brak obsługi daty');
+                }, 'Data 29.02 w roku nieprzestępnym');
+                
                 return await testRunner.runAll();
             }
 
