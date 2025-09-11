@@ -103,7 +103,7 @@
     </header>
     
     <div class="calendar-container">
-        <div class="calendar-week" id="calendar-week">
+        <div class="calendar-week" id="calendar-week" style="display: flex; justify-content: space-between; gap: 10px; flex-direction: row; width: 100%; background-color: #f0f0f0; padding: 10px;">
             <!-- Kalendarz będzie generowany przez JavaScript -->
         </div>
         <div class="navigation-buttons">
@@ -223,7 +223,12 @@
         
         function generateCalendar() {
             const calendarWeek = document.getElementById('calendar-week');
-            if (!calendarWeek) return;
+            if (!calendarWeek) {
+                console.error('❌ calendar-week nie znaleziony!');
+                return;
+            }
+            
+            console.log('🔍 Generuję kalendarz...');
             
             // Wyczyść kalendarz
             calendarWeek.innerHTML = '';
@@ -239,6 +244,7 @@
                 
                 const dayElement = document.createElement('div');
                 dayElement.className = 'calendar-day';
+                dayElement.style.cssText = 'flex: 1; text-align: center; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; min-height: 150px; max-height: 200px; display: flex; flex-direction: column; justify-content: flex-start; min-width: 120px; overflow-y: auto;';
                 
                 // Sprawdź czy to dzisiejszy dzień
                 const isToday = date.toDateString() === today.toDateString();
@@ -253,7 +259,7 @@
                 const dateString = `${year}-${month.toString().padStart(2, '0')}-${dayNumber.toString().padStart(2, '0')}`;
                 
                 dayElement.innerHTML = `
-                    <h3 data-date="${dateString}">${dayName}, ${dayNumber}.${month}.${year}</h3>
+                    <h3 data-date="${dateString}">${dayName}, ${dayNumber.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}</h3>
                     <div class="events-container">
                         <!-- Wydarzenia będą dodane przez loadEvents() -->
                     </div>
@@ -264,6 +270,8 @@
             
             // Załaduj wydarzenia po wygenerowaniu kalendarza
             loadEvents();
+            
+            console.log('✅ Kalendarz wygenerowany:', calendarWeek.innerHTML);
         }
         
         function moveCalendar(direction) {
