@@ -103,7 +103,9 @@
     </header>
     
     <div class="calendar-container">
-        <div class="calendar-week"></div>
+        <div class="calendar-week" id="calendar-week">
+            <!-- Kalendarz będzie generowany przez JavaScript -->
+        </div>
         <div class="navigation-buttons">
             <button class="btn-prev-calendar">Poprzednia</button>
             <button class="btn-add-event">+ Dodaj wydarzenie</button>
@@ -156,7 +158,11 @@
         <h2>Moje statystyki:</h2>
     </header>
     <div class="stats-container">
-        <table id="matches-table">
+        <div id="no-stats-message" style="display: none; text-align: center; padding: 40px; color: #666; font-style: italic;">
+            Aktualnie brak statystyk - ale spokojnie, zaraz będzie mecz! 🏀
+        </div>
+        
+        <table id="matches-table" style="display: none;">
             <thead>
                 <tr>
                     <th>Drużyna</th>
@@ -172,7 +178,7 @@
             <tbody></tbody>
         </table>
 
-        <div id="pagination">
+        <div id="pagination" style="display: none;">
             <button id="prev-btn" class="btn-prev-stats" disabled>Poprzednia</button>
             <button id="next-btn" class="btn-next-stats" disabled>Następna</button>
         </div>
@@ -199,7 +205,69 @@
             } else {
                 console.error('❌ Event handlery nie są dostępne');
             }
+            
+            // Generuj kalendarz
+            generateCalendar();
+            
+            // Sprawdź czy są statystyki
+            checkStats();
         });
+        
+        function generateCalendar() {
+            const calendarWeek = document.getElementById('calendar-week');
+            if (!calendarWeek) return;
+            
+            const today = new Date();
+            const dayNames = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+            const shortDayNames = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
+            
+            // Generuj 7 dni (od poniedziałku do niedzieli)
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - today.getDay() + 1 + i); // Zacznij od poniedziałku
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                if (i === today.getDay() - 1 || (today.getDay() === 0 && i === 6)) {
+                    dayElement.classList.add('current');
+                }
+                
+                const dayName = shortDayNames[date.getDay()];
+                const dayNumber = date.getDate();
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                
+                dayElement.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${dayName}</div>
+                    <div style="font-size: 18px; margin-bottom: 5px;">${dayNumber}</div>
+                    <div style="font-size: 12px; color: #666;">${dayNumber}.${month}.${year}</div>
+                `;
+                
+                calendarWeek.appendChild(dayElement);
+            }
+        }
+        
+        function checkStats() {
+            const noStatsMessage = document.getElementById('no-stats-message');
+            const matchesTable = document.getElementById('matches-table');
+            const pagination = document.getElementById('pagination');
+            
+            if (!noStatsMessage || !matchesTable || !pagination) return;
+            
+            // Sprawdź czy są statystyki w localStorage
+            const stats = localStorage.getItem('matches') || '[]';
+            const matches = JSON.parse(stats);
+            
+            if (matches.length === 0) {
+                noStatsMessage.style.display = 'block';
+                matchesTable.style.display = 'none';
+                pagination.style.display = 'none';
+            } else {
+                noStatsMessage.style.display = 'none';
+                matchesTable.style.display = 'table';
+                pagination.style.display = 'flex';
+            }
+        }
     </script>
 </body>
 </html>

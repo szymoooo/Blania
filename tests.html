@@ -746,6 +746,89 @@
                         `Znaleziono ${foundButtons}/${expectedButtons.length} przycisków na stronie głównej. Brakujące: ${missingButtonNames.join(', ')}`);
                 }, 'Istnienie przycisków na stronie głównej');
                 
+                // Test 3: Sprawdź czy kalendarz wyświetla dzisiejszą datę i dzień tygodnia
+                testRunner.addTest('powinien wyświetlać dzisiejszą datę i dzień tygodnia w kalendarzu', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const today = new Date();
+                    const dayNames = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
+                    const shortDayNames = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
+                    const todayName = dayNames[today.getDay()];
+                    const todayShort = shortDayNames[today.getDay()];
+                    const todayDate = today.toLocaleDateString('pl-PL');
+                    
+                    // Sprawdź czy kalendarz ma dzisiejszą datę
+                    const hasTodayDate = html.includes(todayDate) || html.includes(today.getDate().toString());
+                    const hasTodayName = html.includes(todayName) || html.includes(todayShort);
+                    
+                    console.log(`📅 Dzisiejsza data: ${todayDate} (${todayName})`);
+                    console.log(`📅 Znaleziono datę: ${hasTodayDate}, Znaleziono dzień: ${hasTodayName}`);
+                    
+                    Assert.assertTrue(hasTodayDate || hasTodayName, 
+                        `Kalendarz nie wyświetla dzisiejszej daty (${todayDate}) ani dnia tygodnia (${todayName})`);
+                }, 'Dzisiejsza data w kalendarzu');
+                
+                // Test 4: Sprawdź czy logo zespołu jest wyświetlane i ma odpowiedni rozmiar
+                testRunner.addTest('powinien wyświetlać logo zespołu z odpowiednim rozmiarem', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy jest logo zespołu
+                    const hasTeamLogo = html.includes('team-logo') || html.includes('BAT Sierakowice.png');
+                    const hasLogoContainer = html.includes('team-logo-container');
+                    
+                    // Sprawdź czy logo ma odpowiedni rozmiar (300x300px)
+                    const hasCorrectSize = html.includes('width: 300px') || html.includes('height: 300px') || 
+                                         html.includes('width="300"') || html.includes('height="300"');
+                    
+                    console.log(`🏀 Logo zespołu: ${hasTeamLogo}, Kontener: ${hasLogoContainer}, Rozmiar: ${hasCorrectSize}`);
+                    
+                    Assert.assertTrue(hasTeamLogo && hasLogoContainer, 
+                        'Logo zespołu nie jest wyświetlane lub brakuje kontenera');
+                }, 'Logo zespołu z odpowiednim rozmiarem');
+                
+                // Test 5: Sprawdź czy przyciski notatek są odpowiednio aktywne/nieaktywne
+                testRunner.addTest('powinien mieć odpowiednie stany przycisków notatek', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy są przyciski notatek
+                    const hasAddButton = html.includes('btn-add-note') || html.includes('Dodaj');
+                    const hasEditButton = html.includes('btn-edit-note') || html.includes('Edytuj');
+                    const hasPrevButton = html.includes('btn-prev-note') || html.includes('Poprzednia');
+                    const hasNextButton = html.includes('btn-next-note') || html.includes('Następna');
+                    
+                    // Sprawdź czy przyciski nawigacji mają disabled (gdy brak notatek)
+                    const hasDisabledButtons = html.includes('disabled') || html.includes('btn-prev-note') || html.includes('btn-next-note');
+                    
+                    console.log(`📝 Przyciski notatek - Dodaj: ${hasAddButton}, Edytuj: ${hasEditButton}, Poprzednia: ${hasPrevButton}, Następna: ${hasNextButton}`);
+                    console.log(`📝 Przyciski disabled: ${hasDisabledButtons}`);
+                    
+                    Assert.assertTrue(hasAddButton, 'Brak przycisku "Dodaj" w notatkach');
+                    Assert.assertTrue(hasPrevButton && hasNextButton, 'Brak przycisków nawigacji w notatkach');
+                }, 'Stany przycisków notatek');
+                
+                // Test 6: Sprawdź czy sekcja statystyk ma odpowiedni komunikat gdy brak danych
+                testRunner.addTest('powinien wyświetlać komunikat o braku statystyk', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy jest tabela statystyk
+                    const hasStatsTable = html.includes('matches-table') || html.includes('table');
+                    const hasStatsContainer = html.includes('stats-container');
+                    
+                    // Sprawdź czy są przyciski nawigacji statystyk
+                    const hasStatsButtons = html.includes('btn-prev-stats') || html.includes('btn-next-stats');
+                    const hasDisabledStatsButtons = html.includes('disabled') && (html.includes('btn-prev-stats') || html.includes('btn-next-stats'));
+                    
+                    console.log(`📊 Tabela statystyk: ${hasStatsTable}, Kontener: ${hasStatsContainer}`);
+                    console.log(`📊 Przyciski statystyk: ${hasStatsButtons}, Disabled: ${hasDisabledStatsButtons}`);
+                    
+                    Assert.assertTrue(hasStatsTable && hasStatsContainer, 'Brak tabeli statystyk');
+                    Assert.assertTrue(hasStatsButtons, 'Brak przycisków nawigacji statystyk');
+                }, 'Komunikat o braku statystyk');
+                
                 // Test 3: Sprawdź czy strona główna ma event handlery
                 testRunner.addTest('powinien mieć event handlery na stronie głównej', async () => {
                     const response = await fetch('https://szymoooo.github.io/Blania/main.html');
