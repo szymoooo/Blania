@@ -119,8 +119,11 @@ const AppConfig = {
      */
     EVENT_ICONS: {
         'mecz-ligowy': 'match.png',
+        'mecz-dom': 'match.png',
+        'mecz-wyjazd': 'match.png',
         'trening': 'training.png',
         'fizjoterapeuta': 'physio.png',
+        'fizjo': 'physio.png',
         'mecz-sparingowy': 'friendly.png',
         'turniej': 'tournament.png',
         'oboz': 'camp.png',

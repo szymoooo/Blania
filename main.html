@@ -209,6 +209,9 @@
             // Generuj kalendarz
             generateCalendar();
             
+            // Załaduj wydarzenia
+            loadEvents();
+            
             // Sprawdź czy są statystyki
             checkStats();
             
@@ -385,15 +388,48 @@
             localStorage.setItem('currentPage', newPage);
             loadMatches();
         }
+
+        // Funkcja ładowania wydarzeń
+        function loadEvents() {
+            const savedEvents = storage.getSavedEvents();
+            const eventIcons = AppConfig.EVENT_ICONS;
+
+            // Wyczyść istniejące wydarzenia
+            document.querySelectorAll('.event-item').forEach(item => item.remove());
+
+            savedEvents.forEach(event => {
+                const eventDate = new Date(event.date).toISOString().split('T')[0];
+                document.querySelectorAll('.calendar-day').forEach(dayElement => {
+                    const dayDate = new Date(dayElement.querySelector('h3').getAttribute('data-date')).toISOString().split('T')[0];
+                    if (dayDate === eventDate) {
+                        const eventItem = document.createElement('div');
+                        eventItem.className = 'event-item';
+                        eventItem.setAttribute('data-event-id', event.id);
+
+                        eventItem.addEventListener('click', () => editEvent(event.id));
+
+                        const icon = document.createElement('div');
+                        icon.className = 'event-icon';
+                        icon.style.backgroundImage = `url(${eventIcons[event.type]})`;
+                        icon.style.backgroundSize = 'cover';
+                        eventItem.appendChild(icon);
+
+                        const text = document.createElement('div');
+                        text.className = 'event-text';
+                        text.innerHTML = `
+                            <strong>${event.date.split('T')[1].substring(0, 5)} ${event.name.substring(0, 20)}${event.name.length > 20 ? '...' : ''}</strong><br>
+                            ${event.name.length > 20 ? `<small>${event.name.substring(20)}</small>` : ''}
+                            <small>${event.location}</small>
+                        `;
+                        eventItem.appendChild(text);
+
+                        dayElement.querySelector('.events-container').appendChild(eventItem);
+                    }
+                });
+            });
+        }
     </script>
     
     <!-- Skrypty JavaScript - na końcu strony -->
-    <script src="config.js"></script>
-    <script src="storage.js"></script>
-    <script src="app.js"></script>
-    <script src="eventHandlers.js"></script>
-    <script src="stateManager.js"></script>
-    <script src="errorHandler.js"></script>
-    <script src="performance.js"></script>
 </body>
 </html>
