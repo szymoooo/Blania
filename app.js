@@ -1,41 +1,25 @@
+/* ========================================
+   BLANIA - GŁÓWNA APLIKACJA
+   Refaktoryzowana wersja bez duplikatów
+   ======================================== */
+
 // Stałe i zmienne globalne
-const logos = {
-    'BAT Sierakowice': 'BAT Sierakowice.png',
-    'BAT Kartuzy': 'BAT Kartuzy.png',
-    'Bryza Pruszcz Gd': 'Bryza Pruszcz Gd.png',
-    'Elbląg': 'Elblag.png',
-    'Pruszcz Gdański 1': 'Pruszcz Gdanski 1.png',
-    'Pruszcz Gdański 2': 'Pruszcz Gdanski 2.png',
-    'BK VLCI Žďár': 'BK VLCI Zdar.png',
-    'BKM Žilina': 'BKM Zilina.png',
-    'MOSiR Bochnia': 'MOSiR Bochnia.png',
-    'UKS ŻAK Nowy Sącz': 'UKS ZAK Nowy Sacz.png',
-    'Young Angels Košice': 'Young Angels Kosice.png'
-};
+const logos = AppConfig.TEAMS;
 
 let currentWeekStart = new Date();
-let notes = JSON.parse(localStorage.getItem('notes')) || {};
 let currentTeam = 'BAT Sierakowice';
 let currentNoteIndex = 0;
 let currentPage = 1;
-const recordsPerPage = 5;
+const recordsPerPage = AppConfig.UI.RECORDS_PER_PAGE;
 let googleAuthInitialized = false;
 
-// Funkcje pomocnicze
-function safeJsonParse(jsonString) {
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.error('Błąd parsowania JSON:', e);
-        return null;
-    }
-}
+// ===== GOOGLE AUTH FUNCTIONS =====
 
 function decodeJwt(token) {
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        return safeJsonParse(atob(base64));
+        return storage.safeJsonParse(atob(base64));
     } catch (e) {
         console.error('Błąd dekodowania JWT:', e);
         return null;
@@ -47,7 +31,6 @@ function handleAuthError(error) {
     alert('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
 }
 
-// Logika Google Auth
 window.handleGoogleAuth = function(response) {
     if (response.error) {
         handleAuthError(response.error);
@@ -60,7 +43,7 @@ window.handleGoogleAuth = function(response) {
         return;
     }
     
-    localStorage.setItem('googleUser', JSON.stringify(user));
+    storage.setGoogleUser(user);
     updateUserUI(user);
     authorize().catch(handleAuthError);
 };
@@ -69,10 +52,10 @@ async function initializeGoogleAuth() {
     return new Promise((resolve) => {
         const checkGoogle = () => {
             if (window.google?.accounts?.id) {
-                google.accounts.id.initialize({
-                    client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-                    callback: window.handleCredentialResponse
-                });
+        google.accounts.id.initialize({
+            client_id: AppConfig.GOOGLE.CLIENT_ID,
+            callback: window.handleCredentialResponse
+        });
                 googleAuthInitialized = true;
                 resolve(true);
             } else {
@@ -127,8 +110,7 @@ function logout() {
     if (window.google && window.google.accounts) {
         google.accounts.id.disableAutoSelect();
     }
-    localStorage.removeItem('googleUser');
-    localStorage.removeItem('googleAccessToken');
+    storage.clearGoogleAuth();
     updateUserUI(null);
 }
 
@@ -140,12 +122,12 @@ async function authorize() {
         }
 
         const client = google.accounts.oauth2.initTokenClient({
-            client_id: '148953860327-72d408l9qvt34akmhaa1e37m4bvbto70.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/calendar.events',
+            client_id: AppConfig.GOOGLE.CLIENT_ID,
+            scope: AppConfig.GOOGLE.SCOPE,
             prompt: 'consent',
             callback: (response) => {
                 if (response.access_token) {
-                    localStorage.setItem('googleAccessToken', response.access_token);
+                    storage.setGoogleAccessToken(response.access_token);
                     resolve(response.access_token);
                 } else {
                     reject(response.error || 'unknown_error');
@@ -156,13 +138,14 @@ async function authorize() {
     });
 }
 
-// Logika drużyn i notatek
+// ===== TEAM AND NOTES FUNCTIONS =====
+
 function changeLogo() {
     const teamSelector = document.getElementById('team-selector');
     const logo = document.getElementById('team-logo');
     logo.src = logos[teamSelector.value] || 'BAT Sierakowice.png';
     currentTeam = teamSelector.value;
-    localStorage.setItem('currentTeam', currentTeam);
+    storage.setCurrentTeam(currentTeam);
     loadNotes();
     updateNotesNavigation();
 }
@@ -181,15 +164,15 @@ function startGame() {
         return;
     }
 
-    localStorage.setItem("selectedTeam", team);
-    localStorage.setItem("selectedDate", date);
-    localStorage.removeItem("editMatchId");
+    storage.setSelectedTeam(team);
+    storage.setSelectedDate(date);
+    storage.remove(storage.keys.EDIT_MATCH_ID);
     window.location.href = "blania.html";
 }
 
 function loadNotes() {
     const notesDisplay = document.getElementById('notes-display');
-    const teamNotes = notes[currentTeam] || [];
+    const teamNotes = storage.getTeamNotes(currentTeam);
 
     if (teamNotes.length === 0) {
         notesDisplay.innerHTML = '<p>Tutaj dodaj swoje spostrzeżenia na temat przeciwnika. Kliknij "Dodaj".</p>';
@@ -209,7 +192,7 @@ function loadNotes() {
 }
 
 function updateNotesNavigation() {
-    const teamNotes = notes[currentTeam] || [];
+    const teamNotes = storage.getTeamNotes(currentTeam);
     const notesNavigation = document.getElementById('notes-navigation');
     const buttons = notesNavigation.querySelectorAll('button');
     
@@ -226,32 +209,34 @@ function prevNote() {
 }
 
 function nextNote() {
-    if (currentNoteIndex < notes[currentTeam].length - 1) {
+    const teamNotes = storage.getTeamNotes(currentTeam);
+    if (currentNoteIndex < teamNotes.length - 1) {
         currentNoteIndex++;
         loadNotes();
     }
 }
 
 function openNotesForm() {
-    localStorage.setItem('currentTeam', currentTeam);
-    localStorage.removeItem('currentNoteIndex');
+    storage.setCurrentTeam(currentTeam);
+    storage.remove(storage.keys.CURRENT_NOTE_INDEX);
     window.location.href = 'notes-form.html';
 }
 
 function editNote() {
-    const teamNotes = notes[currentTeam] || [];
+    const teamNotes = storage.getTeamNotes(currentTeam);
     if (teamNotes.length > 0) {
         const note = teamNotes[currentNoteIndex];
-        localStorage.setItem('currentTeam', currentTeam);
-        localStorage.setItem('currentNoteIndex', currentNoteIndex);
-        localStorage.setItem('noteToEdit', JSON.stringify(note));
+        storage.setCurrentTeam(currentTeam);
+        storage.setCurrentNoteIndex(currentNoteIndex);
+        storage.setNoteToEdit(note);
         window.location.href = 'notes-form.html';
     }
 }
 
-// Logika kalendarza
+// ===== CALENDAR FUNCTIONS =====
+
 function moveCalendar(days) {
-    currentWeekStart.setDate(currentWeekStart.getDate() + (days * 5));
+    currentWeekStart.setDate(currentWeekStart.getDate() + (days * AppConfig.CALENDAR.DAYS_PER_WEEK));
     generateCalendar();
 }
 
@@ -259,7 +244,7 @@ function generateCalendar() {
     const calendarWeek = document.querySelector('.calendar-week');
     calendarWeek.innerHTML = "";
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < AppConfig.CALENDAR.DAYS_PER_WEEK; i++) {
         const day = new Date(currentWeekStart);
         day.setDate(currentWeekStart.getDate() + i);
 
@@ -279,7 +264,7 @@ function generateCalendar() {
         eventsList.className = 'events-container';
         dayElement.appendChild(eventsList);
 
-        const savedEvents = safeJsonParse(localStorage.getItem('savedEvents')) || [];
+        const savedEvents = storage.getSavedEvents();
         const hasEvents = savedEvents.some(event => {
             const eventDate = new Date(event.date).toISOString().split('T')[0];
             return eventDate === day.toISOString().split('T')[0];
@@ -298,16 +283,8 @@ function generateCalendar() {
 }
 
 function loadEvents() {
-    const savedEvents = safeJsonParse(localStorage.getItem('savedEvents')) || [];
-    const eventIcons = {
-        'mecz-ligowy': 'match.png',
-        'trening': 'training.png',
-        'fizjoterapeuta': 'physio.png',
-        'mecz-sparingowy': 'friendly.png',
-        'turniej': 'tournament.png',
-        'oboz': 'camp.png',
-        'bus': 'bus.png'
-    };
+    const savedEvents = storage.getSavedEvents();
+    const eventIcons = AppConfig.EVENT_ICONS;
 
     savedEvents.forEach(event => {
         const eventDate = new Date(event.date).toISOString().split('T')[0];
@@ -342,12 +319,12 @@ function loadEvents() {
 }
 
 function editEvent(eventId) {
-    const savedEvents = safeJsonParse(localStorage.getItem('savedEvents')) || [];
+    const savedEvents = storage.getSavedEvents();
     const eventToEdit = savedEvents.find(event => event.id === eventId);
 
     if (eventToEdit) {
-        localStorage.setItem("selectedDate", eventToEdit.date.split('T')[0]);
-        localStorage.setItem("editEventId", eventToEdit.id);
+        storage.setSelectedDate(eventToEdit.date.split('T')[0]);
+        storage.setEditEventId(eventToEdit.id);
         window.location.href = "add-event.html";
     } else {
         alert("Event nie został znaleziony.");
@@ -361,14 +338,15 @@ function addEvent() {
     }
     
     const selectedDate = new Date(currentWeekStart).toISOString().split('T')[0];
-    localStorage.setItem("selectedDate", selectedDate);
+    storage.setSelectedDate(selectedDate);
     window.location.href = "add-event.html";
 }
 
-// Logika statystyk
+// ===== STATS FUNCTIONS =====
+
 function loadSavedMatches() {
     const tableBody = document.querySelector("#matches-table tbody");
-    let savedMatches = safeJsonParse(localStorage.getItem("savedMatches")) || [];
+    let savedMatches = storage.getSavedMatches();
 
     savedMatches.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -400,8 +378,7 @@ function loadSavedMatches() {
         deleteButton.className = "action-btn delete-btn";
         deleteButton.addEventListener('click', () => {
             if (confirm("Czy na pewno chcesz usunąć ten mecz?")) {
-                savedMatches = savedMatches.filter(m => m.id !== match.id);
-                localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
+                storage.deleteMatch(match.id);
                 loadSavedMatches();
             }
         });
@@ -431,28 +408,28 @@ function changePage(direction) {
 }
 
 function editMatch(matchId) {
-    const savedMatches = safeJsonParse(localStorage.getItem("savedMatches")) || [];
+    const savedMatches = storage.getSavedMatches();
     const matchToEdit = savedMatches.find(match => match.id === matchId);
 
     if (matchToEdit) {
-        localStorage.setItem("selectedTeam", matchToEdit.team);
-        localStorage.setItem("selectedDate", matchToEdit.date);
-        localStorage.setItem("editMatchId", matchToEdit.id);
+        storage.setSelectedTeam(matchToEdit.team);
+        storage.setSelectedDate(matchToEdit.date);
+        storage.setEditMatchId(matchToEdit.id);
         window.location.href = "blania.html";
     } else {
         alert("Mecz nie został znaleziony.");
     }
 }
 
-// Funkcje pomocnicze
+// ===== HELPER FUNCTIONS =====
+
 function checkLoginStatus() {
-    const user = safeJsonParse(localStorage.getItem('googleUser'));
+    const user = storage.getGoogleUser();
     if (!user) return false;
     
     const tokenExpiration = user.exp * 1000;
     if (Date.now() > tokenExpiration) {
-        localStorage.removeItem('googleUser');
-        localStorage.removeItem('googleAccessToken');
+        storage.clearGoogleAuth();
         return false;
     }
     return true;
@@ -464,7 +441,7 @@ async function addEventToGoogleCalendar(event) {
             throw new Error("Proszę zalogować się przez Google");
         }
 
-        let accessToken = localStorage.getItem('googleAccessToken');
+        let accessToken = storage.getGoogleAccessToken();
         if (!accessToken) {
             accessToken = await authorize();
         }
@@ -494,7 +471,7 @@ async function addEventToGoogleCalendar(event) {
 
         if (!response.ok) {
             if (response.status === 401) {
-                localStorage.removeItem('googleAccessToken');
+                storage.remove(storage.keys.GOOGLE_ACCESS_TOKEN);
                 return addEventToGoogleCalendar(event);
             }
             const errorData = await response.json();
@@ -508,41 +485,63 @@ async function addEventToGoogleCalendar(event) {
     }
 }
 
-// Inicjalizacja aplikacji
+// ===== INITIALIZATION =====
+
 async function initializeApp() {
-    await initializeGoogleAuth();
-    
-    const user = JSON.parse(localStorage.getItem('googleUser'));
-    updateUserUI(user);
+    try {
+        // Initialize state manager
+        if (window.stateManager) {
+            window.stateManager.initialize();
+        }
+        
+        // Initialize error handling
+        if (window.errorHandler) {
+            window.errorHandler.setupGlobalErrorHandling();
+        }
+        
+        // Initialize performance optimization
+        if (window.performanceOptimizer) {
+            window.performanceOptimizer.initialize();
+        }
+        
+        await initializeGoogleAuth();
+        
+        const user = storage.getGoogleUser();
+        if (user && window.stateManager) {
+            window.stateManager.dispatch('LOGIN', user);
+        }
+        updateUserUI(user);
 
-    setTodayDate();
-    
-    const savedTeam = localStorage.getItem('currentTeam');
-    if (savedTeam) {
-        currentTeam = savedTeam;
-        document.getElementById('team-selector').value = currentTeam;
-        changeLogo();
-    } else {
-        changeLogo();
+        setTodayDate();
+        
+        const savedTeam = storage.getCurrentTeam();
+        if (savedTeam) {
+            currentTeam = savedTeam;
+            if (window.stateManager) {
+                window.stateManager.dispatch('SET_CURRENT_TEAM', savedTeam);
+            }
+            document.getElementById('team-selector').value = currentTeam;
+            changeLogo();
+        } else {
+            changeLogo();
+        }
+
+        generateCalendar();
+        loadSavedMatches();
+        loadNotes();
+
+        // Inicjalizuj handlery
+        if (window.eventHandlers) {
+            eventHandlers.initMainHandlers();
+        }
+        
+    } catch (error) {
+        if (window.errorHandler) {
+            window.errorHandler.handleError(error, { context: 'app_initialization' });
+        } else {
+            console.error('App initialization error:', error);
+        }
     }
-
-    generateCalendar();
-    loadSavedMatches();
-    loadNotes();
-
-    // Event listeners
-    document.getElementById('logout-btn').addEventListener('click', logout);
-    document.getElementById('team-selector').addEventListener('change', changeLogo);
-    document.querySelector('.btn-prev-calendar').addEventListener('click', () => moveCalendar(-1));
-    document.querySelector('.btn-next-calendar').addEventListener('click', () => moveCalendar(1));
-    document.querySelector('.btn-add-event').addEventListener('click', addEvent);
-    document.querySelector('.btn-start-game').addEventListener('click', startGame);
-    document.querySelector('.btn-prev-note').addEventListener('click', prevNote);
-    document.querySelector('.btn-next-note').addEventListener('click', nextNote);
-    document.querySelector('.btn-add-note').addEventListener('click', openNotesForm);
-    document.querySelector('.btn-edit-note').addEventListener('click', editNote);
-    document.getElementById('prev-btn').addEventListener('click', () => changePage(-1));
-    document.getElementById('next-btn').addEventListener('click', () => changePage(1));
 }
 
 // Start aplikacji

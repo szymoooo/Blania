@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testy jednostkowe - Blania</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .test-button {
+            padding: 10px 20px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .test-button:hover {
+            background-color: #005bb5;
+        }
+        
+        .test-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .test-results {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .test-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .summary-card .number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .summary-card.passed .number {
+            color: #28a745;
+        }
+        
+        .summary-card.failed .number {
+            color: #dc3545;
+        }
+        
+        .summary-card.total .number {
+            color: #0078d7;
+        }
+        
+        .test-output {
+            background-color: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .test-details {
+            margin-top: 20px;
+        }
+        
+        .test-suite {
+            margin-bottom: 20px;
+        }
+        
+        .test-suite h4 {
+            color: #333;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #0078d7;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        
+        .test-status {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .test-name {
+            flex: 1;
+        }
+        
+        .test-duration {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .test-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            padding-left: 30px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0078d7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🧪 Testy jednostkowe - Blania</h1>
+            <p>System testów dla aplikacji planera statystyk koszykarskich</p>
+        </div>
+        
+        <div class="test-controls">
+            <button id="runAllTests" class="test-button">Uruchom wszystkie testy</button>
+            <button id="runStorageTests" class="test-button">Testy Storage</button>
+            <button id="runErrorTests" class="test-button">Testy Error Handler</button>
+            <button id="clearResults" class="test-button">Wyczyść wyniki</button>
+        </div>
+        
+        <div id="testResults" class="test-results" style="display: none;">
+            <div id="testSummary" class="test-summary"></div>
+            <div id="testOutput" class="test-output"></div>
+            <div id="testDetails" class="test-details"></div>
+        </div>
+        
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Uruchamianie testów...</p>
+        </div>
+    </div>
+
+    <!-- Load all required scripts -->
+    <script src="config.js"></script>
+    <script src="storage.js"></script>
+    <script src="errorHandler.js"></script>
+    <script src="tests/testRunner.js"></script>
+    <script src="tests/storageTests.js"></script>
+    <script src="tests/errorHandlerTests.js"></script>
+    
+    <script>
+        /**
+         * Główna klasa do zarządzania testami
+         * @class TestManager
+         */
+        class TestManager {
+            constructor() {
+                this.storageTests = new StorageTests();
+                this.errorTests = new ErrorHandlerTests();
+                this.allResults = [];
+                this.setupEventListeners();
+            }
+
+            /**
+             * Konfiguruje event listenery
+             */
+            setupEventListeners() {
+                document.getElementById('runAllTests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('runStorageTests').addEventListener('click', () => this.runStorageTests());
+                document.getElementById('runErrorTests').addEventListener('click', () => this.runErrorTests());
+                document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
+            }
+
+            /**
+             * Uruchamia wszystkie testy
+             */
+            async runAllTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('🚀 Uruchamianie wszystkich testów...\n');
+                
+                try {
+                    const storageResults = await this.storageTests.run();
+                    const errorResults = await this.errorTests.run();
+                    
+                    this.allResults = [storageResults, errorResults];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów:', error);
+                    this.showError('Błąd podczas uruchamiania testów: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Uruchamia testy Storage
+             */
+            async runStorageTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('💾 Uruchamianie testów Storage...\n');
+                
+                try {
+                    const results = await this.storageTests.run();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów Storage:', error);
+                    this.showError('Błąd podczas uruchamiania testów Storage: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Uruchamia testy Error Handler
+             */
+            async runErrorTests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('⚠️ Uruchamianie testów Error Handler...\n');
+                
+                try {
+                    const results = await this.errorTests.run();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów Error Handler:', error);
+                    this.showError('Błąd podczas uruchamiania testów Error Handler: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Wyświetla wyniki testów
+             */
+            displayResults() {
+                const totalPassed = this.allResults.reduce((sum, result) => sum + result.passed, 0);
+                const totalFailed = this.allResults.reduce((sum, result) => sum + result.failed, 0);
+                const totalTests = this.allResults.reduce((sum, result) => sum + result.total, 0);
+                
+                this.displaySummary(totalPassed, totalFailed, totalTests);
+                this.displayOutput();
+                this.displayDetails();
+                
+                document.getElementById('testResults').style.display = 'block';
+            }
+
+            /**
+             * Wyświetla podsumowanie testów
+             */
+            displaySummary(passed, failed, total) {
+                const summaryDiv = document.getElementById('testSummary');
+                summaryDiv.innerHTML = `
+                    <div class="summary-card passed">
+                        <h3>Przeszły</h3>
+                        <div class="number">${passed}</div>
+                    </div>
+                    <div class="summary-card failed">
+                        <h3>Nie przeszły</h3>
+                        <div class="number">${failed}</div>
+                    </div>
+                    <div class="summary-card total">
+                        <h3>Razem</h3>
+                        <div class="number">${total}</div>
+                    </div>
+                `;
+            }
+
+            /**
+             * Wyświetla output testów
+             */
+            displayOutput() {
+                const outputDiv = document.getElementById('testOutput');
+                
+                // Capture console output
+                const originalLog = console.log;
+                const originalError = console.error;
+                let output = '';
+                
+                console.log = (...args) => {
+                    output += args.join(' ') + '\n';
+                    originalLog.apply(console, args);
+                };
+                
+                console.error = (...args) => {
+                    output += 'ERROR: ' + args.join(' ') + '\n';
+                    originalError.apply(console, args);
+                };
+                
+                // Re-run tests to capture output
+                this.runTestsForOutput().then(() => {
+                    outputDiv.textContent = output;
+                    console.log = originalLog;
+                    console.error = originalError;
+                });
+            }
+
+            /**
+             * Uruchamia testy dla output
+             */
+            async runTestsForOutput() {
+                // This will be called to capture console output
+                // The actual test running is handled by the individual test classes
+            }
+
+            /**
+             * Wyświetla szczegóły testów
+             */
+            displayDetails() {
+                const detailsDiv = document.getElementById('testDetails');
+                let html = '';
+                
+                this.allResults.forEach((result, index) => {
+                    const suiteName = index === 0 ? 'Storage Tests' : 'Error Handler Tests';
+                    html += `<div class="test-suite">`;
+                    html += `<h4>${suiteName}</h4>`;
+                    
+                    result.results.forEach(test => {
+                        const statusIcon = test.status === 'PASSED' ? '✅' : '❌';
+                        html += `
+                            <div class="test-item">
+                                <span class="test-status">${statusIcon}</span>
+                                <span class="test-name">${test.name}</span>
+                                <span class="test-duration">${test.duration.toFixed(2)}ms</span>
+                            </div>
+                        `;
+                        
+                        if (test.error) {
+                            html += `<div class="test-error">${test.error}</div>`;
+                        }
+                    });
+                    
+                    html += `</div>`;
+                });
+                
+                detailsDiv.innerHTML = html;
+            }
+
+            /**
+             * Czyści wyniki
+             */
+            clearResults() {
+                this.allResults = [];
+                document.getElementById('testResults').style.display = 'none';
+                document.getElementById('testOutput').textContent = '';
+                console.clear();
+            }
+
+            /**
+             * Wyświetla loading
+             */
+            showLoading() {
+                document.getElementById('loadingIndicator').style.display = 'block';
+                document.getElementById('testResults').style.display = 'none';
+            }
+
+            /**
+             * Ukrywa loading
+             */
+            hideLoading() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+
+            /**
+             * Czyści output
+             */
+            clearOutput() {
+                document.getElementById('testOutput').textContent = '';
+            }
+
+            /**
+             * Wyświetla błąd
+             */
+            showError(message) {
+                const outputDiv = document.getElementById('testOutput');
+                outputDiv.textContent = 'ERROR: ' + message;
+                document.getElementById('testResults').style.display = 'block';
+            }
+        }
+
+        // Initialize test manager when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.testManager = new TestManager();
+        });
+    </script>
+</body>
+</html>

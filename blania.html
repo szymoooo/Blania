@@ -4,144 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blanka</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #ffffff;
-            color: #333;
-            padding: 1px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-            margin: 0;
-            box-sizing: border-box;
-        }
-        header {
-            font-size: 28px;
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 700px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin: 0 20px;
-        }
-        .stats-section {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .stats-section h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .counter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .counter button {
-            width: 30px;
-            height: 30px;
-            font-size: 16px;
-            background-color: #0078d7;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 0 5px;
-        }
-        .counter button:hover {
-            background-color: #005bb5;
-        }
-        .counter input {
-            width: 50px;
-            padding: 5px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .total-and-stream {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .total-points {
-            display: flex;
-            align-items: center;
-        }
-        .total-points label {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .stream-link {
-            display: flex;
-            align-items: center;
-        }
-        .stream-link label {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .stream-link input {
-            width: 200px;
-            padding: 5px;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .save-btn {
-            display: block;
-            margin: 10px auto;
-            padding: 12px 20px;
-            font-size: 16px;
-            background-color: #0078d7;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 50%;
-        }
-        .save-btn:hover {
-            background-color: #005bb5;
-        }
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #888;
-        }
-        #other-stats-table th:nth-child(1), #other-stats-table td:nth-child(1) { width: 25%; }
-        #other-stats-table th:nth-child(2), #other-stats-table td:nth-child(2) { width: 25%; }
-        #other-stats-table th:nth-child(3), #other-stats-table td:nth-child(3) { width: 25%; }
-        #other-stats-table th:nth-child(4), #other-stats-table td:nth-child(4) { width: 25%; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>Statystyki meczu - <span id="team-name"></span></header>
@@ -277,7 +140,8 @@
     </div>
     <div class="footer"><p>© 2024 Blanka. Wszystkie prawa zastrzeżone.</p></div>
 
-<script>
+    <script src="storage.js"></script>
+    <script>
         function changeStat(stat, delta) {
             const statElement = document.getElementById(stat);
             let currentValue = parseInt(statElement.value) || 0;
@@ -313,13 +177,11 @@
         }
 
         function saveMatch() {
-            const matchId = localStorage.getItem("editMatchId");
-            let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-
+            const matchId = storage.getEditMatchId();
             const newMatch = { 
                 id: matchId || Date.now(),
                 team: document.getElementById("team-name").textContent, 
-                date: localStorage.getItem("selectedDate") || "Brak daty",
+                date: storage.getSelectedDate() || "Brak daty",
                 "2pkt-celne": document.getElementById("2pkt-celne").value, 
                 "2pkt-niecelne": document.getElementById("2pkt-niecelne").value, 
                 "3pkt-celne": document.getElementById("3pkt-celne").value, 
@@ -334,41 +196,23 @@
                 streamLink: document.getElementById("streamLink").value.trim()
             };
 
-            if (matchId) {
-                const matchIndex = savedMatches.findIndex(m => m.id === Number(matchId)); // Konwersja na liczbę
-                if (matchIndex !== -1) {
-                    savedMatches[matchIndex] = newMatch;
-                }
+            if (storage.saveMatch(newMatch)) {
+                storage.clearEditData();
+                window.location.href = "main.html";
             } else {
-                savedMatches.push(newMatch);
+                alert("Błąd podczas zapisywania meczu.");
             }
-
-            localStorage.setItem("savedMatches", JSON.stringify(savedMatches));
-            localStorage.removeItem("editMatchId");
-            localStorage.removeItem("selectedTeam");
-            localStorage.removeItem("selectedDate");
-
-            window.location.href = "main.html";
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            const matchId = localStorage.getItem("editMatchId");
-            let savedMatches = JSON.parse(localStorage.getItem("savedMatches")) || [];
-            const team = localStorage.getItem("selectedTeam") || "Nieznany zespół";
-
-            console.log("Wczytano z localStorage:", { // Debugowanie
-                matchId: matchId,
-                selectedTeam: team,
-                savedMatches: savedMatches
-            });
+            const matchId = storage.getEditMatchId();
+            const team = storage.getSelectedTeam() || "Nieznany zespół";
 
             document.getElementById("team-name").textContent = team;
 
             if (matchId !== null) {
-                const match = savedMatches.find(m => m.id === Number(matchId)); // Konwersja na liczbę
-
-                console.log("Wczytany rekord do edycji:", match); // Debugowanie
-                console.log("Wszystkie rekordy:", savedMatches); // Debugowanie
+                const savedMatches = storage.getSavedMatches();
+                const match = savedMatches.find(m => m.id === Number(matchId));
 
                 if (match) {
                     Object.keys(match).forEach(key => {
@@ -381,13 +225,10 @@
                     updateEffectiveness("3pkt");
                     updateEffectiveness("1pkt");
                     updateTotalPoints();
-                } else {
-                    console.log("Nie znaleziono rekordu o podanym ID."); // Debugowanie
                 }
-            } else {
-                console.log("Tryb nowego meczu – brak rekordu do edycji."); // Debugowanie
             }
         });
+    </script>
     </script>
 </body>
 </html>
