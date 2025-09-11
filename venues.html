@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale i Obiekty - Blania Admin</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --accent: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .venues-container {
+            width: 100vw;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .venues-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .venues-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .add-venue-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .add-venue-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .venues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            max-width: 100%;
+        }
+        
+        .venue-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+            border-left: 5px solid;
+        }
+        
+        .venue-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .venue-card.sala {
+            border-left-color: #28a745;
+        }
+        
+        .venue-card.boisko {
+            border-left-color: #007bff;
+        }
+        
+        .venue-card.obiekt {
+            border-left-color: #6f42c1;
+        }
+        
+        .venue-card.klub {
+            border-left-color: #fd7e14;
+        }
+        
+        .venue-card.inne {
+            border-left-color: #6c757d;
+        }
+        
+        .venue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .venue-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .venue-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .venue-type-badge.sala {
+            background: #28a745;
+            color: white;
+        }
+        
+        .venue-type-badge.boisko {
+            background: #007bff;
+            color: white;
+        }
+        
+        .venue-type-badge.obiekt {
+            background: #6f42c1;
+            color: white;
+        }
+        
+        .venue-type-badge.klub {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .venue-type-badge.inne {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .venue-details {
+            margin-bottom: 15px;
+        }
+        
+        .venue-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .venue-detail i {
+            width: 20px;
+            margin-right: 10px;
+            color: #6b7280;
+        }
+        
+        .venue-detail-value {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .venue-capacity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .capacity-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .capacity-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: bold;
+        }
+        
+        .capacity-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .venue-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .availability-btn {
+            background: var(--success);
+            color: white;
+        }
+        
+        .availability-btn:hover {
+            background: #218838;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-select {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .form-textarea {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .back-btn {
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsywność */
+        @media (min-width: 1200px) {
+            .venues-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .venues-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 991px) {
+            .venues-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .venues-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="venues-container">
+        <a href="admin.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Powrót do panelu admin
+        </a>
+        
+        <div class="venues-header">
+            <h1 class="venues-title">Sale i Obiekty</h1>
+            <button class="add-venue-btn" onclick="openAddVenueModal()">
+                <i class="fas fa-plus"></i> Dodaj obiekt
+            </button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Szukaj obiektu..." onkeyup="filterVenues()">
+            <select class="filter-select" id="typeFilter" onchange="filterVenues()">
+                <option value="">Wszystkie typy</option>
+                <option value="sala">Sala treningowa</option>
+                <option value="boisko">Boisko</option>
+                <option value="obiekt">Obiekt sportowy</option>
+                <option value="klub">Klub sportowy</option>
+                <option value="inne">Inne</option>
+            </select>
+        </div>
+        
+        <div class="venues-grid" id="venuesGrid">
+            <!-- Obiekty będą dodane przez JavaScript -->
+        </div>
+        
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-building"></i>
+            <h3>Brak obiektów</h3>
+            <p>Dodaj pierwszy obiekt do swojej bazy!</p>
+            <button class="add-venue-btn" onclick="openAddVenueModal()">
+                <i class="fas fa-plus"></i> Dodaj obiekt
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal dodawania/edycji obiektu -->
+    <div id="venueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Dodaj obiekt</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="venueForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="venueName">Nazwa obiektu *</label>
+                        <input type="text" class="form-input" id="venueName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venueType">Typ obiektu *</label>
+                        <select class="form-select" id="venueType" required>
+                            <option value="">Wybierz typ</option>
+                            <option value="sala">Sala treningowa</option>
+                            <option value="boisko">Boisko</option>
+                            <option value="obiekt">Obiekt sportowy</option>
+                            <option value="klub">Klub sportowy</option>
+                            <option value="inne">Inne</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venueAddress">Adres *</label>
+                        <input type="text" class="form-input" id="venueAddress" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venueCity">Miasto *</label>
+                        <input type="text" class="form-input" id="venueCity" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venueCapacity">Pojemność (osoby)</label>
+                        <input type="number" class="form-input" id="venueCapacity" min="1" max="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venuePhone">Telefon</label>
+                        <input type="tel" class="form-input" id="venuePhone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venueEmail">Email</label>
+                        <input type="email" class="form-input" id="venueEmail">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="venueWebsite">Strona internetowa</label>
+                        <input type="url" class="form-input" id="venueWebsite">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label" for="venueDescription">Opis obiektu</label>
+                        <textarea class="form-textarea" id="venueDescription" placeholder="Dodatkowe informacje o obiekcie..."></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label" for="venueNotes">Notatki</label>
+                        <textarea class="form-textarea" id="venueNotes" placeholder="Notatki dla trenera..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Dodaj obiekt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let venues = [];
+        let editingVenueId = null;
+        
+        // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVenues();
+            renderVenues();
+        });
+        
+        // Ładowanie obiektów z localStorage
+        function loadVenues() {
+            const savedVenues = localStorage.getItem('basketballVenues');
+            venues = savedVenues ? JSON.parse(savedVenues) : [];
+        }
+        
+        // Zapisywanie obiektów do localStorage
+        function saveVenues() {
+            localStorage.setItem('basketballVenues', JSON.stringify(venues));
+        }
+        
+        // Renderowanie listy obiektów
+        function renderVenues() {
+            const venuesGrid = document.getElementById('venuesGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (venues.length === 0) {
+                venuesGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            venuesGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            venuesGrid.innerHTML = venues.map(venue => `
+                <div class="venue-card ${venue.type}">
+                    <div class="venue-header">
+                        <h3 class="venue-name">${venue.name}</h3>
+                        <span class="venue-type-badge ${venue.type}">${getTypeName(venue.type)}</span>
+                    </div>
+                    
+                    <div class="venue-details">
+                        <div class="venue-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="venue-detail-value">${venue.address}, ${venue.city}</span>
+                        </div>
+                        
+                        ${venue.phone ? `
+                        <div class="venue-detail">
+                            <i class="fas fa-phone"></i>
+                            <span class="venue-detail-value">${venue.phone}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${venue.email ? `
+                        <div class="venue-detail">
+                            <i class="fas fa-envelope"></i>
+                            <span class="venue-detail-value">${venue.email}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${venue.website ? `
+                        <div class="venue-detail">
+                            <i class="fas fa-globe"></i>
+                            <span class="venue-detail-value">${venue.website}</span>
+                        </div>
+                        ` : ''}
+                        
+                        ${venue.description ? `
+                        <div class="venue-detail">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="venue-detail-value">${venue.description}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${venue.capacity ? `
+                    <div class="venue-capacity">
+                        <i class="fas fa-users" style="color: var(--primary); font-size: 20px;"></i>
+                        <div class="capacity-info">
+                            <div class="capacity-label">Pojemność</div>
+                            <div class="capacity-value">${venue.capacity} osób</div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${venue.notes ? `<div style="margin-top: 10px; font-size: 14px; color: #6b7280; font-style: italic;">${venue.notes}</div>` : ''}
+                    
+                    <div class="venue-actions">
+                        <button class="action-btn availability-btn" onclick="checkAvailability('${venue.id}')">
+                            <i class="fas fa-calendar-check"></i> Dostępność
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editVenue('${venue.id}')">
+                            <i class="fas fa-edit"></i> Edytuj
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteVenue('${venue.id}')">
+                            <i class="fas fa-trash"></i> Usuń
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filtrowanie obiektów
+        function filterVenues() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            
+            const filteredVenues = venues.filter(venue => {
+                const matchesSearch = venue.name.toLowerCase().includes(searchTerm) || 
+                                    venue.address.toLowerCase().includes(searchTerm) ||
+                                    venue.city.toLowerCase().includes(searchTerm);
+                const matchesType = !typeFilter || venue.type === typeFilter;
+                return matchesSearch && matchesType;
+            });
+            
+            // Tymczasowo zastąp listę obiektów
+            const originalVenues = venues;
+            venues = filteredVenues;
+            renderVenues();
+            venues = originalVenues;
+        }
+        
+        // Otwórz modal dodawania
+        function openAddVenueModal() {
+            editingVenueId = null;
+            document.getElementById('modalTitle').textContent = 'Dodaj obiekt';
+            document.getElementById('submitBtn').textContent = 'Dodaj obiekt';
+            document.getElementById('venueForm').reset();
+            document.getElementById('venueModal').style.display = 'block';
+        }
+        
+        // Edytuj obiekt
+        function editVenue(venueId) {
+            const venue = venues.find(v => v.id === venueId);
+            if (!venue) return;
+            
+            editingVenueId = venueId;
+            document.getElementById('modalTitle').textContent = 'Edytuj obiekt';
+            document.getElementById('submitBtn').textContent = 'Zapisz zmiany';
+            
+            // Wypełnij formularz
+            document.getElementById('venueName').value = venue.name;
+            document.getElementById('venueType').value = venue.type;
+            document.getElementById('venueAddress').value = venue.address;
+            document.getElementById('venueCity').value = venue.city;
+            document.getElementById('venueCapacity').value = venue.capacity || '';
+            document.getElementById('venuePhone').value = venue.phone || '';
+            document.getElementById('venueEmail').value = venue.email || '';
+            document.getElementById('venueWebsite').value = venue.website || '';
+            document.getElementById('venueDescription').value = venue.description || '';
+            document.getElementById('venueNotes').value = venue.notes || '';
+            
+            document.getElementById('venueModal').style.display = 'block';
+        }
+        
+        // Usuń obiekt
+        function deleteVenue(venueId) {
+            if (confirm('Czy na pewno chcesz usunąć ten obiekt?')) {
+                venues = venues.filter(v => v.id !== venueId);
+                saveVenues();
+                renderVenues();
+            }
+        }
+        
+        // Sprawdź dostępność
+        function checkAvailability(venueId) {
+            alert('Sprawdzanie dostępności - w budowie');
+        }
+        
+        // Zamknij modal
+        function closeModal() {
+            document.getElementById('venueModal').style.display = 'none';
+        }
+        
+        // Obsługa formularza
+        document.getElementById('venueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('venueName').value.trim(),
+                type: document.getElementById('venueType').value,
+                address: document.getElementById('venueAddress').value.trim(),
+                city: document.getElementById('venueCity').value.trim(),
+                capacity: parseInt(document.getElementById('venueCapacity').value) || null,
+                phone: document.getElementById('venuePhone').value.trim() || null,
+                email: document.getElementById('venueEmail').value.trim() || null,
+                website: document.getElementById('venueWebsite').value.trim() || null,
+                description: document.getElementById('venueDescription').value.trim() || null,
+                notes: document.getElementById('venueNotes').value.trim() || null
+            };
+            
+            if (editingVenueId) {
+                // Edycja
+                const venueIndex = venues.findIndex(v => v.id === editingVenueId);
+                venues[venueIndex] = { ...venues[venueIndex], ...formData };
+            } else {
+                // Dodawanie
+                const newVenue = {
+                    id: Date.now().toString(),
+                    ...formData,
+                    createdAt: new Date().toISOString()
+                };
+                venues.push(newVenue);
+            }
+            
+            saveVenues();
+            renderVenues();
+            closeModal();
+        });
+        
+        // Funkcje pomocnicze
+        function getTypeName(type) {
+            const types = {
+                'sala': 'Sala treningowa',
+                'boisko': 'Boisko',
+                'obiekt': 'Obiekt sportowy',
+                'klub': 'Klub sportowy',
+                'inne': 'Inne'
+            };
+            return types[type] || type;
+        }
+        
+        // Zamknij modal po kliknięciu poza nim
+        window.onclick = function(event) {
+            const modal = document.getElementById('venueModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

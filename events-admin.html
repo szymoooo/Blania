@@ -608,7 +608,10 @@
                     
                     <div class="form-group">
                         <label class="form-label" for="eventLocation">Lokalizacja *</label>
-                        <input type="text" class="form-input" id="eventLocation" required>
+                        <select class="form-select" id="eventLocation" required>
+                            <option value="">Wybierz lokalizację</option>
+                            <!-- Lokalizacje będą dodane przez JavaScript -->
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -647,6 +650,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadEvents();
             loadPlayers();
+            loadVenues();
             renderEvents();
         });
         
@@ -660,6 +664,26 @@
         function loadPlayers() {
             const savedPlayers = localStorage.getItem('basketballPlayers');
             players = savedPlayers ? JSON.parse(savedPlayers) : [];
+        }
+        
+        // Ładowanie obiektów z localStorage
+        function loadVenues() {
+            const savedVenues = localStorage.getItem('basketballVenues');
+            const venues = savedVenues ? JSON.parse(savedVenues) : [];
+            updateLocationSelect(venues);
+        }
+        
+        // Aktualizacja listy lokalizacji
+        function updateLocationSelect(venues) {
+            const locationSelect = document.getElementById('eventLocation');
+            locationSelect.innerHTML = '<option value="">Wybierz lokalizację</option>';
+            
+            venues.forEach(venue => {
+                const option = document.createElement('option');
+                option.value = `${venue.name}, ${venue.address}, ${venue.city}`;
+                option.textContent = `${venue.name} - ${venue.address}, ${venue.city}`;
+                locationSelect.appendChild(option);
+            });
         }
         
         // Zapisywanie wydarzeń do localStorage
