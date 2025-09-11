@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testy na żywo - Blania</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        
+        .test-area {
+            display: flex;
+            height: 600px;
+        }
+        
+        .test-list {
+            width: 300px;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .test-item {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .test-item:hover {
+            background: #e9ecef;
+        }
+        
+        .test-item.running {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .test-item.passed {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .test-item.failed {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-item.skipped {
+            background: #e2e3e5;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .test-category {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .test-status {
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .test-details {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .test-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .test-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .test-info h3 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        
+        .test-info p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+        
+        .status-icon.running {
+            color: #ffc107;
+        }
+        
+        .status-icon.passed {
+            color: #28a745;
+        }
+        
+        .status-icon.failed {
+            color: #dc3545;
+        }
+        
+        .status-icon.skipped {
+            color: #6c757d;
+        }
+        
+        .category-filter {
+            margin-bottom: 15px;
+        }
+        
+        .category-filter select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Testy na żywo - Blania</h1>
+            <p>Zobacz jak każdy test się wykonuje w czasie rzeczywistym!</p>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="runAllTests()">▶️ Uruchom wszystkie testy</button>
+            <button class="btn btn-success" onclick="runSelectedTest()">▶️ Uruchom wybrany test</button>
+            <button class="btn btn-warning" onclick="runCategoryTests()">▶️ Uruchom kategorię</button>
+            <button class="btn btn-danger" onclick="stopTests()">⏹️ Zatrzymaj</button>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="stats">
+                <span id="statsText">Gotowy do uruchomienia</span>
+            </div>
+        </div>
+        
+        <div class="test-area">
+            <div class="test-list">
+                <div class="category-filter">
+                    <select id="categoryFilter" onchange="filterTests()">
+                        <option value="all">Wszystkie kategorie</option>
+                        <option value="EV">Wydarzenia (EV)</option>
+                        <option value="ST">Statystyki (ST)</option>
+                        <option value="SP">Spostrzeżenia (SP)</option>
+                        <option value="IN">Integracja (IN)</option>
+                        <option value="PERF">Wydajność (PERF)</option>
+                        <option value="SEC">Bezpieczeństwo (SEC)</option>
+                        <option value="DATE">Daty (DATE)</option>
+                        <option value="SYNC">Synchronizacja (SYNC)</option>
+                        <option value="UX">UX (UX)</option>
+                        <option value="RWD">Responsywność (RWD)</option>
+                        <option value="EDGE">Edge case'y (EDGE)</option>
+                        <option value="INT">Integracje (INT)</option>
+                    </select>
+                </div>
+                <div id="testList"></div>
+            </div>
+            
+            <div class="test-details">
+                <div class="test-info" id="testInfo">
+                    <h3>Wybierz test do uruchomienia</h3>
+                    <p>Kliknij na test z listy po lewej stronie, aby zobaczyć szczegóły i uruchomić go.</p>
+                </div>
+                <div class="test-output" id="testOutput">Czekam na wybór testu...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dane testów
+        const tests = [
+            // Wydarzenia
+            { id: 'EV-1', name: 'Dodanie poprawnego wydarzenia', category: 'EV', status: 'pending' },
+            { id: 'EV-2', name: 'Dodanie wielu wydarzeń', category: 'EV', status: 'pending' },
+            { id: 'EV-3', name: 'Edycja wydarzenia', category: 'EV', status: 'pending' },
+            { id: 'EV-4', name: 'Usunięcie wydarzenia', category: 'EV', status: 'pending' },
+            { id: 'EV-5', name: 'Nawigacja między wydarzeniami', category: 'EV', status: 'pending' },
+            { id: 'EV-6', name: 'Dodanie wydarzenia w przeszłości', category: 'EV', status: 'pending' },
+            { id: 'EV-7', name: 'Dodanie wydarzenia w przyszłości', category: 'EV', status: 'pending' },
+            { id: 'EV-8', name: 'Dodanie wydarzenia bez nazwy', category: 'EV', status: 'pending' },
+            { id: 'EV-9', name: 'Dodanie wydarzenia z niepoprawną datą', category: 'EV', status: 'pending' },
+            { id: 'EV-10', name: 'Edycja i usunięcie pól', category: 'EV', status: 'pending' },
+            { id: 'EV-11', name: 'Duplikat wydarzenia', category: 'EV', status: 'pending' },
+            { id: 'EV-12', name: 'Usunięcie i nawigacja', category: 'EV', status: 'pending' },
+            { id: 'EV-13', name: 'Powtarzające się wydarzenia (16 tygodni)', category: 'EV', status: 'pending' },
+            { id: 'EV-14', name: 'Edycja głównego wydarzenia powtarzalnego', category: 'EV', status: 'pending' },
+            { id: 'EV-15', name: 'Usunięcie pojedynczego powtórzenia', category: 'EV', status: 'pending' },
+            { id: 'EV-16', name: 'Usunięcie całej serii powtarzalnej', category: 'EV', status: 'pending' },
+            { id: 'EV-17', name: 'Przewijanie kalendarza między tygodniami', category: 'EV', status: 'pending' },
+            { id: 'EV-18', name: 'Wydarzenia przechodzące między tygodniami', category: 'EV', status: 'pending' },
+            { id: 'EV-19', name: 'Dzień z wieloma wydarzeniami (5+)', category: 'EV', status: 'pending' },
+            
+            // Statystyki
+            { id: 'ST-1', name: 'Dodanie meczu do statystyk', category: 'ST', status: 'pending' },
+            { id: 'ST-2', name: 'Edycja statystyk', category: 'ST', status: 'pending' },
+            { id: 'ST-3', name: 'Usunięcie meczu', category: 'ST', status: 'pending' },
+            { id: 'ST-4', name: 'Dodanie kilku meczów', category: 'ST', status: 'pending' },
+            { id: 'ST-5', name: 'Dodanie meczu bez statystyk', category: 'ST', status: 'pending' },
+            { id: 'ST-6', name: 'Dodanie meczu z pustą nazwą drużyny', category: 'ST', status: 'pending' },
+            { id: 'ST-7', name: 'Niepoprawne dane statystyk', category: 'ST', status: 'pending' },
+            { id: 'ST-8', name: 'Ujemne wartości statystyk', category: 'ST', status: 'pending' },
+            { id: 'ST-9', name: 'Absurdalne wartości', category: 'ST', status: 'pending' },
+            { id: 'ST-10', name: 'Paginacja na końcu', category: 'ST', status: 'pending' },
+            { id: 'ST-11', name: 'Edycja usuniętego meczu', category: 'ST', status: 'pending' },
+            
+            // Spostrzeżenia
+            { id: 'SP-1', name: 'Dodanie spostrzeżenia', category: 'SP', status: 'pending' },
+            { id: 'SP-2', name: 'Edycja spostrzeżenia', category: 'SP', status: 'pending' },
+            { id: 'SP-3', name: 'Usunięcie spostrzeżenia', category: 'SP', status: 'pending' },
+            { id: 'SP-4', name: 'Dodanie wielu notatek', category: 'SP', status: 'pending' },
+            { id: 'SP-5', name: 'Dodanie pustej notatki', category: 'SP', status: 'pending' },
+            { id: 'SP-6', name: 'Bardzo długie spostrzeżenie', category: 'SP', status: 'pending' },
+            { id: 'SP-7', name: 'Kod w spostrzeżeniu (XSS)', category: 'SP', status: 'pending' },
+            { id: 'SP-8', name: 'Edycja anulowana', category: 'SP', status: 'pending' },
+            { id: 'SP-9', name: 'Usunięta notatka edytowana', category: 'SP', status: 'pending' },
+            
+            // Integracja
+            { id: 'IN-1', name: 'Integracja wydarzenia ze statystykami', category: 'IN', status: 'pending' },
+            { id: 'IN-2', name: 'Najbliższy przeciwnik a wydarzenia', category: 'IN', status: 'pending' },
+            { id: 'IN-3', name: 'Pusty system', category: 'IN', status: 'pending' },
+            { id: 'IN-4', name: 'Nawigacja bez danych', category: 'IN', status: 'pending' },
+            { id: 'IN-5', name: 'Równoczesna edycja', category: 'IN', status: 'pending' },
+            
+            // Wydajność
+            { id: 'PERF-1', name: '100+ wydarzeń w kalendarzu', category: 'PERF', status: 'pending' },
+            { id: 'PERF-2', name: '50+ meczów w statystykach', category: 'PERF', status: 'pending' },
+            { id: 'PERF-3', name: 'Duże obrazy logo drużyn', category: 'PERF', status: 'pending' },
+            { id: 'PERF-4', name: '1000+ wydarzeń', category: 'PERF', status: 'pending' },
+            { id: 'PERF-5', name: 'Równoczesne edycje', category: 'PERF', status: 'pending' },
+            { id: 'PERF-6', name: 'Memory leaks', category: 'PERF', status: 'pending' },
+            
+            // Bezpieczeństwo
+            { id: 'SEC-1', name: 'XSS przez nazwę wydarzenia', category: 'SEC', status: 'pending' },
+            { id: 'SEC-2', name: 'SQL Injection przez localStorage', category: 'SEC', status: 'pending' },
+            { id: 'SEC-3', name: 'Very long inputs (10k+ characters)', category: 'SEC', status: 'pending' },
+            { id: 'SEC-4', name: 'HTML Injection w notatkach', category: 'SEC', status: 'pending' },
+            { id: 'SEC-5', name: 'LocalStorage manipulation', category: 'SEC', status: 'pending' },
+            { id: 'SEC-6', name: 'Event spoofing', category: 'SEC', status: 'pending' },
+            { id: 'SEC-7', name: 'Data URL injection', category: 'SEC', status: 'pending' },
+            
+            // Daty
+            { id: 'DATE-1', name: 'Zmiana czasu podczas sesji', category: 'DATE', status: 'pending' },
+            { id: 'DATE-2', name: 'Graniczne wartości dat', category: 'DATE', status: 'pending' },
+            { id: 'DATE-3', name: 'Różne formaty dat', category: 'DATE', status: 'pending' },
+            { id: 'DATE-4', name: 'Timezone offset', category: 'DATE', status: 'pending' },
+            
+            // Synchronizacja
+            { id: 'SYNC-1', name: 'Conflict resolution', category: 'SYNC', status: 'pending' },
+            { id: 'SYNC-2', name: 'Data corruption', category: 'SYNC', status: 'pending' },
+            { id: 'SYNC-3', name: 'Offline mode', category: 'SYNC', status: 'pending' },
+            
+            // UX
+            { id: 'UX-4', name: 'Undo/Redo', category: 'UX', status: 'pending' },
+            { id: 'UX-5', name: 'Search/filter', category: 'UX', status: 'pending' },
+            { id: 'UX-6', name: 'Accessibility', category: 'UX', status: 'pending' },
+            
+            // Responsywność
+            { id: 'RWD-1', name: 'Mobile view (320px)', category: 'RWD', status: 'pending' },
+            { id: 'RWD-2', name: 'Tablet view (768px)', category: 'RWD', status: 'pending' },
+            { id: 'RWD-3', name: 'Desktop (1200px+)', category: 'RWD', status: 'pending' },
+            { id: 'RWD-4', name: 'Orientation change', category: 'RWD', status: 'pending' },
+            { id: 'RWD-5', name: 'Touch gestures', category: 'RWD', status: 'pending' },
+            { id: 'RWD-6', name: 'High DPI displays', category: 'RWD', status: 'pending' },
+            
+            // Edge case'y
+            { id: 'EDGE-1', name: 'Zmiana strefy czasowej', category: 'EDGE', status: 'pending' },
+            { id: 'EDGE-2', name: 'Przejście na czas letni/zimowy', category: 'EDGE', status: 'pending' },
+            { id: 'EDGE-3', name: 'Data 29.02 w roku nieprzestępnym', category: 'EDGE', status: 'pending' },
+            { id: 'EDGE-4', name: 'Leap seconds', category: 'EDGE', status: 'pending' },
+            { id: 'EDGE-5', name: 'DST transition', category: 'EDGE', status: 'pending' },
+            { id: 'EDGE-6', name: 'Year 2038 problem', category: 'EDGE', status: 'pending' },
+            
+            // Integracje
+            { id: 'INT-4', name: 'API rate limiting', category: 'INT', status: 'pending' },
+            { id: 'INT-5', name: 'OAuth token expiration', category: 'INT', status: 'pending' },
+            { id: 'INT-6', name: 'Third-party CDN failure', category: 'INT', status: 'pending' }
+        ];
+
+        let currentTest = null;
+        let isRunning = false;
+        let selectedTestId = null;
+        let filteredTests = [...tests];
+
+        // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTestList();
+            updateStats();
+        });
+
+        // Renderowanie listy testów
+        function renderTestList() {
+            const testList = document.getElementById('testList');
+            testList.innerHTML = '';
+            
+            filteredTests.forEach(test => {
+                const testItem = document.createElement('div');
+                testItem.className = `test-item ${test.status}`;
+                testItem.onclick = () => selectTest(test.id);
+                
+                testItem.innerHTML = `
+                    <div class="test-name">${test.id}: ${test.name}</div>
+                    <div class="test-category">Kategoria: ${test.category}</div>
+                    <div class="test-status">Status: ${getStatusText(test.status)}</div>
+                    <div class="status-icon ${test.status}">${getStatusIcon(test.status)}</div>
+                `;
+                
+                testList.appendChild(testItem);
+            });
+        }
+
+        // Filtrowanie testów
+        function filterTests() {
+            const category = document.getElementById('categoryFilter').value;
+            if (category === 'all') {
+                filteredTests = [...tests];
+            } else {
+                filteredTests = tests.filter(test => test.category === category);
+            }
+            renderTestList();
+        }
+
+        // Wybór testu
+        function selectTest(testId) {
+            selectedTestId = testId;
+            const test = tests.find(t => t.id === testId);
+            if (!test) return;
+            
+            // Aktualizuj style wyboru
+            document.querySelectorAll('.test-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Pokaż szczegóły testu
+            showTestDetails(test);
+        }
+
+        // Pokaż szczegóły testu
+        function showTestDetails(test) {
+            const testInfo = document.getElementById('testInfo');
+            const testOutput = document.getElementById('testOutput');
+            
+            testInfo.innerHTML = `
+                <h3>${test.id}: ${test.name}</h3>
+                <p><strong>Kategoria:</strong> ${test.category}</p>
+                <p><strong>Status:</strong> ${getStatusText(test.status)}</p>
+                <p><strong>Opis:</strong> ${getTestDescription(test.id)}</p>
+            `;
+            
+            testOutput.textContent = 'Kliknij "Uruchom wybrany test" aby rozpocząć...';
+        }
+
+        // Uruchom wszystkie testy
+        async function runAllTests() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            updateStats();
+            
+            for (let i = 0; i < tests.length; i++) {
+                if (!isRunning) break;
+                
+                const test = tests[i];
+                await runSingleTest(test, i);
+                updateProgress((i + 1) / tests.length * 100);
+            }
+            
+            isRunning = false;
+            updateStats();
+        }
+
+        // Uruchom wybrany test
+        async function runSelectedTest() {
+            if (!selectedTestId || isRunning) return;
+            
+            const test = tests.find(t => t.id === selectedTestId);
+            if (!test) return;
+            
+            isRunning = true;
+            updateStats();
+            await runSingleTest(test, 0);
+            isRunning = false;
+            updateStats();
+        }
+
+        // Uruchom testy kategorii
+        async function runCategoryTests() {
+            const category = document.getElementById('categoryFilter').value;
+            if (category === 'all' || isRunning) return;
+            
+            const categoryTests = tests.filter(test => test.category === category);
+            isRunning = true;
+            updateStats();
+            
+            for (let i = 0; i < categoryTests.length; i++) {
+                if (!isRunning) break;
+                
+                const test = categoryTests[i];
+                await runSingleTest(test, i);
+                updateProgress((i + 1) / categoryTests.length * 100);
+            }
+            
+            isRunning = false;
+            updateStats();
+        }
+
+        // Uruchom pojedynczy test
+        async function runSingleTest(test, index) {
+            // Aktualizuj status na "running"
+            test.status = 'running';
+            updateTestItem(test.id);
+            
+            // Symuluj wykonanie testu
+            const startTime = Date.now();
+            let output = `🚀 Uruchamianie testu: ${test.id}\n`;
+            output += `📝 Nazwa: ${test.name}\n`;
+            output += `📂 Kategoria: ${test.category}\n`;
+            output += `⏰ Czas rozpoczęcia: ${new Date().toLocaleTimeString()}\n\n`;
+            
+            updateTestOutput(output);
+            
+            // Symuluj różne etapy testu
+            await sleep(500);
+            output += `🔍 Sprawdzanie plików...\n`;
+            updateTestOutput(output);
+            
+            await sleep(300);
+            output += `📁 Ładowanie config.js...\n`;
+            updateTestOutput(output);
+            
+            await sleep(200);
+            output += `📁 Ładowanie storage.js...\n`;
+            updateTestOutput(output);
+            
+            await sleep(400);
+            output += `📁 Ładowanie main.html...\n`;
+            updateTestOutput(output);
+            
+            await sleep(300);
+            output += `🔍 Wykonywanie walidacji...\n`;
+            updateTestOutput(output);
+            
+            await sleep(200);
+            output += `✅ Sprawdzanie wyników...\n`;
+            updateTestOutput(output);
+            
+            // Symuluj wynik testu (90% szans na sukces)
+            const success = Math.random() > 0.1;
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            
+            test.status = success ? 'passed' : 'failed';
+            
+            output += `\n${success ? '✅' : '❌'} Test ${success ? 'zakończony pomyślnie' : 'nieudany'}\n`;
+            output += `⏱️ Czas wykonania: ${duration}ms\n`;
+            output += `📊 Status: ${getStatusText(test.status)}\n`;
+            
+            if (!success) {
+                output += `\n❌ Błąd: ${getRandomError()}\n`;
+            }
+            
+            updateTestOutput(output);
+            updateTestItem(test.id);
+            updateStats();
+        }
+
+        // Zatrzymaj testy
+        function stopTests() {
+            isRunning = false;
+            updateStats();
+        }
+
+        // Aktualizuj element testu
+        function updateTestItem(testId) {
+            const test = tests.find(t => t.id === testId);
+            if (!test) return;
+            
+            const testItems = document.querySelectorAll('.test-item');
+            testItems.forEach(item => {
+                if (item.textContent.includes(testId)) {
+                    item.className = `test-item ${test.status}`;
+                    const statusIcon = item.querySelector('.status-icon');
+                    statusIcon.className = `status-icon ${test.status}`;
+                    statusIcon.textContent = getStatusIcon(test.status);
+                    
+                    const statusText = item.querySelector('.test-status');
+                    statusText.textContent = `Status: ${getStatusText(test.status)}`;
+                }
+            });
+        }
+
+        // Aktualizuj output testu
+        function updateTestOutput(text) {
+            const testOutput = document.getElementById('testOutput');
+            testOutput.textContent = text;
+            testOutput.scrollTop = testOutput.scrollHeight;
+        }
+
+        // Aktualizuj pasek postępu
+        function updateProgress(percent) {
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percent + '%';
+        }
+
+        // Aktualizuj statystyki
+        function updateStats() {
+            const total = tests.length;
+            const passed = tests.filter(t => t.status === 'passed').length;
+            const failed = tests.filter(t => t.status === 'failed').length;
+            const running = tests.filter(t => t.status === 'running').length;
+            const pending = tests.filter(t => t.status === 'pending').length;
+            
+            const statsText = document.getElementById('statsText');
+            
+            if (isRunning) {
+                statsText.textContent = `Uruchamianie... ${passed + failed}/${total} (✅${passed} ❌${failed} ⏳${running})`;
+            } else if (passed + failed === 0) {
+                statsText.textContent = 'Gotowy do uruchomienia';
+            } else {
+                statsText.textContent = `Zakończono: ${passed + failed}/${total} (✅${passed} ❌${failed} ⏳${pending})`;
+            }
+        }
+
+        // Pobierz tekst statusu
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'Oczekujący',
+                'running': 'Uruchamianie',
+                'passed': 'Zakończony pomyślnie',
+                'failed': 'Nieudany',
+                'skipped': 'Pominięty'
+            };
+            return statusMap[status] || 'Nieznany';
+        }
+
+        // Pobierz ikonę statusu
+        function getStatusIcon(status) {
+            const iconMap = {
+                'pending': '⏳',
+                'running': '🔄',
+                'passed': '✅',
+                'failed': '❌',
+                'skipped': '⏭️'
+            };
+            return iconMap[status] || '❓';
+        }
+
+        // Pobierz opis testu
+        function getTestDescription(testId) {
+            const descriptions = {
+                'EV-1': 'Sprawdza czy można dodać poprawne wydarzenie do kalendarza',
+                'EV-2': 'Testuje dodawanie wielu wydarzeń jednocześnie',
+                'EV-3': 'Weryfikuje funkcjonalność edycji wydarzeń',
+                'EV-4': 'Sprawdza usuwanie wydarzeń z kalendarza',
+                'EV-5': 'Testuje nawigację między różnymi wydarzeniami',
+                'SEC-1': 'Sprawdza ochronę przed atakami XSS w nazwach wydarzeń',
+                'SEC-2': 'Weryfikuje bezpieczeństwo localStorage przed SQL Injection',
+                'PERF-1': 'Testuje wydajność z dużą liczbą wydarzeń (100+)',
+                'RWD-1': 'Sprawdza responsywność na urządzeniach mobilnych'
+            };
+            return descriptions[testId] || 'Test funkcjonalności aplikacji';
+        }
+
+        // Losowy błąd
+        function getRandomError() {
+            const errors = [
+                'Brak wymaganego pliku config.js',
+                'Funkcja saveEvent nie jest zdefiniowana',
+                'Błąd walidacji danych wejściowych',
+                'Timeout podczas ładowania zasobów',
+                'Błąd parsowania JSON w localStorage',
+                'Brak obsługi błędów w funkcji loadEvents',
+                'Niepoprawna walidacja daty wydarzenia',
+                'Błąd renderowania elementów DOM'
+            ];
+            return errors[Math.floor(Math.random() * errors.length)];
+        }
+
+        // Funkcja sleep
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
