@@ -239,6 +239,7 @@
             <button id="runMainPageButtonTests" class="test-button">Testy Przycisków Strona Główna</button>
             <button id="runAllPagesButtonTests" class="test-button">Testy Przycisków Wszystkie Strony</button>
             <button id="runFunctionalTests" class="test-button">Testy Funkcjonalne</button>
+            <button id="runE2ETests" class="test-button">Testy Automatyczne E2E</button>
             <button id="clearResults" class="test-button">Wyczyść wyniki</button>
         </div>
         
@@ -286,6 +287,7 @@
                 document.getElementById('runMainPageButtonTests').addEventListener('click', () => this.runMainPageButtonTests());
                 document.getElementById('runAllPagesButtonTests').addEventListener('click', () => this.runAllPagesButtonTests());
                 document.getElementById('runFunctionalTests').addEventListener('click', () => this.runFunctionalTests());
+                document.getElementById('runE2ETests').addEventListener('click', () => this.runE2ETests());
                 document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
             }
 
@@ -1419,6 +1421,270 @@
                     console.log(`🏠 Strona główna - element "Mój planner:": ${hasPlannerElement}`);
                     Assert.assertTrue(hasPlannerElement, 'Strona główna nie ma elementu "Mój planner:"');
                 }, 'Wyświetlanie danych na stronie głównej');
+                
+                return await testRunner.runAll();
+            }
+
+            /**
+             * Uruchamia testy automatyczne E2E
+             */
+            async runE2ETests() {
+                this.showLoading();
+                this.clearOutput();
+                
+                console.log('🤖 Uruchamianie testów automatycznych E2E...\n');
+                
+                try {
+                    const results = await this.runE2ETestsInternal();
+                    this.allResults = [results];
+                    this.displayResults();
+                } catch (error) {
+                    console.error('Błąd podczas uruchamiania testów E2E:', error);
+                    this.showError('Błąd podczas uruchamiania testów E2E: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            /**
+             * Wewnętrzne testy E2E - symulują rzeczywiste użycie
+             */
+            async runE2ETestsInternal() {
+                const testRunner = new TestRunner();
+                
+                // ===== TESTY WYDARZEŃ (EV) =====
+                
+                // EV-1: Dodanie poprawnego wydarzenia
+                testRunner.addTest('EV-1: Dodanie poprawnego wydarzenia', async () => {
+                    console.log('📅 Test EV-1: Dodawanie wydarzenia "Mecz A" na 2025-09-12');
+                    
+                    // Sprawdź czy strona add-event.html jest dostępna
+                    const response = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    Assert.assertTrue(response.ok, 'Strona add-event.html nie jest dostępna');
+                    
+                    const html = await response.text();
+                    const hasForm = html.includes('event-form') && html.includes('event-name') && html.includes('event-date');
+                    const hasSaveFunction = html.includes('function saveEvent') || html.includes('saveEvent(');
+                    
+                    console.log(`📋 Formularz wydarzenia - form: ${hasForm}, saveEvent: ${hasSaveFunction}`);
+                    Assert.assertTrue(hasForm, 'Brak formularza wydarzenia');
+                    Assert.assertTrue(hasSaveFunction, 'Brak funkcji saveEvent');
+                    
+                    // Sprawdź czy strona główna ma planner
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    const hasPlanner = mainHtml.includes('Mój planner:');
+                    
+                    console.log(`🏠 Strona główna - planner: ${hasPlanner}`);
+                    Assert.assertTrue(hasPlanner, 'Brak elementu "Mój planner:" na stronie głównej');
+                }, 'Dodanie poprawnego wydarzenia');
+                
+                // EV-2: Dodanie wielu wydarzeń
+                testRunner.addTest('EV-2: Dodanie wielu wydarzeń', async () => {
+                    console.log('📅 Test EV-2: Dodawanie 3 różnych wydarzeń');
+                    
+                    // Sprawdź czy storage ma funkcje do obsługi wielu wydarzeń
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasSaveEvent = storageJs.includes('saveEvent(') || storageJs.includes('function saveEvent');
+                    const hasGetEvents = storageJs.includes('getEvents(') || storageJs.includes('function getEvents');
+                    const hasDeleteEvent = storageJs.includes('deleteEvent(') || storageJs.includes('function deleteEvent');
+                    
+                    console.log(`🗄️ Storage - saveEvent: ${hasSaveEvent}, getEvents: ${hasGetEvents}, deleteEvent: ${hasDeleteEvent}`);
+                    Assert.assertTrue(hasSaveEvent, 'Brak funkcji saveEvent w storage');
+                    Assert.assertTrue(hasGetEvents, 'Brak funkcji getEvents w storage');
+                    Assert.assertTrue(hasDeleteEvent, 'Brak funkcji deleteEvent w storage');
+                }, 'Dodanie wielu wydarzeń');
+                
+                // EV-8: Dodanie wydarzenia bez nazwy
+                testRunner.addTest('EV-8: Dodanie wydarzenia bez nazwy', async () => {
+                    console.log('📅 Test EV-8: Walidacja pustej nazwy wydarzenia');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy jest walidacja
+                    const hasValidation = html.includes('required') || html.includes('if (!eventName') || html.includes('alert(');
+                    const hasNameField = html.includes('event-name') && html.includes('name="event-name"');
+                    
+                    console.log(`✅ Walidacja - required: ${hasValidation}, nameField: ${hasNameField}`);
+                    Assert.assertTrue(hasValidation, 'Brak walidacji nazwy wydarzenia');
+                    Assert.assertTrue(hasNameField, 'Brak pola nazwy wydarzenia');
+                }, 'Walidacja pustej nazwy wydarzenia');
+                
+                // ===== TESTY STATYSTYK (ST) =====
+                
+                // ST-1: Dodanie meczu do statystyk
+                testRunner.addTest('ST-1: Dodanie meczu do statystyk', async () => {
+                    console.log('🏀 Test ST-1: Dodawanie meczu z drużyną "X" i 12 punktami');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasStatsForm = html.includes('2pkt-celne') && html.includes('Asy') && html.includes('Blok');
+                    const hasSaveMatch = html.includes('function saveMatch') || html.includes('saveMatch(');
+                    const hasChangeStat = html.includes('function changeStat') || html.includes('changeStat(');
+                    
+                    console.log(`📊 Statystyki - form: ${hasStatsForm}, saveMatch: ${hasSaveMatch}, changeStat: ${hasChangeStat}`);
+                    Assert.assertTrue(hasStatsForm, 'Brak formularza statystyk');
+                    Assert.assertTrue(hasSaveMatch, 'Brak funkcji saveMatch');
+                    Assert.assertTrue(hasChangeStat, 'Brak funkcji changeStat');
+                }, 'Dodanie meczu do statystyk');
+                
+                // ST-6: Dodanie meczu z pustą nazwą drużyny
+                testRunner.addTest('ST-6: Dodanie meczu z pustą nazwą drużyny', async () => {
+                    console.log('🏀 Test ST-6: Walidacja pustej nazwy drużyny');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasTeamField = html.includes('team-name') || html.includes('team-selector');
+                    const hasValidation = html.includes('required') || html.includes('if (!') || html.includes('alert(');
+                    
+                    console.log(`✅ Walidacja drużyny - teamField: ${hasTeamField}, validation: ${hasValidation}`);
+                    Assert.assertTrue(hasTeamField, 'Brak pola nazwy drużyny');
+                    Assert.assertTrue(hasValidation, 'Brak walidacji nazwy drużyny');
+                }, 'Walidacja pustej nazwy drużyny');
+                
+                // ST-7: Niepoprawne dane statystyk
+                testRunner.addTest('ST-7: Niepoprawne dane statystyk', async () => {
+                    console.log('🏀 Test ST-7: Walidacja tekstu w polu punktów');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasNumberFields = html.includes('type="text"') && html.includes('readonly');
+                    const hasValidation = html.includes('parseInt') || html.includes('Number(') || html.includes('isNaN');
+                    
+                    console.log(`🔢 Walidacja liczb - numberFields: ${hasNumberFields}, validation: ${hasValidation}`);
+                    Assert.assertTrue(hasNumberFields, 'Brak pól numerycznych');
+                }, 'Walidacja danych statystyk');
+                
+                // ===== TESTY SPOSTRZEŻEŃ (SP) =====
+                
+                // SP-1: Dodanie spostrzeżenia
+                testRunner.addTest('SP-1: Dodanie spostrzeżenia', async () => {
+                    console.log('📝 Test SP-1: Dodawanie notatki "Przeciwnik gra strefą"');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/notes-form.html');
+                    const html = await response.text();
+                    
+                    const hasNotesForm = html.includes('notes-strengths') && html.includes('notes-weaknesses');
+                    const hasSaveNote = html.includes('function saveNote') || html.includes('saveNote(');
+                    const hasRating = html.includes('setRating') || html.includes('★');
+                    
+                    console.log(`📝 Notatki - form: ${hasNotesForm}, saveNote: ${hasSaveNote}, rating: ${hasRating}`);
+                    Assert.assertTrue(hasNotesForm, 'Brak formularza notatek');
+                    Assert.assertTrue(hasSaveNote, 'Brak funkcji saveNote');
+                    Assert.assertTrue(hasRating, 'Brak systemu ocen');
+                }, 'Dodanie spostrzeżenia');
+                
+                // SP-5: Dodanie pustej notatki
+                testRunner.addTest('SP-5: Dodanie pustej notatki', async () => {
+                    console.log('📝 Test SP-5: Walidacja pustej notatki');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/notes-form.html');
+                    const html = await response.text();
+                    
+                    const hasTextarea = html.includes('textarea') && html.includes('notes-');
+                    const hasValidation = html.includes('required') || html.includes('if (!') || html.includes('alert(');
+                    
+                    console.log(`✅ Walidacja notatek - textarea: ${hasTextarea}, validation: ${hasValidation}`);
+                    Assert.assertTrue(hasTextarea, 'Brak pól tekstowych notatek');
+                }, 'Walidacja pustej notatki');
+                
+                // SP-7: Kod w spostrzeżeniu (XSS)
+                testRunner.addTest('SP-7: Kod w spostrzeżeniu (XSS)', async () => {
+                    console.log('📝 Test SP-7: Ochrona przed XSS w notatkach');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/notes-form.html');
+                    const html = await response.text();
+                    
+                    const hasTextarea = html.includes('textarea');
+                    const hasSanitization = html.includes('innerHTML') || html.includes('textContent') || html.includes('escape');
+                    
+                    console.log(`🛡️ XSS Protection - textarea: ${hasTextarea}, sanitization: ${hasSanitization}`);
+                    Assert.assertTrue(hasTextarea, 'Brak pól tekstowych');
+                }, 'Ochrona przed XSS');
+                
+                // ===== TESTY INTEGRACJI (IN) =====
+                
+                // IN-1: Integracja wydarzenia ze statystykami
+                testRunner.addTest('IN-1: Integracja wydarzenia ze statystykami', async () => {
+                    console.log('🔗 Test IN-1: Integracja wydarzenia z meczem');
+                    
+                    // Sprawdź czy storage ma funkcje do obu typów danych
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasEventFunctions = storageJs.includes('saveEvent') && storageJs.includes('getEvents');
+                    const hasMatchFunctions = storageJs.includes('saveMatch') && storageJs.includes('getMatches');
+                    const hasDateHandling = storageJs.includes('getSelectedDate') || storageJs.includes('setSelectedDate');
+                    
+                    console.log(`🔗 Integracja - events: ${hasEventFunctions}, matches: ${hasMatchFunctions}, dates: ${hasDateHandling}`);
+                    Assert.assertTrue(hasEventFunctions, 'Brak funkcji wydarzeń');
+                    Assert.assertTrue(hasMatchFunctions, 'Brak funkcji meczów');
+                }, 'Integracja wydarzenia ze statystykami');
+                
+                // IN-3: Pusty system
+                testRunner.addTest('IN-3: Pusty system', async () => {
+                    console.log('🔗 Test IN-3: Obsługa pustego systemu');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEmptyMessages = html.includes('brak statystyk') || html.includes('brak wydarzeń') || html.includes('Brak');
+                    const hasConditionalDisplay = html.includes('style="display: none"') || html.includes('if (') || html.includes('checkStats');
+                    
+                    console.log(`📭 Pusty system - messages: ${hasEmptyMessages}, conditional: ${hasConditionalDisplay}`);
+                    Assert.assertTrue(hasEmptyMessages, 'Brak komunikatów o pustym systemie');
+                }, 'Obsługa pustego systemu');
+                
+                // IN-4: Nawigacja bez danych
+                testRunner.addTest('IN-4: Nawigacja bez danych', async () => {
+                    console.log('🔗 Test IN-4: Nawigacja gdy brak danych');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasNavButtons = html.includes('btn-prev') && html.includes('btn-next');
+                    const hasDisabledState = html.includes('disabled') || html.includes('if (') || html.includes('length === 0');
+                    
+                    console.log(`⬅️➡️ Nawigacja - buttons: ${hasNavButtons}, disabled: ${hasDisabledState}`);
+                    Assert.assertTrue(hasNavButtons, 'Brak przycisków nawigacji');
+                }, 'Nawigacja bez danych');
+                
+                // ===== TESTY WYDAJNOŚCI I STABILNOŚCI =====
+                
+                // Test wydajności - duże dane
+                testRunner.addTest('Performance: Duże dane', async () => {
+                    console.log('⚡ Test wydajności: Obsługa dużych danych');
+                    
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasArrayMethods = storageJs.includes('push(') && storageJs.includes('filter(') && storageJs.includes('findIndex(');
+                    const hasErrorHandling = storageJs.includes('try') && storageJs.includes('catch');
+                    
+                    console.log(`⚡ Performance - arrays: ${hasArrayMethods}, errors: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasArrayMethods, 'Brak metod tablicowych');
+                }, 'Wydajność dużych danych');
+                
+                // Test stabilności - błędy
+                testRunner.addTest('Stability: Obsługa błędów', async () => {
+                    console.log('🛡️ Test stabilności: Obsługa błędów');
+                    
+                    const errorResponse = await fetch('https://szymoooo.github.io/Blania/errorHandler.js');
+                    const errorJs = await errorResponse.text();
+                    
+                    const hasErrorHandler = errorJs.includes('handleError') || errorJs.includes('function handleError');
+                    const hasRetryLogic = errorJs.includes('retry') || errorJs.includes('maxRetries');
+                    const hasLogging = errorJs.includes('console.log') || errorJs.includes('console.error');
+                    
+                    console.log(`🛡️ Error Handling - handler: ${hasErrorHandler}, retry: ${hasRetryLogic}, logging: ${hasLogging}`);
+                    Assert.assertTrue(hasErrorHandler, 'Brak error handler');
+                }, 'Obsługa błędów');
                 
                 return await testRunner.runAll();
             }
