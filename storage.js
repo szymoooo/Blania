@@ -150,6 +150,12 @@ class StorageManager {
     saveNotes(notes) {
         return this.set(this.keys.NOTES, notes);
     }
+    
+    saveNote(note) {
+        const notes = this.getNotes();
+        notes.push(note);
+        return this.saveNotes(notes);
+    }
 
     getTeamNotes(team) {
         const notes = this.getNotes();

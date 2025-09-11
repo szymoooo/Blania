@@ -33,6 +33,49 @@
     <script src="storage.js"></script>
     <script src="eventHandlers.js"></script>
     <script>
+        let currentRating = 0;
+        
+        function setRating(rating) {
+            currentRating = rating;
+            const stars = document.querySelectorAll('.rating span');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.style.color = '#ffc107';
+                } else {
+                    star.style.color = '#ccc';
+                }
+            });
+        }
+        
+        function saveNote() {
+            console.log('💾 Przycisk "Zapisz notatkę" został kliknięty!');
+            
+            const note = {
+                id: Date.now(),
+                strengths: document.getElementById('notes-strengths').value,
+                weaknesses: document.getElementById('notes-weaknesses').value,
+                focus: document.getElementById('notes-focus').value,
+                star: document.getElementById('notes-star').value,
+                defender: document.getElementById('notes-defender').value,
+                other: document.getElementById('notes-other').value,
+                rating: currentRating,
+                date: new Date().toISOString()
+            };
+            
+            if (storage.saveNote(note)) {
+                console.log('✅ Notatka zapisana pomyślnie');
+                window.location.href = 'main.html';
+            } else {
+                console.error('❌ Błąd podczas zapisywania notatki');
+                alert('Błąd podczas zapisywania notatki.');
+            }
+        }
+        
+        function closeNotesForm() {
+            console.log('❌ Przycisk "Anuluj" został kliknięty!');
+            window.location.href = 'main.html';
+        }
+        
         window.onload = function () {
             const noteToEdit = storage.getNoteToEdit();
             if (noteToEdit) {
