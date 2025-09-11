@@ -98,6 +98,10 @@ class StorageManager {
     getSavedMatches() {
         return this.get(this.keys.SAVED_MATCHES, []);
     }
+    
+    getMatches() {
+        return this.getSavedMatches();
+    }
 
     saveMatch(match) {
         const matches = this.getSavedMatches();
@@ -121,6 +125,10 @@ class StorageManager {
     // Wydarzenia
     getSavedEvents() {
         return this.get(this.keys.SAVED_EVENTS, []);
+    }
+    
+    getEvents() {
+        return this.getSavedEvents();
     }
 
     saveEvent(event) {
