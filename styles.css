@@ -124,7 +124,7 @@ p { margin-bottom: 15px; }
 /* ===== 6. EVENT STYLES ===== */
 .event-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     padding: 8px;
     margin: 6px 0;
