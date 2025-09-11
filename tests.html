@@ -712,12 +712,11 @@
                     const html = await response.text();
                     
                     const expectedButtons = [
-                        'btn-prev-calendar',
-                        'btn-add-event', 
-                        'btn-next-calendar',
+                        'primary-btn',  // Poprzednia, Następna, + Dodaj wydarzenie
+                        'add-event',    // + Dodaj wydarzenie
                         'btn-start-game',
                         'btn-prev-note',
-                        'btn-edit-note',
+                        'btn-edit-note', 
                         'btn-add-note',
                         'btn-next-note',
                         'btn-prev-stats',
@@ -902,22 +901,28 @@
                 
                 // Test 9: Sprawdź responsywność logo zespołu
                 testRunner.addTest('powinien mieć poprawnie skalowane logo zespołu', async () => {
+                    // Sprawdź czy styles.css jest ładowany
                     const response = await fetch('https://szymoooo.github.io/Blania/main.html');
                     const html = await response.text();
                     
-                    // Sprawdź czy logo ma odpowiednie style responsywne
-                    const hasResponsiveStyles = html.includes('max-width: 100%') || 
-                                              html.includes('max-height: 100%') ||
-                                              html.includes('object-fit: contain');
+                    Assert.assertTrue(html.includes('styles.css'), 'Strona nie ładuje styles.css');
                     
-                    Assert.assertTrue(hasResponsiveStyles, 'Logo nie ma responsywnych stylów');
+                    // Sprawdź czy styles.css ma responsywne style
+                    const cssResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const css = await cssResponse.text();
+                    
+                    const hasResponsiveStyles = css.includes('max-width: 100%') || 
+                                              css.includes('max-height: 100%') ||
+                                              css.includes('object-fit: contain');
+                    
+                    Assert.assertTrue(hasResponsiveStyles, 'Logo nie ma responsywnych stylów w CSS');
                     
                     // Sprawdź czy są media queries
-                    const hasMediaQueries = html.includes('@media') || 
-                                          html.includes('min-width') || 
-                                          html.includes('max-width');
+                    const hasMediaQueries = css.includes('@media') || 
+                                          css.includes('min-width') || 
+                                          css.includes('max-width');
                     
-                    Assert.assertTrue(hasMediaQueries, 'Brak media queries dla responsywności');
+                    Assert.assertTrue(hasMediaQueries, 'Brak media queries dla responsywności w CSS');
                 }, 'Responsywność logo zespołu');
                 
                 // Test 10: Sprawdź czy logo nie wychodzi poza kontener
@@ -1159,23 +1164,38 @@
                 
                 // Test 9: Sprawdź responsywność na wszystkich stronach
                 testRunner.addTest('powinien mieć responsywny design na wszystkich stronach', async () => {
+                    // Sprawdź czy styles.css ma media queries
+                    const cssResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const css = await cssResponse.text();
+                    
+                    const hasMediaQueries = css.includes('@media');
+                    const hasMinWidth = css.includes('min-width');
+                    const hasMaxWidth = css.includes('max-width');
+                    
+                    console.log(`📱 CSS Media Queries - @media: ${hasMediaQueries}, min-width: ${hasMinWidth}, max-width: ${hasMaxWidth}`);
+                    
+                    Assert.assertTrue(hasMediaQueries, 'Brak @media queries w CSS');
+                    Assert.assertTrue(hasMinWidth, 'Brak min-width w CSS');
+                    Assert.assertTrue(hasMaxWidth, 'Brak max-width w CSS');
+                    
+                    // Sprawdź czy wszystkie strony ładują styles.css
                     const pages = ['main.html', 'blania.html', 'add-event.html', 'notes-form.html'];
-                    let pagesWithResponsiveDesign = 0;
+                    let pagesWithCSS = 0;
                     
                     for (const page of pages) {
-                        const response = await fetch(page);
+                        const response = await fetch(`https://szymoooo.github.io/Blania/${page}`);
                         if (response.ok) {
                             const html = await response.text();
-                            if (html.includes('@media') || html.includes('max-width') || html.includes('min-width')) {
-                                pagesWithResponsiveDesign++;
+                            if (html.includes('styles.css')) {
+                                pagesWithCSS++;
                             }
                         }
                     }
                     
-                    console.log(`📱 Strony z responsywnym designem: ${pagesWithResponsiveDesign}/${pages.length}`);
+                    console.log(`📱 Strony z CSS: ${pagesWithCSS}/${pages.length}`);
                     
-                    Assert.assertTrue(pagesWithResponsiveDesign > 0, 
-                        `Brak responsywnego designu. Znaleziono na ${pagesWithResponsiveDesign}/${pages.length} stronach`);
+                    Assert.assertEquals(pagesWithCSS, pages.length, 
+                        `Nie wszystkie strony ładują CSS. Znaleziono na ${pagesWithCSS}/${pages.length} stronach`);
                 }, 'Responsywny design na wszystkich stronach');
                 
                 // Test 10: Sprawdź czy elementy nie wychodzą poza kontenery
