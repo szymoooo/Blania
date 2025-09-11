@@ -637,7 +637,14 @@ button:hover, .primary-btn:hover, .btn-prev-calendar:hover,
     }
     
     .calendar-week {
-        flex-direction: column;
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 5px;
+    }
+    
+    .calendar-day {
+        min-width: 100px;
+        flex-shrink: 0;
     }
     
     .navigation-buttons, .notes-navigation {

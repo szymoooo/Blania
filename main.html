@@ -395,7 +395,10 @@
         // Funkcja ładowania wydarzeń
         function loadEvents() {
             const savedEvents = storage.getSavedEvents();
-            const eventIcons = AppConfig.EVENT_ICONS;
+            const eventIcons = window.AppConfig.EVENT_ICONS;
+            
+            console.log('🔍 EventIcons:', eventIcons);
+            console.log('🔍 SavedEvents:', savedEvents);
 
             // Wyczyść istniejące wydarzenia
             document.querySelectorAll('.event-item').forEach(item => item.remove());
