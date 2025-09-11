@@ -3,63 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self';">
     <title>Dodaj wydarzenie</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .form-group .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .form-group .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .form-actions button[type="submit"] {
+            background-color: #0078d7;
+            color: white;
+        }
+        .form-actions button[type="button"] {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
     <div class="form-container">
         <h2>Dodaj nowe wydarzenie</h2>
-        <form id="event-form" onsubmit="return false;">
+        <form id="event-form">
             <!-- Typ wydarzenia -->
             <div class="form-group">
                 <label for="event-type">Typ wydarzenia:</label>
                 <select id="event-type" name="event-type" required onchange="handleEventTypeChange()">
-                    <option value="mecz-ligowy">Mecz ligowy</option>
+                    <option value="mecz-dom">Mecz - dom</option>
+                    <option value="mecz-wyjazd">Mecz - wyjazd</option>
                     <option value="trening">Trening</option>
-                    <option value="fizjoterapeuta">Fizjoterapeuta</option>
-                    <option value="mecz-sparingowy">Mecz sparingowy</option>
-                    <option value="turniej">Turniej</option>
                     <option value="oboz">Obóz</option>
-                    <option value="bus">Bus</option>
+                    <option value="fizjo">Fizjoterapeuta</option>
                 </select>
             </div>
 
             <!-- Nazwa wydarzenia -->
             <div class="form-group">
                 <label for="event-name">Nazwa wydarzenia:</label>
-                <select id="event-name" name="event-name" required>
-                    <option value="">Wybierz drużynę</option>
-                </select>
+                <input type="text" id="event-name" name="event-name" required>
             </div>
 
             <!-- Data -->
             <div class="form-group">
                 <label for="event-date">Data:</label>
-                <input type="date" id="event-date" name="event-date" required>
+                <input type="date" id="event-date" name="event-date" required onchange="setDefaultTime()">
             </div>
 
             <!-- Godzina -->
             <div class="form-group">
                 <label for="event-time">Godzina:</label>
-                <input type="time" id="event-time" name="event-time" value="10:30">
+                <input type="time" id="event-time" name="event-time" step="900" required value="17:00">
             </div>
 
             <!-- Lokalizacja -->
             <div class="form-group">
                 <label for="event-location">Lokalizacja:</label>
                 <select id="event-location" name="event-location">
-                    <option value="Gdynia, ul. Cechowa 22 - SP6">Gdynia, ul. Cechowa 22 - SP6</option>
-                    <option value="Gdynia, ul. Wiczlińska 50a - Microsoft">Gdynia, ul. Wiczlińska 50a - Microsoft</option>
-                    <option value="Gdynia, ul. Kopernika 34 - Maku">Gdynia, ul. Kopernika 34 - Maku</option>
-                    <option value="Gdynia, ul. Olimpijska 5/9 - GCS">Gdynia, ul. Olimpijska 5/9 - GCS</option>
-                    <option value="Sopot, ul. Książąt Pomorskich 16-18">Sopot, ul. Książąt Pomorskich 16-18</option>
+                    <option value="Sierakowice, Kubusia Puchatka 7 - SP1">Sierakowice, Kubusia Puchatka 7 - SP1</option>
+                    <option value="Sierakowice, Spacerowa 14 - SP2">Sierakowice, Spacerowa 14 - SP2</option>
+                    <option value="Sierakowice, Dworcowa 3 - LO1">Sierakowice, Dworcowa 3 - LO1</option>
                     <option value="Mecz wyjazdowy">Mecz wyjazdowy</option>
-                    <option value="Dom">Dom</option>
                 </select>
             </div>
 
-            <!-- Powtarzanie -->
+            <!-- Powtarzanie cykliczne -->
             <div class="form-group">
                 <div class="checkbox-group">
                     <input type="checkbox" id="event-repeat" name="event-repeat">
@@ -73,38 +132,30 @@
                 <textarea id="event-notes" name="event-notes"></textarea>
             </div>
 
-            <!-- Przypomnienie -->
-            <div class="form-group">
-                <label for="reminder">Przypomnienie:</label>
-                <select id="reminder" name="reminder">
-                    <option value="0">Brak przypomnienia</option>
-                    <option value="5">5 minut przed</option>
-                    <option value="15">15 minut przed</option>
-                    <option value="30">30 minut przed</option>
-                    <option value="60">1 godzina przed</option>
-                    <option value="1440">1 dzień przed</option>
-                </select>
-            </div>
-
-            <!-- Przyciski -->
+            <!-- Przyciski akcji -->
             <div class="form-actions">
-                <button type="button" onclick="cancelEvent()">Anuluj</button>
-                <button type="button" onclick="saveEvent()">Zapisz</button>
+                <button type="button" onclick="window.history.back()">Anuluj</button>
+                <button type="submit">Zapisz</button>
             </div>
         </form>
     </div>
 
-    <!-- Skrypty JavaScript - na końcu strony -->
-    <script src="config.js"></script>
-    <script src="storage.js"></script>
-    <script src="eventHandlers.js"></script>
     <script>
+        // Automatyczne przypisanie koloru na podstawie typu wydarzenia
+        const eventColors = {
+            'mecz-dom': '#0078d7',
+            'mecz-wyjazd': '#dc3545',
+            'trening': '#28a745',
+            'oboz': '#17a2b8',
+            'fizjo': '#ffc107'
+        };
+
         // Wczytaj edytowane wydarzenie (jeśli istnieje)
-        const editEventId = storage.getEditEventId();
+        const editEventId = localStorage.getItem('editEventId');
         let editEvent = null;
 
         if (editEventId) {
-            const savedEvents = storage.getSavedEvents();
+            const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
             editEvent = savedEvents.find(event => event.id === parseInt(editEventId));
         }
 
@@ -116,90 +167,137 @@
             document.getElementById('event-location').value = editEvent.location;
             document.getElementById('event-repeat').checked = editEvent.repeat;
             document.getElementById('event-notes').value = editEvent.notes;
-            document.getElementById('reminder').value = editEvent.reminder;
             document.getElementById('event-type').value = editEvent.type;
         }
 
-        // Ustaw domyślną datę z localStorage (jeśli istnieje)
-        const selectedDate = storage.getSelectedDate();
-        if (selectedDate) {
-            document.getElementById('event-date').value = selectedDate;
-        }
+        // Ustaw domyślną datę na dzisiaj
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('event-date').value = today;
 
-        // Funkcja obsługi zmiany typu wydarzenia
-        function handleEventTypeChange() {
-            const eventType = document.getElementById('event-type').value;
-            const eventNameSelect = document.getElementById('event-name');
-            
-            // Wyczyść poprzednie opcje
-            eventNameSelect.innerHTML = '';
-            
-            if (eventType === 'mecz-ligowy' || eventType === 'mecz-sparingowy') {
-                // Opcje drużyn dla meczów
-                const teams = ['BAT Sierakowice', 'BAT Kartuzy', 'Bryza Pruszcz Gd', 'Elbląg', 'Pruszcz Gdański 1', 'Pruszcz Gdański 2', 'BK VLCI Žďár', 'BKM Žilina', 'MOSiR Bochnia', 'UKS ŻAK Nowy Sącz', 'Young Angels Košice'];
-                teams.forEach(team => {
-                    const option = document.createElement('option');
-                    option.value = team;
-                    option.textContent = team;
-                    eventNameSelect.appendChild(option);
-                });
-            } else {
-                // Opcje dla innych typów wydarzeń
-                const options = ['Trening', 'Fizjoterapeuta', 'Turniej', 'Obóz', 'Bus'];
-                options.forEach(option => {
-                    const optionElement = document.createElement('option');
-                    optionElement.value = option;
-                    optionElement.textContent = option;
-                    eventNameSelect.appendChild(optionElement);
-                });
+        // Funkcja do ustawienia domyślnej godziny na 17:00
+        function setDefaultTime() {
+            const eventTime = document.getElementById('event-time');
+            if (!eventTime.value) {
+                eventTime.value = '17:00';
             }
         }
 
-        // Funkcja zapisywania wydarzenia
-        function saveEvent() {
-            console.log('💾 Przycisk "Zapisz wydarzenie" został kliknięty!');
-            
-            const eventType = document.getElementById('event-type').value;
-            const eventName = document.getElementById('event-name').value;
+        // Funkcja do generowania unikalnego ID
+        function generateUniqueId() {
+            return Date.now() + Math.floor(Math.random() * 1000);
+        }
+
+        // Obsługa formularza
+        document.getElementById('event-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Pobierz wartości z formularza
+            const eventName = document.getElementById('event-name').value.trim();
             const eventDate = document.getElementById('event-date').value;
             const eventTime = document.getElementById('event-time').value;
             const eventLocation = document.getElementById('event-location').value;
-            const isRecurring = document.getElementById('event-repeat').checked;
-            const eventNotes = document.getElementById('event-notes').value;
-            const reminder = document.getElementById('reminder').value;
-            
-            if (!eventName || !eventDate) {
-                alert('Proszę wypełnić nazwę wydarzenia i datę.');
+            const eventRepeat = document.getElementById('event-repeat').checked;
+            const eventNotes = document.getElementById('event-notes').value.trim();
+            const eventType = document.getElementById('event-type').value;
+
+            // Walidacja danych
+            if (!eventName) {
+                alert("Proszę podać nazwę wydarzenia.");
                 return;
             }
-            
+            if (!eventDate) {
+                alert("Proszę wybrać datę wydarzenia.");
+                return;
+            }
+            if (!eventTime) {
+                alert("Proszę wybrać godzinę wydarzenia.");
+                return;
+            }
+            if (!eventLocation) {
+                alert("Proszę wybrać lokalizację wydarzenia.");
+                return;
+            }
+
+            // Utwórz obiekt wydarzenia
             const event = {
-                id: Date.now(),
-                type: eventType,
+                id: editEvent ? editEvent.id : generateUniqueId(),
                 name: eventName,
-                date: eventDate,
-                time: eventTime,
+                date: eventDate + 'T' + eventTime,
                 location: eventLocation,
-                recurring: isRecurring,
+                repeat: eventRepeat,
                 notes: eventNotes,
-                reminder: reminder,
-                createdAt: new Date().toISOString()
+                type: eventType,
+                color: eventColors[eventType]
             };
-            
-            if (storage.saveEvent(event)) {
-                console.log('✅ Wydarzenie zapisane pomyślnie');
-                window.location.href = 'main.html';
+
+            // Zapisz wydarzenie w localStorage
+            const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
+            if (editEvent) {
+                // Edytuj istniejące wydarzenie
+                const eventIndex = savedEvents.findIndex(e => e.id === editEvent.id);
+                if (eventIndex !== -1) {
+                    savedEvents[eventIndex] = event;
+                    console.log(`Zaktualizowano wydarzenie: ${event.name} na dzień ${eventDate}`);
+                }
             } else {
-                console.error('❌ Błąd podczas zapisywania wydarzenia');
-                alert('Błąd podczas zapisywania wydarzenia.');
+                // Dodaj nowe wydarzenie
+                savedEvents.push(event);
+                console.log(`Dodano wydarzenie: ${event.name} na dzień ${eventDate}`);
+
+                // Jeśli opcja "Powtarzaj co tydzień" jest zaznaczona, dodaj wydarzenia dla kolejnych tygodni
+                if (eventRepeat) {
+                    const repeatWeeks = 16;
+                    console.log(`Dodawanie powtarzających się wydarzeń co tydzień przez ${repeatWeeks} tygodni:`);
+                    
+                    for (let i = 1; i <= repeatWeeks; i++) {
+                        const newEventDate = new Date(event.date);
+                        newEventDate.setDate(newEventDate.getDate() + 7 * i);
+
+                        const repeatedEvent = {
+                            ...event,
+                            id: generateUniqueId(),
+                            date: newEventDate.toISOString().split('T')[0] + 'T' + eventTime
+                        };
+
+                        savedEvents.push(repeatedEvent);
+                        console.log(`Dodano powtórzenie ${i}: ${repeatedEvent.name} na dzień ${repeatedEvent.date.split('T')[0]}`);
+                    }
+                    
+                    console.log(`Łącznie dodano ${repeatWeeks + 1} wydarzeń (oryginalne + ${repeatWeeks} powtórzeń)`);
+                }
+            }
+
+            localStorage.setItem('savedEvents', JSON.stringify(savedEvents));
+
+            // Wyczyść edytowane wydarzenie
+            localStorage.removeItem('editEventId');
+
+            // Przekieruj z powrotem do kalendarza
+            window.location.href = 'main.html';
+        });
+
+        // Funkcja do obsługi zmiany typu wydarzenia
+        function handleEventTypeChange() {
+            const eventType = document.getElementById('event-type').value;
+            const eventNameInput = document.getElementById('event-name');
+
+            // Ustaw domyślną nazwę na podstawie typu
+            if (eventType === 'mecz-dom') {
+                eventNameInput.value = 'Mecz domowy';
+            } else if (eventType === 'mecz-wyjazd') {
+                eventNameInput.value = 'Mecz wyjazdowy';
+            } else if (eventType === 'trening') {
+                eventNameInput.value = 'Trening';
+            } else if (eventType === 'oboz') {
+                eventNameInput.value = 'Obóz';
+            } else if (eventType === 'fizjo') {
+                eventNameInput.value = 'Fizjoterapeuta';
             }
         }
-        
-        // Funkcja anulowania
-        function cancelEvent() {
-            console.log('❌ Przycisk "Anuluj" został kliknięty!');
-            window.location.href = 'main.html';
-        }
+
+        // Inicjalizacja formularza
+        handleEventTypeChange();
+        setDefaultTime();
     </script>
 </body>
 </html>
