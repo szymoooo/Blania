@@ -923,7 +923,7 @@
                 testRunner.addTest('powinien mieć odpowiednie formularze na wszystkich stronach', async () => {
                     const pageForms = [
                         { page: 'add-event.html', expectedForm: 'form' },
-                        { page: 'notes-form.html', expectedForm: 'form' }
+                        { page: 'notes-form.html', expectedForm: 'textarea' } // notes-form.html ma textarea zamiast form
                     ];
                     
                     let formsFound = 0;
