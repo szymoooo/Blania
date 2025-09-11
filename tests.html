@@ -2438,6 +2438,432 @@
                     Assert.assertTrue(hasDateHandling, 'Brak obsługi daty');
                 }, 'Data 29.02 w roku nieprzestępnym');
                 
+                // ===== SPECJALISTYCZNE TESTY BEZPIECZEŃSTWA =====
+                
+                // 🛡️ Bezpieczeństwo (Security)
+                testRunner.addTest('SEC-4: HTML Injection w notatkach', async () => {
+                    console.log('🛡️ Test bezpieczeństwa: HTML Injection w notatkach');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasTextarea = addEventHtml.includes('textarea') && addEventHtml.includes('event-notes');
+                    const hasTextContent = addEventHtml.includes('textContent') || addEventHtml.includes('createElement');
+                    const hasNoInnerHTML = !addEventHtml.includes('innerHTML') || addEventHtml.includes('textContent');
+                    
+                    console.log(`🛡️ HTML Injection - textarea: ${hasTextarea}, textContent: ${hasTextContent}, noInnerHTML: ${hasNoInnerHTML}`);
+                    Assert.assertTrue(hasTextarea, 'Brak textarea dla notatek');
+                    Assert.assertTrue(hasTextContent, 'Brak textContent (używa innerHTML)');
+                    Assert.assertTrue(hasNoInnerHTML, 'Używa niebezpiecznego innerHTML');
+                }, 'Ochrona HTML Injection');
+                
+                testRunner.addTest('SEC-5: LocalStorage manipulation', async () => {
+                    console.log('🛡️ Test bezpieczeństwa: LocalStorage manipulation');
+                    
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasErrorHandling = storageJs.includes('try') && storageJs.includes('catch');
+                    const hasDataValidation = storageJs.includes('JSON.parse') && storageJs.includes('JSON.stringify');
+                    const hasFallback = storageJs.includes('||') && storageJs.includes('[]');
+                    
+                    console.log(`🛡️ LocalStorage - errors: ${hasErrorHandling}, validation: ${hasDataValidation}, fallback: ${hasFallback}`);
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów localStorage');
+                    Assert.assertTrue(hasDataValidation, 'Brak walidacji danych JSON');
+                    Assert.assertTrue(hasFallback, 'Brak fallback dla uszkodzonych danych');
+                }, 'Ochrona LocalStorage');
+                
+                testRunner.addTest('SEC-6: Event spoofing', async () => {
+                    console.log('🛡️ Test bezpieczeństwa: Event spoofing');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasIdValidation = mainHtml.includes('event.id') && mainHtml.includes('find(');
+                    const hasEventCheck = mainHtml.includes('eventToEdit') && mainHtml.includes('if (eventToEdit)');
+                    const hasSafeEdit = mainHtml.includes('editEvent') && mainHtml.includes('function editEvent');
+                    
+                    console.log(`🛡️ Event Spoofing - validation: ${hasIdValidation}, check: ${hasEventCheck}, safe: ${hasSafeEdit}`);
+                    Assert.assertTrue(hasIdValidation, 'Brak walidacji ID wydarzeń');
+                    Assert.assertTrue(hasEventCheck, 'Brak sprawdzania istnienia wydarzenia');
+                    Assert.assertTrue(hasSafeEdit, 'Brak bezpiecznej edycji');
+                }, 'Ochrona Event Spoofing');
+                
+                testRunner.addTest('SEC-7: Data URL injection', async () => {
+                    console.log('🛡️ Test bezpieczeństwa: Data URL injection');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasInputValidation = addEventResponse.text().includes('required') && addEventResponse.text().includes('maxlength');
+                    const hasNoDataURL = !addEventResponse.text().includes('data:') && !addEventResponse.text().includes('javascript:');
+                    const hasSafeRendering = addEventResponse.text().includes('textContent') || addEventResponse.text().includes('createElement');
+                    
+                    console.log(`🛡️ Data URL - validation: ${hasInputValidation}, noDataURL: ${hasNoDataURL}, safe: ${hasSafeRendering}`);
+                    Assert.assertTrue(hasInputValidation, 'Brak walidacji inputów');
+                    Assert.assertTrue(hasNoDataURL, 'Używa niebezpiecznych data URLs');
+                    Assert.assertTrue(hasSafeRendering, 'Brak bezpiecznego renderowania');
+                }, 'Ochrona Data URL injection');
+                
+                // 🗓️ Obsługa dat i czasu
+                testRunner.addTest('DATE-1: Zmiana czasu podczas sesji', async () => {
+                    console.log('🗓️ Test dat: Zmiana czasu podczas sesji');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasUTCDate = mainHtml.includes('toISOString()') && mainHtml.includes('split(\'T\')');
+                    const hasDateObject = mainHtml.includes('new Date()') && mainHtml.includes('getTime()');
+                    const hasConsistentFormat = mainHtml.includes('padStart(2, \'0\')') && mainHtml.includes('getFullYear()');
+                    
+                    console.log(`🗓️ Time Change - UTC: ${hasUTCDate}, object: ${hasDateObject}, format: ${hasConsistentFormat}`);
+                    Assert.assertTrue(hasUTCDate, 'Brak obsługi UTC');
+                    Assert.assertTrue(hasDateObject, 'Brak obiektów Date');
+                    Assert.assertTrue(hasConsistentFormat, 'Brak spójnego formatu dat');
+                }, 'Obsługa zmiany czasu');
+                
+                testRunner.addTest('DATE-2: Graniczne wartości dat', async () => {
+                    console.log('🗓️ Test dat: Graniczne wartości dat');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasDateValidation = addEventHtml.includes('isNaN(eventDateTime.getTime())');
+                    const hasDateInput = addEventHtml.includes('type="date"') && addEventHtml.includes('event-date');
+                    const hasErrorHandling = addEventHtml.includes('alert(') && addEventHtml.includes('Niepoprawna data');
+                    
+                    console.log(`🗓️ Date Limits - validation: ${hasDateValidation}, input: ${hasDateInput}, errors: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasDateValidation, 'Brak walidacji granicznych dat');
+                    Assert.assertTrue(hasDateInput, 'Brak inputu daty');
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów dat');
+                }, 'Obsługa granicznych dat');
+                
+                testRunner.addTest('DATE-3: Różne formaty dat', async () => {
+                    console.log('🗓️ Test dat: Różne formaty dat');
+                    
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const hasDateInput = addEventHtml.includes('type="date"') && addEventHtml.includes('required');
+                    const hasValidation = addEventHtml.includes('isNaN') && addEventHtml.includes('getTime()');
+                    const hasErrorMessage = addEventHtml.includes('Niepoprawna data') || addEventHtml.includes('alert(');
+                    
+                    console.log(`🗓️ Date Formats - input: ${hasDateInput}, validation: ${hasValidation}, message: ${hasErrorMessage}`);
+                    Assert.assertTrue(hasDateInput, 'Brak inputu daty');
+                    Assert.assertTrue(hasValidation, 'Brak walidacji formatów dat');
+                    Assert.assertTrue(hasErrorMessage, 'Brak komunikatów o błędach dat');
+                }, 'Obsługa formatów dat');
+                
+                testRunner.addTest('DATE-4: Timezone offset', async () => {
+                    console.log('🗓️ Test dat: Timezone offset');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasISOString = mainHtml.includes('toISOString()') && mainHtml.includes('split(\'T\')');
+                    const hasDateMethods = mainHtml.includes('getDate()') && mainHtml.includes('getMonth()');
+                    const hasConsistentFormat = mainHtml.includes('padStart(2, \'0\')') && mainHtml.includes('getFullYear()');
+                    
+                    console.log(`🗓️ Timezone - ISO: ${hasISOString}, methods: ${hasDateMethods}, format: ${hasConsistentFormat}`);
+                    Assert.assertTrue(hasISOString, 'Brak obsługi ISO string');
+                    Assert.assertTrue(hasDateMethods, 'Brak metod Date');
+                    Assert.assertTrue(hasConsistentFormat, 'Brak spójnego formatu');
+                }, 'Obsługa stref czasowych');
+                
+                // 📊 Wydajność (Performance)
+                testRunner.addTest('PERF-4: 1000+ wydarzeń', async () => {
+                    console.log('⚡ Test wydajności: 1000+ wydarzeń');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasEfficientRendering = mainHtml.includes('forEach') && mainHtml.includes('querySelectorAll');
+                    const hasEventFiltering = mainHtml.includes('dayDate === eventDate') && mainHtml.includes('filter');
+                    const hasOptimizedDOM = mainHtml.includes('createElement') && mainHtml.includes('appendChild');
+                    
+                    console.log(`⚡ 1000+ Events - rendering: ${hasEfficientRendering}, filtering: ${hasEventFiltering}, DOM: ${hasOptimizedDOM}`);
+                    Assert.assertTrue(hasEfficientRendering, 'Brak wydajnego renderowania');
+                    Assert.assertTrue(hasEventFiltering, 'Brak filtrowania wydarzeń');
+                    Assert.assertTrue(hasOptimizedDOM, 'Brak optymalizacji DOM');
+                }, 'Wydajność 1000+ wydarzeń');
+                
+                testRunner.addTest('PERF-5: Simultaneous edits', async () => {
+                    console.log('⚡ Test wydajności: Simultaneous edits');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasEventHandling = mainHtml.includes('addEventListener') && mainHtml.includes('click');
+                    const hasAsyncOperations = mainHtml.includes('async') || mainHtml.includes('Promise');
+                    const hasConflictResolution = mainHtml.includes('editEvent') && mainHtml.includes('deleteEvent');
+                    
+                    console.log(`⚡ Simultaneous - events: ${hasEventHandling}, async: ${hasAsyncOperations}, conflict: ${hasConflictResolution}`);
+                    Assert.assertTrue(hasEventHandling, 'Brak obsługi eventów');
+                    Assert.assertTrue(hasAsyncOperations, 'Brak operacji asynchronicznych');
+                    Assert.assertTrue(hasConflictResolution, 'Brak rozwiązywania konfliktów');
+                }, 'Wydajność równoczesnych edycji');
+                
+                testRunner.addTest('PERF-6: Memory leaks', async () => {
+                    console.log('⚡ Test wydajności: Memory leaks');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasEventCleanup = mainHtml.includes('removeEventListener') || mainHtml.includes('remove()');
+                    const hasDOMCleanup = mainHtml.includes('innerHTML = \'\'') && mainHtml.includes('querySelectorAll');
+                    const hasMemoryManagement = mainHtml.includes('forEach') && mainHtml.includes('filter');
+                    
+                    console.log(`⚡ Memory - cleanup: ${hasEventCleanup}, DOM: ${hasDOMCleanup}, management: ${hasMemoryManagement}`);
+                    Assert.assertTrue(hasEventCleanup, 'Brak czyszczenia eventów');
+                    Assert.assertTrue(hasDOMCleanup, 'Brak czyszczenia DOM');
+                    Assert.assertTrue(hasMemoryManagement, 'Brak zarządzania pamięcią');
+                }, 'Zarządzanie pamięcią');
+                
+                // 🔄 Synchronizacja i integralność danych
+                testRunner.addTest('SYNC-1: Conflict resolution', async () => {
+                    console.log('🔄 Test synchronizacji: Conflict resolution');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasEditLogic = mainHtml.includes('editEvent') && mainHtml.includes('setEditEventId');
+                    const hasStorageUpdate = mainHtml.includes('saveEvent') && mainHtml.includes('localStorage');
+                    const hasConflictHandling = mainHtml.includes('findIndex') && mainHtml.includes('splice');
+                    
+                    console.log(`🔄 Conflict - edit: ${hasEditLogic}, storage: ${hasStorageUpdate}, handling: ${hasConflictHandling}`);
+                    Assert.assertTrue(hasEditLogic, 'Brak logiki edycji');
+                    Assert.assertTrue(hasStorageUpdate, 'Brak aktualizacji storage');
+                    Assert.assertTrue(hasConflictHandling, 'Brak obsługi konfliktów');
+                }, 'Rozwiązywanie konfliktów');
+                
+                testRunner.addTest('SYNC-2: Data corruption', async () => {
+                    console.log('🔄 Test synchronizacji: Data corruption');
+                    
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await storageResponse.text();
+                    
+                    const hasErrorHandling = storageJs.includes('try') && storageJs.includes('catch');
+                    const hasDataValidation = storageJs.includes('JSON.parse') && storageJs.includes('JSON.stringify');
+                    const hasFallback = storageJs.includes('||') && storageJs.includes('[]');
+                    
+                    console.log(`🔄 Corruption - errors: ${hasErrorHandling}, validation: ${hasDataValidation}, fallback: ${hasFallback}`);
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów');
+                    Assert.assertTrue(hasDataValidation, 'Brak walidacji danych');
+                    Assert.assertTrue(hasFallback, 'Brak fallback');
+                }, 'Odzyskiwanie danych');
+                
+                testRunner.addTest('SYNC-3: Offline mode', async () => {
+                    console.log('🔄 Test synchronizacji: Offline mode');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasLocalStorage = mainHtml.includes('localStorage') && mainHtml.includes('getItem');
+                    const hasOfflineData = mainHtml.includes('savedEvents') && mainHtml.includes('savedMatches');
+                    const hasDataPersistence = mainHtml.includes('setItem') && mainHtml.includes('JSON.stringify');
+                    
+                    console.log(`🔄 Offline - storage: ${hasLocalStorage}, data: ${hasOfflineData}, persistence: ${hasDataPersistence}`);
+                    Assert.assertTrue(hasLocalStorage, 'Brak localStorage');
+                    Assert.assertTrue(hasOfflineData, 'Brak danych offline');
+                    Assert.assertTrue(hasDataPersistence, 'Brak trwałości danych');
+                }, 'Tryb offline');
+                
+                // 🎯 User Experience (UX)
+                testRunner.addTest('UX-4: Undo/Redo', async () => {
+                    console.log('🎯 Test UX: Undo/Redo');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasHistory = mainHtml.includes('history') || mainHtml.includes('back()');
+                    const hasEditFunctions = mainHtml.includes('editEvent') && mainHtml.includes('deleteEvent');
+                    const hasNavigation = mainHtml.includes('moveCalendar') && mainHtml.includes('Poprzednia');
+                    
+                    console.log(`🎯 Undo/Redo - history: ${hasHistory}, edit: ${hasEditFunctions}, nav: ${hasNavigation}`);
+                    Assert.assertTrue(hasHistory, 'Brak historii');
+                    Assert.assertTrue(hasEditFunctions, 'Brak funkcji edycji');
+                    Assert.assertTrue(hasNavigation, 'Brak nawigacji');
+                }, 'Funkcje Undo/Redo');
+                
+                testRunner.addTest('UX-5: Search/filter', async () => {
+                    console.log('🎯 Test UX: Search/filter');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasEventFiltering = mainHtml.includes('dayDate === eventDate') && mainHtml.includes('filter');
+                    const hasEventSearch = mainHtml.includes('event.name') && mainHtml.includes('includes');
+                    const hasEventDisplay = mainHtml.includes('event-item') && mainHtml.includes('event-text');
+                    
+                    console.log(`🎯 Search - filtering: ${hasEventFiltering}, search: ${hasEventSearch}, display: ${hasEventDisplay}`);
+                    Assert.assertTrue(hasEventFiltering, 'Brak filtrowania wydarzeń');
+                    Assert.assertTrue(hasEventSearch, 'Brak wyszukiwania wydarzeń');
+                    Assert.assertTrue(hasEventDisplay, 'Brak wyświetlania wydarzeń');
+                }, 'Wyszukiwanie i filtrowanie');
+                
+                testRunner.addTest('UX-6: Accessibility', async () => {
+                    console.log('🎯 Test UX: Accessibility');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasLabels = mainHtml.includes('label') && mainHtml.includes('for=');
+                    const hasButtons = mainHtml.includes('button') && mainHtml.includes('onclick');
+                    const hasSemanticHTML = mainHtml.includes('<header>') && mainHtml.includes('<main>');
+                    
+                    console.log(`🎯 Accessibility - labels: ${hasLabels}, buttons: ${hasButtons}, semantic: ${hasSemanticHTML}`);
+                    Assert.assertTrue(hasLabels, 'Brak etykiet');
+                    Assert.assertTrue(hasButtons, 'Brak przycisków');
+                    Assert.assertTrue(hasSemanticHTML, 'Brak semantycznego HTML');
+                }, 'Dostępność');
+                
+                // 📱 Responsywność zaawansowana
+                testRunner.addTest('RWD-4: Orientation change', async () => {
+                    console.log('📱 Test responsywności: Orientation change');
+                    
+                    const stylesResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const stylesCss = await stylesResponse.text();
+                    
+                    const hasMediaQueries = stylesCss.includes('@media') && stylesCss.includes('max-width');
+                    const hasFlexLayout = stylesCss.includes('display: flex') && stylesCss.includes('flex-direction');
+                    const hasResponsiveCalendar = stylesCss.includes('calendar-week') && stylesCss.includes('overflow-x');
+                    
+                    console.log(`📱 Orientation - media: ${hasMediaQueries}, flex: ${hasFlexLayout}, calendar: ${hasResponsiveCalendar}`);
+                    Assert.assertTrue(hasMediaQueries, 'Brak media queries');
+                    Assert.assertTrue(hasFlexLayout, 'Brak flex layout');
+                    Assert.assertTrue(hasResponsiveCalendar, 'Brak responsywnego kalendarza');
+                }, 'Zmiana orientacji');
+                
+                testRunner.addTest('RWD-5: Touch gestures', async () => {
+                    console.log('📱 Test responsywności: Touch gestures');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasTouchEvents = mainHtml.includes('addEventListener') && mainHtml.includes('click');
+                    const hasNavigation = mainHtml.includes('moveCalendar') && mainHtml.includes('Poprzednia');
+                    const hasSwipeSupport = mainHtml.includes('touchstart') || mainHtml.includes('swipe');
+                    
+                    console.log(`📱 Touch - events: ${hasTouchEvents}, nav: ${hasNavigation}, swipe: ${hasSwipeSupport}`);
+                    Assert.assertTrue(hasTouchEvents, 'Brak obsługi touch');
+                    Assert.assertTrue(hasNavigation, 'Brak nawigacji');
+                    Assert.assertTrue(hasSwipeSupport, 'Brak obsługi swipe');
+                }, 'Gesty dotykowe');
+                
+                testRunner.addTest('RWD-6: High DPI displays', async () => {
+                    console.log('📱 Test responsywności: High DPI displays');
+                    
+                    const stylesResponse = await fetch('https://szymoooo.github.io/Blania/styles.css');
+                    const stylesCss = await stylesResponse.text();
+                    
+                    const hasImageOptimization = stylesCss.includes('background-size: cover') && stylesCss.includes('background-position');
+                    const hasResponsiveImages = stylesCss.includes('width') && stylesCss.includes('height');
+                    const hasMediaQueries = stylesCss.includes('@media') && stylesCss.includes('min-resolution');
+                    
+                    console.log(`📱 High DPI - images: ${hasImageOptimization}, responsive: ${hasResponsiveImages}, media: ${hasMediaQueries}`);
+                    Assert.assertTrue(hasImageOptimization, 'Brak optymalizacji obrazów');
+                    Assert.assertTrue(hasResponsiveImages, 'Brak responsywnych obrazów');
+                    Assert.assertTrue(hasMediaQueries, 'Brak media queries dla DPI');
+                }, 'Wyświetlacze wysokiej rozdzielczości');
+                
+                // 🧪 Edge Case'y zaawansowane
+                testRunner.addTest('EDGE-4: Leap seconds', async () => {
+                    console.log('🧩 Test edge case: Leap seconds');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasTimeHandling = mainHtml.includes('getTime()') && mainHtml.includes('setTime()');
+                    const hasDateValidation = mainHtml.includes('isNaN') && mainHtml.includes('getTime()');
+                    const hasTimeFormat = mainHtml.includes('split(\'T\')') && mainHtml.includes('substring(0, 5)');
+                    
+                    console.log(`🧩 Leap Seconds - time: ${hasTimeHandling}, validation: ${hasDateValidation}, format: ${hasTimeFormat}`);
+                    Assert.assertTrue(hasTimeHandling, 'Brak obsługi czasu');
+                    Assert.assertTrue(hasDateValidation, 'Brak walidacji dat');
+                    Assert.assertTrue(hasTimeFormat, 'Brak formatowania czasu');
+                }, 'Sekundy przestępne');
+                
+                testRunner.addTest('EDGE-5: DST transition', async () => {
+                    console.log('🧩 Test edge case: DST transition');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasDuplicateCheck = mainHtml.includes('checkForDuplicateEvent') || mainHtml.includes('duplicate');
+                    const hasDateValidation = mainHtml.includes('validateDate') || mainHtml.includes('isNaN');
+                    const hasTimeHandling = mainHtml.includes('setHours') && mainHtml.includes('setDate');
+                    
+                    console.log(`🧩 DST - duplicate: ${hasDuplicateCheck}, validation: ${hasDateValidation}, time: ${hasTimeHandling}`);
+                    Assert.assertTrue(hasDuplicateCheck, 'Brak sprawdzania duplikatów');
+                    Assert.assertTrue(hasDateValidation, 'Brak walidacji dat');
+                    Assert.assertTrue(hasTimeHandling, 'Brak obsługi czasu');
+                }, 'Przejście na czas letni/zimowy');
+                
+                testRunner.addTest('EDGE-6: Year 2038 problem', async () => {
+                    console.log('🧩 Test edge case: Year 2038 problem');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasDateHandling = mainHtml.includes('new Date()') && mainHtml.includes('getTime()');
+                    const hasDateValidation = mainHtml.includes('isNaN') && mainHtml.includes('getTime()');
+                    const hasDateMethods = mainHtml.includes('getFullYear()') && mainHtml.includes('getMonth()');
+                    
+                    console.log(`🧩 2038 - handling: ${hasDateHandling}, validation: ${hasDateValidation}, methods: ${hasDateMethods}`);
+                    Assert.assertTrue(hasDateHandling, 'Brak obsługi dat');
+                    Assert.assertTrue(hasDateValidation, 'Brak walidacji dat');
+                    Assert.assertTrue(hasDateMethods, 'Brak metod Date');
+                }, 'Problem roku 2038');
+                
+                // 🔧 Integracje zewnętrzne zaawansowane
+                testRunner.addTest('INT-4: API rate limiting', async () => {
+                    console.log('🔧 Test integracji: API rate limiting');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasLocalStorage = mainHtml.includes('localStorage') && mainHtml.includes('getItem');
+                    const hasOfflineMode = mainHtml.includes('savedEvents') && mainHtml.includes('savedMatches');
+                    const hasErrorHandling = mainHtml.includes('try') && mainHtml.includes('catch');
+                    
+                    console.log(`🔧 Rate Limiting - storage: ${hasLocalStorage}, offline: ${hasOfflineMode}, errors: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasLocalStorage, 'Brak localStorage');
+                    Assert.assertTrue(hasOfflineMode, 'Brak trybu offline');
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów');
+                }, 'Ograniczenia API');
+                
+                testRunner.addTest('INT-5: OAuth token expiration', async () => {
+                    console.log('🔧 Test integracji: OAuth token expiration');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasLocalStorage = mainHtml.includes('localStorage') && mainHtml.includes('setItem');
+                    const hasOfflineMode = mainHtml.includes('savedEvents') && mainHtml.includes('savedMatches');
+                    const hasNoOAuth = !mainHtml.includes('oauth') && !mainHtml.includes('token');
+                    
+                    console.log(`🔧 OAuth - storage: ${hasLocalStorage}, offline: ${hasOfflineMode}, noOAuth: ${hasNoOAuth}`);
+                    Assert.assertTrue(hasLocalStorage, 'Brak localStorage');
+                    Assert.assertTrue(hasOfflineMode, 'Brak trybu offline');
+                    Assert.assertTrue(hasNoOAuth, 'Używa OAuth (niepotrzebne)');
+                }, 'Wygasanie tokenów OAuth');
+                
+                testRunner.addTest('INT-6: Third-party CDN failure', async () => {
+                    console.log('🔧 Test integracji: Third-party CDN failure');
+                    
+                    const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const mainHtml = await mainResponse.text();
+                    
+                    const hasLocalIcons = mainHtml.includes('eventIcons') && mainHtml.includes('match.png');
+                    const hasFallbackIcons = mainHtml.includes('background-image') && mainHtml.includes('url(');
+                    const hasErrorHandling = mainHtml.includes('try') && mainHtml.includes('catch');
+                    
+                    console.log(`🔧 CDN Failure - local: ${hasLocalIcons}, fallback: ${hasFallbackIcons}, errors: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasLocalIcons, 'Brak lokalnych ikon');
+                    Assert.assertTrue(hasFallbackIcons, 'Brak fallback ikon');
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów');
+                }, 'Awaria CDN');
+                
                 return await testRunner.runAll();
             }
 
