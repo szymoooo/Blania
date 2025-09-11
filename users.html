@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zawodnicy - Blania</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --accent: #ffc107;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .users-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .users-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .add-player-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .add-player-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .player-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .player-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .player-number {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .player-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .player-detail {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .player-detail-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .player-detail-value {
+            font-size: 14px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .player-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .stats-btn {
+            background: var(--success);
+            color: white;
+        }
+        
+        .stats-btn:hover {
+            background: #218838;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-select {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .back-btn {
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsywność */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .player-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="users-container">
+        <a href="admin.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Powrót do panelu admin
+        </a>
+        
+        <div class="users-header">
+            <h1 class="users-title">Zawodnicy</h1>
+            <button class="add-player-btn" onclick="openAddPlayerModal()">
+                <i class="fas fa-plus"></i> Dodaj zawodnika
+            </button>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Szukaj zawodnika..." onkeyup="filterPlayers()">
+            <select class="filter-select" id="positionFilter" onchange="filterPlayers()">
+                <option value="">Wszystkie pozycje</option>
+                <option value="PG">Rozgrywający (PG)</option>
+                <option value="SG">Rzucający obrońca (SG)</option>
+                <option value="SF">Niski skrzydłowy (SF)</option>
+                <option value="PF">Silny skrzydłowy (PF)</option>
+                <option value="C">Środkowy (C)</option>
+            </select>
+        </div>
+        
+        <div class="players-grid" id="playersGrid">
+            <!-- Zawodnicy będą dodani przez JavaScript -->
+        </div>
+        
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-users"></i>
+            <h3>Brak zawodników</h3>
+            <p>Dodaj pierwszego zawodnika do swojej drużyny!</p>
+            <button class="add-player-btn" onclick="openAddPlayerModal()">
+                <i class="fas fa-plus"></i> Dodaj zawodnika
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal dodawania/edycji zawodnika -->
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Dodaj zawodnika</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="playerForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="firstName">Imię *</label>
+                        <input type="text" class="form-input" id="firstName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="lastName">Nazwisko *</label>
+                        <input type="text" class="form-input" id="lastName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="birthDate">Data urodzenia *</label>
+                        <input type="date" class="form-input" id="birthDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="jerseyNumber">Numer koszulki *</label>
+                        <input type="number" class="form-input" id="jerseyNumber" min="0" max="99" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="position">Pozycja *</label>
+                        <select class="form-select" id="position" required>
+                            <option value="">Wybierz pozycję</option>
+                            <option value="PG">Rozgrywający (PG)</option>
+                            <option value="SG">Rzucający obrońca (SG)</option>
+                            <option value="SF">Niski skrzydłowy (SF)</option>
+                            <option value="PF">Silny skrzydłowy (PF)</option>
+                            <option value="C">Środkowy (C)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="height">Wzrost (cm) *</label>
+                        <input type="number" class="form-input" id="height" min="150" max="250" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="weight">Waga (kg) *</label>
+                        <input type="number" class="form-input" id="weight" min="40" max="150" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="experience">Doświadczenie (lata)</label>
+                        <input type="number" class="form-input" id="experience" min="0" max="20">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label class="form-label" for="notes">Notatki</label>
+                        <textarea class="form-input" id="notes" rows="3" placeholder="Dodatkowe informacje o zawodniku..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Dodaj zawodnika</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let players = [];
+        let editingPlayerId = null;
+        
+        // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPlayers();
+            renderPlayers();
+        });
+        
+        // Ładowanie zawodników z localStorage
+        function loadPlayers() {
+            const savedPlayers = localStorage.getItem('basketballPlayers');
+            players = savedPlayers ? JSON.parse(savedPlayers) : [];
+        }
+        
+        // Zapisywanie zawodników do localStorage
+        function savePlayers() {
+            localStorage.setItem('basketballPlayers', JSON.stringify(players));
+        }
+        
+        // Renderowanie listy zawodników
+        function renderPlayers() {
+            const playersGrid = document.getElementById('playersGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (players.length === 0) {
+                playersGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            playersGrid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            playersGrid.innerHTML = players.map(player => `
+                <div class="player-card">
+                    <div class="player-header">
+                        <h3 class="player-name">${player.firstName} ${player.lastName}</h3>
+                        <div class="player-number">${player.jerseyNumber}</div>
+                    </div>
+                    
+                    <div class="player-details">
+                        <div class="player-detail">
+                            <div class="player-detail-label">Pozycja</div>
+                            <div class="player-detail-value">${getPositionName(player.position)}</div>
+                        </div>
+                        
+                        <div class="player-detail">
+                            <div class="player-detail-label">Wiek</div>
+                            <div class="player-detail-value">${calculateAge(player.birthDate)} lat</div>
+                        </div>
+                        
+                        <div class="player-detail">
+                            <div class="player-detail-label">Wzrost</div>
+                            <div class="player-detail-value">${player.height} cm</div>
+                        </div>
+                        
+                        <div class="player-detail">
+                            <div class="player-detail-label">Waga</div>
+                            <div class="player-detail-value">${player.weight} kg</div>
+                        </div>
+                        
+                        <div class="player-detail">
+                            <div class="player-detail-label">Doświadczenie</div>
+                            <div class="player-detail-value">${player.experience || 0} lat</div>
+                        </div>
+                        
+                        <div class="player-detail">
+                            <div class="player-detail-label">BMI</div>
+                            <div class="player-detail-value">${calculateBMI(player.height, player.weight)}</div>
+                        </div>
+                    </div>
+                    
+                    ${player.notes ? `<div style="margin-top: 10px; font-size: 14px; color: #6b7280; font-style: italic;">${player.notes}</div>` : ''}
+                    
+                    <div class="player-actions">
+                        <button class="action-btn stats-btn" onclick="viewPlayerStats('${player.id}')">
+                            <i class="fas fa-chart-line"></i> Statystyki
+                        </button>
+                        <button class="action-btn edit-btn" onclick="editPlayer('${player.id}')">
+                            <i class="fas fa-edit"></i> Edytuj
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deletePlayer('${player.id}')">
+                            <i class="fas fa-trash"></i> Usuń
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Filtrowanie zawodników
+        function filterPlayers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const positionFilter = document.getElementById('positionFilter').value;
+            
+            const filteredPlayers = players.filter(player => {
+                const matchesSearch = player.firstName.toLowerCase().includes(searchTerm) || 
+                                    player.lastName.toLowerCase().includes(searchTerm);
+                const matchesPosition = !positionFilter || player.position === positionFilter;
+                return matchesSearch && matchesPosition;
+            });
+            
+            // Tymczasowo zastąp listę zawodników
+            const originalPlayers = players;
+            players = filteredPlayers;
+            renderPlayers();
+            players = originalPlayers;
+        }
+        
+        // Otwórz modal dodawania
+        function openAddPlayerModal() {
+            editingPlayerId = null;
+            document.getElementById('modalTitle').textContent = 'Dodaj zawodnika';
+            document.getElementById('submitBtn').textContent = 'Dodaj zawodnika';
+            document.getElementById('playerForm').reset();
+            document.getElementById('playerModal').style.display = 'block';
+        }
+        
+        // Edytuj zawodnika
+        function editPlayer(playerId) {
+            const player = players.find(p => p.id === playerId);
+            if (!player) return;
+            
+            editingPlayerId = playerId;
+            document.getElementById('modalTitle').textContent = 'Edytuj zawodnika';
+            document.getElementById('submitBtn').textContent = 'Zapisz zmiany';
+            
+            // Wypełnij formularz
+            document.getElementById('firstName').value = player.firstName;
+            document.getElementById('lastName').value = player.lastName;
+            document.getElementById('birthDate').value = player.birthDate;
+            document.getElementById('jerseyNumber').value = player.jerseyNumber;
+            document.getElementById('position').value = player.position;
+            document.getElementById('height').value = player.height;
+            document.getElementById('weight').value = player.weight;
+            document.getElementById('experience').value = player.experience || '';
+            document.getElementById('notes').value = player.notes || '';
+            
+            document.getElementById('playerModal').style.display = 'block';
+        }
+        
+        // Usuń zawodnika
+        function deletePlayer(playerId) {
+            if (confirm('Czy na pewno chcesz usunąć tego zawodnika?')) {
+                players = players.filter(p => p.id !== playerId);
+                savePlayers();
+                renderPlayers();
+            }
+        }
+        
+        // Zamknij modal
+        function closeModal() {
+            document.getElementById('playerModal').style.display = 'none';
+        }
+        
+        // Obsługa formularza
+        document.getElementById('playerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                birthDate: document.getElementById('birthDate').value,
+                jerseyNumber: parseInt(document.getElementById('jerseyNumber').value),
+                position: document.getElementById('position').value,
+                height: parseInt(document.getElementById('height').value),
+                weight: parseFloat(document.getElementById('weight').value),
+                experience: parseInt(document.getElementById('experience').value) || 0,
+                notes: document.getElementById('notes').value.trim()
+            };
+            
+            // Walidacja
+            if (players.some(p => p.jerseyNumber === formData.jerseyNumber && p.id !== editingPlayerId)) {
+                alert('Numer koszulki jest już zajęty!');
+                return;
+            }
+            
+            if (editingPlayerId) {
+                // Edycja
+                const playerIndex = players.findIndex(p => p.id === editingPlayerId);
+                players[playerIndex] = { ...players[playerIndex], ...formData };
+            } else {
+                // Dodawanie
+                const newPlayer = {
+                    id: Date.now().toString(),
+                    ...formData,
+                    createdAt: new Date().toISOString()
+                };
+                players.push(newPlayer);
+            }
+            
+            savePlayers();
+            renderPlayers();
+            closeModal();
+        });
+        
+        // Funkcje pomocnicze
+        function getPositionName(position) {
+            const positions = {
+                'PG': 'Rozgrywający',
+                'SG': 'Rzucający obrońca',
+                'SF': 'Niski skrzydłowy',
+                'PF': 'Silny skrzydłowy',
+                'C': 'Środkowy'
+            };
+            return positions[position] || position;
+        }
+        
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+        
+        function calculateBMI(height, weight) {
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            return bmi.toFixed(1);
+        }
+        
+        function viewPlayerStats(playerId) {
+            alert('Statystyki zawodnika - w budowie');
+        }
+        
+        // Zamknij modal po kliknięciu poza nim
+        window.onclick = function(event) {
+            const modal = document.getElementById('playerModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
