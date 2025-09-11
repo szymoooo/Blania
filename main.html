@@ -430,31 +430,45 @@
 
                         eventItem.addEventListener('click', () => editEvent(event.id));
 
+                        // Ikona - kwadrat 2x2 linie tekstu
                         const icon = document.createElement('div');
                         icon.className = 'event-icon';
                         icon.style.backgroundImage = `url(${eventIcons[event.type]})`;
                         icon.style.backgroundSize = 'cover';
-                        icon.style.width = '32px';
-                        icon.style.height = '32px';
+                        icon.style.width = '48px';  // Większa ikona
+                        icon.style.height = '48px'; // Większa ikona
                         icon.style.backgroundPosition = 'center';
                         icon.style.backgroundRepeat = 'no-repeat';
+                        icon.style.borderRadius = '4px';
                         eventItem.appendChild(icon);
 
-                        const text = document.createElement('div');
-                        text.className = 'event-text';
-                        // Bezpieczne renderowanie - używamy textContent zamiast innerHTML
-                        const strong = document.createElement('strong');
-                        strong.textContent = `${event.date.split('T')[1].substring(0, 5)} ${event.name}`;
+                        // Kontener tekstu z dwoma liniami
+                        const textContainer = document.createElement('div');
+                        textContainer.className = 'event-text-container';
                         
-                        const br = document.createElement('br');
+                        // 1. linia - godzina + typ wydarzenia
+                        const firstLine = document.createElement('div');
+                        firstLine.className = 'event-first-line';
+                        const timeSpan = document.createElement('span');
+                        timeSpan.className = 'event-time';
+                        timeSpan.textContent = event.date.split('T')[1].substring(0, 5);
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'event-name';
+                        nameSpan.textContent = event.name;
+                        firstLine.appendChild(timeSpan);
+                        firstLine.appendChild(nameSpan);
                         
-                        const small = document.createElement('small');
-                        small.textContent = event.location;
+                        // 2. linia - lokalizacja (może być 2 linie)
+                        const secondLine = document.createElement('div');
+                        secondLine.className = 'event-second-line';
+                        const locationSpan = document.createElement('span');
+                        locationSpan.className = 'event-location';
+                        locationSpan.textContent = event.location;
+                        secondLine.appendChild(locationSpan);
                         
-                        text.appendChild(strong);
-                        text.appendChild(br);
-                        text.appendChild(small);
-                        eventItem.appendChild(text);
+                        textContainer.appendChild(firstLine);
+                        textContainer.appendChild(secondLine);
+                        eventItem.appendChild(textContainer);
 
                         dayElement.querySelector('.events-container').appendChild(eventItem);
                     }

@@ -124,47 +124,66 @@ p { margin-bottom: 15px; }
 /* ===== 6. EVENT STYLES ===== */
 .event-item {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px;
-    margin: 4px 0;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px;
+    margin: 6px 0;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    height: 80px;
+    min-height: 60px;
     cursor: pointer;
 }
 
 .event-icon {
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
     background-color: #eee;
     border-radius: 4px;
     flex-shrink: 0;
     background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.event-text {
+.event-text-container {
     flex-grow: 1;
-    text-align: left;
-    font-size: 14px;
     display: flex;
     flex-direction: column;
+    gap: 4px;
+    min-height: 48px;
     justify-content: center;
-    line-height: 1.2;
 }
 
-.event-text strong {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-    margin-bottom: 2px;
+.event-first-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-.event-text small {
+.event-time {
+    color: #007bff;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.event-name {
+    color: #333;
+    font-weight: 500;
+}
+
+.event-second-line {
     font-size: 12px;
-    margin-top: 2px;
+    color: #666;
+    line-height: 1.3;
+}
+
+.event-location {
+    display: block;
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
 .regeneration-text {
@@ -436,12 +455,12 @@ button:hover, .primary-btn:hover, .btn-prev-calendar:hover,
 
 /* ===== 14. NAVIGATION ===== */
 .navigation-buttons {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
-    gap: 50px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+    padding: 20px 0;
 }
 
 .notes-navigation {
