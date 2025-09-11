@@ -28,6 +28,7 @@
         .admin-container {
             display: flex;
             min-height: 100vh;
+            width: 100vw;
         }
         
         /* Sidebar */
@@ -40,6 +41,7 @@
             height: 100vh;
             overflow-y: auto;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
         
         .admin-logo {
@@ -79,6 +81,8 @@
             flex: 1;
             margin-left: 250px;
             padding: 20px;
+            width: calc(100vw - 250px);
+            max-width: none;
         }
         
         .admin-header {
@@ -176,48 +180,58 @@
         /* Modules Grid */
         .admin-modules-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
+            max-width: 100%;
         }
         
         .admin-module-card {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
             text-align: center;
             transition: all 0.3s;
             cursor: pointer;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
         }
         
         .admin-module-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
         .admin-module-icon {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             margin: 0 auto 15px;
-            border-radius: 15px;
+            border-radius: 12px;
             background-color: var(--light);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary);
-            font-size: 30px;
+            font-size: 24px;
         }
         
         .admin-module-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: var(--dark);
+            line-height: 1.2;
         }
         
         .admin-module-desc {
             color: #6b7280;
-            font-size: 14px;
+            font-size: 12px;
+            line-height: 1.3;
+            text-align: center;
         }
         
         /* Back to main button */
@@ -241,6 +255,24 @@
         }
         
         /* Responsywność */
+        @media (min-width: 1200px) {
+            .admin-modules-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .admin-modules-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 991px) {
+            .admin-modules-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
         @media (max-width: 992px) {
             .admin-sidebar {
                 width: 80px;
@@ -265,7 +297,7 @@
             }
             
             .admin-modules-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .admin-sidebar {
@@ -276,6 +308,16 @@
             
             .admin-main-content {
                 margin-left: 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .admin-modules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-module-card {
+                min-height: 150px;
             }
         }
     </style>
