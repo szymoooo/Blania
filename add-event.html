@@ -139,6 +139,52 @@
         // Inicjalizacja formularza
         handleEventTypeChange();
         setDefaultTime();
+        
+        // Funkcja zapisywania wydarzenia
+        function saveEvent() {
+            console.log('💾 Przycisk "Zapisz wydarzenie" został kliknięty!');
+            
+            const eventType = document.getElementById('event-type').value;
+            const eventName = document.getElementById('event-name').value;
+            const eventDate = document.getElementById('event-date').value;
+            const eventTime = document.getElementById('event-time').value;
+            const eventLocation = document.getElementById('event-location').value;
+            const isRecurring = document.getElementById('recurring').checked;
+            const eventNotes = document.getElementById('event-notes').value;
+            const reminder = document.getElementById('reminder').value;
+            
+            if (!eventName || !eventDate) {
+                alert('Proszę wypełnić nazwę wydarzenia i datę.');
+                return;
+            }
+            
+            const event = {
+                id: Date.now(),
+                type: eventType,
+                name: eventName,
+                date: eventDate,
+                time: eventTime,
+                location: eventLocation,
+                recurring: isRecurring,
+                notes: eventNotes,
+                reminder: reminder,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (storage.saveEvent(event)) {
+                console.log('✅ Wydarzenie zapisane pomyślnie');
+                window.location.href = 'main.html';
+            } else {
+                console.error('❌ Błąd podczas zapisywania wydarzenia');
+                alert('Błąd podczas zapisywania wydarzenia.');
+            }
+        }
+        
+        // Funkcja anulowania
+        function cancelEvent() {
+            console.log('❌ Przycisk "Anuluj" został kliknięty!');
+            window.location.href = 'main.html';
+        }
     </script>
 </body>
 </html>
