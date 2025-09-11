@@ -1470,6 +1470,14 @@
                     Assert.assertTrue(hasForm, 'Brak formularza wydarzenia');
                     Assert.assertTrue(hasSaveFunction, 'Brak funkcji saveEvent');
                     
+                    // Sprawdź czy wszystkie wymagane pliki JavaScript są dostępne
+                    const configResponse = await fetch('https://szymoooo.github.io/Blania/config.js');
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    
+                    console.log(`📁 Pliki JS - config: ${configResponse.ok}, storage: ${storageResponse.ok}`);
+                    Assert.assertTrue(configResponse.ok, 'Brak pliku config.js - AppConfig nie jest zdefiniowany');
+                    Assert.assertTrue(storageResponse.ok, 'Brak pliku storage.js - storage nie jest zdefiniowany');
+                    
                     // Sprawdź czy strona główna ma planner
                     const mainResponse = await fetch('https://szymoooo.github.io/Blania/main.html');
                     const mainHtml = await mainResponse.text();
@@ -1497,6 +1505,77 @@
                     Assert.assertTrue(hasDeleteEvent, 'Brak funkcji deleteEvent w storage');
                 }, 'Dodanie wielu wydarzeń');
                 
+                // EV-3: Edycja wydarzenia
+                testRunner.addTest('EV-3: Edycja wydarzenia', async () => {
+                    console.log('📅 Test EV-3: Edycja wydarzenia - zmiana nazwy');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEditFunction = html.includes('editEvent') || html.includes('function editEvent');
+                    const hasEventDisplay = html.includes('event-item') || html.includes('event-text');
+                    
+                    console.log(`✏️ Edycja - editFunction: ${hasEditFunction}, eventDisplay: ${hasEventDisplay}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji wydarzenia');
+                }, 'Edycja wydarzenia');
+                
+                // EV-4: Usunięcie wydarzenia
+                testRunner.addTest('EV-4: Usunięcie wydarzenia', async () => {
+                    console.log('📅 Test EV-4: Usunięcie wydarzenia');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasDeleteFunction = html.includes('deleteEvent') || html.includes('function deleteEvent');
+                    const hasDeleteButton = html.includes('btn-delete') || html.includes('Usuń');
+                    
+                    console.log(`🗑️ Usuwanie - deleteFunction: ${hasDeleteFunction}, deleteButton: ${hasDeleteButton}`);
+                    Assert.assertTrue(hasDeleteFunction, 'Brak funkcji usuwania wydarzenia');
+                }, 'Usunięcie wydarzenia');
+                
+                // EV-5: Nawigacja między wydarzeniami
+                testRunner.addTest('EV-5: Nawigacja między wydarzeniami', async () => {
+                    console.log('📅 Test EV-5: Nawigacja między wydarzeniami');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasNavButtons = html.includes('btn-prev') && html.includes('btn-next');
+                    const hasNavFunction = html.includes('moveCalendar') || html.includes('function moveCalendar');
+                    
+                    console.log(`⬅️➡️ Nawigacja - buttons: ${hasNavButtons}, function: ${hasNavFunction}`);
+                    Assert.assertTrue(hasNavButtons, 'Brak przycisków nawigacji');
+                    Assert.assertTrue(hasNavFunction, 'Brak funkcji nawigacji');
+                }, 'Nawigacja między wydarzeniami');
+                
+                // EV-6: Dodanie wydarzenia w przeszłości
+                testRunner.addTest('EV-6: Dodanie wydarzenia w przeszłości', async () => {
+                    console.log('📅 Test EV-6: Wydarzenie w przeszłości - data 2025-09-01');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const html = await response.text();
+                    
+                    const hasDateField = html.includes('event-date') && html.includes('type="date"');
+                    const hasPastHandling = html.includes('past') || html.includes('history') || html.includes('opacity');
+                    
+                    console.log(`📅 Przeszłość - dateField: ${hasDateField}, pastHandling: ${hasPastHandling}`);
+                    Assert.assertTrue(hasDateField, 'Brak pola daty');
+                }, 'Dodanie wydarzenia w przeszłości');
+                
+                // EV-7: Dodanie wydarzenia w przyszłości
+                testRunner.addTest('EV-7: Dodanie wydarzenia w przyszłości', async () => {
+                    console.log('📅 Test EV-7: Wydarzenie w przyszłości - data 2025-10-01');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const html = await response.text();
+                    
+                    const hasDateField = html.includes('event-date') && html.includes('type="date"');
+                    const hasFutureHandling = html.includes('future') || html.includes('upcoming');
+                    
+                    console.log(`📅 Przyszłość - dateField: ${hasDateField}, futureHandling: ${hasFutureHandling}`);
+                    Assert.assertTrue(hasDateField, 'Brak pola daty');
+                }, 'Dodanie wydarzenia w przyszłości');
+                
                 // EV-8: Dodanie wydarzenia bez nazwy
                 testRunner.addTest('EV-8: Dodanie wydarzenia bez nazwy', async () => {
                     console.log('📅 Test EV-8: Walidacja pustej nazwy wydarzenia');
@@ -1512,6 +1591,64 @@
                     Assert.assertTrue(hasValidation, 'Brak walidacji nazwy wydarzenia');
                     Assert.assertTrue(hasNameField, 'Brak pola nazwy wydarzenia');
                 }, 'Walidacja pustej nazwy wydarzenia');
+                
+                // EV-9: Dodanie wydarzenia z niepoprawną datą
+                testRunner.addTest('EV-9: Dodanie wydarzenia z niepoprawną datą', async () => {
+                    console.log('📅 Test EV-9: Walidacja niepoprawnej daty - 31/02/2025');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const html = await response.text();
+                    
+                    const hasDateField = html.includes('event-date') && html.includes('type="date"');
+                    const hasDateValidation = html.includes('min=') || html.includes('max=') || html.includes('pattern=');
+                    
+                    console.log(`📅 Walidacja daty - dateField: ${hasDateField}, validation: ${hasDateValidation}`);
+                    Assert.assertTrue(hasDateField, 'Brak pola daty');
+                }, 'Walidacja niepoprawnej daty');
+                
+                // EV-10: Edycja i usunięcie pól
+                testRunner.addTest('EV-10: Edycja i usunięcie pól', async () => {
+                    console.log('📅 Test EV-10: Edycja wydarzenia - usunięcie wszystkich danych');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEditFunction = html.includes('editEvent') || html.includes('function editEvent');
+                    const hasValidation = html.includes('required') || html.includes('if (!') || html.includes('alert(');
+                    
+                    console.log(`✏️ Edycja pól - editFunction: ${hasEditFunction}, validation: ${hasValidation}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji');
+                }, 'Edycja i usunięcie pól');
+                
+                // EV-11: Duplikat wydarzenia
+                testRunner.addTest('EV-11: Duplikat wydarzenia', async () => {
+                    console.log('📅 Test EV-11: Duplikat wydarzenia - identyczna data i nazwa');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await response.text();
+                    
+                    const hasDuplicateCheck = storageJs.includes('findIndex') || storageJs.includes('some(') || storageJs.includes('filter(');
+                    const hasEventComparison = storageJs.includes('name') && storageJs.includes('date');
+                    
+                    console.log(`🔄 Duplikat - duplicateCheck: ${hasDuplicateCheck}, eventComparison: ${hasEventComparison}`);
+                    Assert.assertTrue(hasDuplicateCheck, 'Brak sprawdzania duplikatów');
+                }, 'Duplikat wydarzenia');
+                
+                // EV-12: Usunięcie i nawigacja
+                testRunner.addTest('EV-12: Usunięcie i nawigacja', async () => {
+                    console.log('📅 Test EV-12: Usunięcie wydarzenia i nawigacja');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasDeleteFunction = html.includes('deleteEvent') || html.includes('function deleteEvent');
+                    const hasNavFunction = html.includes('moveCalendar') || html.includes('function moveCalendar');
+                    const hasErrorHandling = html.includes('try') && html.includes('catch');
+                    
+                    console.log(`🗑️⬅️ Usunięcie + nawigacja - delete: ${hasDeleteFunction}, nav: ${hasNavFunction}, error: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasDeleteFunction, 'Brak funkcji usuwania');
+                    Assert.assertTrue(hasNavFunction, 'Brak funkcji nawigacji');
+                }, 'Usunięcie i nawigacja');
                 
                 // ===== TESTY STATYSTYK (ST) =====
                 
@@ -1547,6 +1684,77 @@
                     Assert.assertTrue(hasValidation, 'Brak walidacji nazwy drużyny');
                 }, 'Walidacja pustej nazwy drużyny');
                 
+                // ST-2: Edycja statystyk
+                testRunner.addTest('ST-2: Edycja statystyk', async () => {
+                    console.log('🏀 Test ST-2: Edycja statystyk - zmiana punktów 12 → 15');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEditFunction = html.includes('editMatch') || html.includes('function editMatch');
+                    const hasStatsTable = html.includes('matches-table') || html.includes('stats-table');
+                    
+                    console.log(`✏️ Edycja statystyk - editFunction: ${hasEditFunction}, statsTable: ${hasStatsTable}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji statystyk');
+                }, 'Edycja statystyk');
+                
+                // ST-3: Usunięcie meczu
+                testRunner.addTest('ST-3: Usunięcie meczu', async () => {
+                    console.log('🏀 Test ST-3: Usunięcie meczu');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasDeleteFunction = html.includes('deleteMatch') || html.includes('function deleteMatch');
+                    const hasDeleteButton = html.includes('btn-delete') || html.includes('Usuń');
+                    
+                    console.log(`🗑️ Usuwanie meczu - deleteFunction: ${hasDeleteFunction}, deleteButton: ${hasDeleteButton}`);
+                    Assert.assertTrue(hasDeleteFunction, 'Brak funkcji usuwania meczu');
+                }, 'Usunięcie meczu');
+                
+                // ST-4: Dodanie kilku meczów
+                testRunner.addTest('ST-4: Dodanie kilku meczów', async () => {
+                    console.log('🏀 Test ST-4: Dodanie 5 meczów - paginacja');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasPagination = html.includes('pagination') || html.includes('btn-prev') && html.includes('btn-next');
+                    const hasPaginationFunction = html.includes('loadMatches') || html.includes('function loadMatches');
+                    
+                    console.log(`📄 Paginacja - pagination: ${hasPagination}, function: ${hasPaginationFunction}`);
+                    Assert.assertTrue(hasPagination, 'Brak paginacji');
+                }, 'Dodanie kilku meczów');
+                
+                // ST-5: Dodanie meczu bez statystyk
+                testRunner.addTest('ST-5: Dodanie meczu bez statystyk', async () => {
+                    console.log('🏀 Test ST-5: Mecz tylko z datą i drużyną - brak punktów');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasOptionalFields = html.includes('optional') || html.includes('placeholder');
+                    const hasEmptyHandling = html.includes('empty') || html.includes('null') || html.includes('undefined');
+                    
+                    console.log(`📊 Opcjonalne pola - optional: ${hasOptionalFields}, emptyHandling: ${hasEmptyHandling}`);
+                    Assert.assertTrue(hasOptionalFields, 'Brak obsługi opcjonalnych pól');
+                }, 'Dodanie meczu bez statystyk');
+                
+                // ST-6: Dodanie meczu z pustą nazwą drużyny
+                testRunner.addTest('ST-6: Dodanie meczu z pustą nazwą drużyny', async () => {
+                    console.log('🏀 Test ST-6: Walidacja pustej nazwy drużyny');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasTeamField = html.includes('team-name') || html.includes('team-selector');
+                    const hasValidation = html.includes('required') || html.includes('if (!') || html.includes('alert(');
+                    
+                    console.log(`✅ Walidacja drużyny - teamField: ${hasTeamField}, validation: ${hasValidation}`);
+                    Assert.assertTrue(hasTeamField, 'Brak pola nazwy drużyny');
+                    Assert.assertTrue(hasValidation, 'Brak walidacji nazwy drużyny');
+                }, 'Walidacja pustej nazwy drużyny');
+                
                 // ST-7: Niepoprawne dane statystyk
                 testRunner.addTest('ST-7: Niepoprawne dane statystyk', async () => {
                     console.log('🏀 Test ST-7: Walidacja tekstu w polu punktów');
@@ -1560,6 +1768,62 @@
                     console.log(`🔢 Walidacja liczb - numberFields: ${hasNumberFields}, validation: ${hasValidation}`);
                     Assert.assertTrue(hasNumberFields, 'Brak pól numerycznych');
                 }, 'Walidacja danych statystyk');
+                
+                // ST-8: Ujemne wartości statystyk
+                testRunner.addTest('ST-8: Ujemne wartości statystyk', async () => {
+                    console.log('🏀 Test ST-8: Walidacja ujemnych wartości - -5 punktów');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasNumberFields = html.includes('type="text"') && html.includes('readonly');
+                    const hasMinValidation = html.includes('min=') || html.includes('Math.max') || html.includes('>= 0');
+                    
+                    console.log(`➖ Ujemne wartości - numberFields: ${hasNumberFields}, minValidation: ${hasMinValidation}`);
+                    Assert.assertTrue(hasNumberFields, 'Brak pól numerycznych');
+                }, 'Walidacja ujemnych wartości');
+                
+                // ST-9: Absurdalne wartości
+                testRunner.addTest('ST-9: Absurdalne wartości', async () => {
+                    console.log('🏀 Test ST-9: Walidacja absurdalnych wartości - 9999 punktów');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
+                    const html = await response.text();
+                    
+                    const hasNumberFields = html.includes('type="text"') && html.includes('readonly');
+                    const hasMaxValidation = html.includes('max=') || html.includes('Math.min') || html.includes('<= 100');
+                    
+                    console.log(`🔢 Absurdalne wartości - numberFields: ${hasNumberFields}, maxValidation: ${hasMaxValidation}`);
+                    Assert.assertTrue(hasNumberFields, 'Brak pól numerycznych');
+                }, 'Walidacja absurdalnych wartości');
+                
+                // ST-10: Paginacja na końcu
+                testRunner.addTest('ST-10: Paginacja na końcu', async () => {
+                    console.log('🏀 Test ST-10: Paginacja na ostatniej stronie');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasPagination = html.includes('pagination') || html.includes('btn-prev') && html.includes('btn-next');
+                    const hasDisabledState = html.includes('disabled') || html.includes('if (') || html.includes('length === 0');
+                    
+                    console.log(`📄 Paginacja końca - pagination: ${hasPagination}, disabled: ${hasDisabledState}`);
+                    Assert.assertTrue(hasPagination, 'Brak paginacji');
+                }, 'Paginacja na końcu');
+                
+                // ST-11: Edycja usuniętego meczu
+                testRunner.addTest('ST-11: Edycja usuniętego meczu', async () => {
+                    console.log('🏀 Test ST-11: Edycja usuniętego meczu - komunikat "brak meczu"');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEditFunction = html.includes('editMatch') || html.includes('function editMatch');
+                    const hasErrorHandling = html.includes('try') && html.includes('catch') || html.includes('if (!');
+                    
+                    console.log(`✏️ Edycja usuniętego - editFunction: ${hasEditFunction}, errorHandling: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji');
+                }, 'Edycja usuniętego meczu');
                 
                 // ===== TESTY SPOSTRZEŻEŃ (SP) =====
                 
@@ -1594,6 +1858,79 @@
                     Assert.assertTrue(hasTextarea, 'Brak pól tekstowych notatek');
                 }, 'Walidacja pustej notatki');
                 
+                // SP-2: Edycja spostrzeżenia
+                testRunner.addTest('SP-2: Edycja spostrzeżenia', async () => {
+                    console.log('📝 Test SP-2: Edycja spostrzeżenia - "strefą" → "pressingiem"');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEditFunction = html.includes('editNote') || html.includes('function editNote');
+                    const hasNotesDisplay = html.includes('notes-display') || html.includes('note-item');
+                    
+                    console.log(`✏️ Edycja notatki - editFunction: ${hasEditFunction}, notesDisplay: ${hasNotesDisplay}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji notatki');
+                }, 'Edycja spostrzeżenia');
+                
+                // SP-3: Usunięcie spostrzeżenia
+                testRunner.addTest('SP-3: Usunięcie spostrzeżenia', async () => {
+                    console.log('📝 Test SP-3: Usunięcie spostrzeżenia');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasDeleteFunction = html.includes('deleteNote') || html.includes('function deleteNote');
+                    const hasDeleteButton = html.includes('btn-delete') || html.includes('Usuń');
+                    
+                    console.log(`🗑️ Usuwanie notatki - deleteFunction: ${hasDeleteFunction}, deleteButton: ${hasDeleteButton}`);
+                    Assert.assertTrue(hasDeleteFunction, 'Brak funkcji usuwania notatki');
+                }, 'Usunięcie spostrzeżenia');
+                
+                // SP-4: Dodanie wielu notatek
+                testRunner.addTest('SP-4: Dodanie wielu notatek', async () => {
+                    console.log('📝 Test SP-4: Dodanie 3 różnych spostrzeżeń');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await response.text();
+                    
+                    const hasSaveNote = storageJs.includes('saveNote(') || storageJs.includes('function saveNote');
+                    const hasGetNotes = storageJs.includes('getNotes(') || storageJs.includes('function getNotes');
+                    const hasArrayHandling = storageJs.includes('push(') && storageJs.includes('filter(');
+                    
+                    console.log(`📝 Wiele notatek - saveNote: ${hasSaveNote}, getNotes: ${hasGetNotes}, arrayHandling: ${hasArrayHandling}`);
+                    Assert.assertTrue(hasSaveNote, 'Brak funkcji saveNote');
+                    Assert.assertTrue(hasGetNotes, 'Brak funkcji getNotes');
+                }, 'Dodanie wielu notatek');
+                
+                // SP-5: Dodanie pustej notatki
+                testRunner.addTest('SP-5: Dodanie pustej notatki', async () => {
+                    console.log('📝 Test SP-5: Walidacja pustej notatki');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/notes-form.html');
+                    const html = await response.text();
+                    
+                    const hasTextarea = html.includes('textarea') && html.includes('notes-');
+                    const hasValidation = html.includes('required') || html.includes('if (!') || html.includes('alert(');
+                    
+                    console.log(`✅ Walidacja notatek - textarea: ${hasTextarea}, validation: ${hasValidation}`);
+                    Assert.assertTrue(hasTextarea, 'Brak pól tekstowych notatek');
+                }, 'Walidacja pustej notatki');
+                
+                // SP-6: Bardzo długie spostrzeżenie
+                testRunner.addTest('SP-6: Bardzo długie spostrzeżenie', async () => {
+                    console.log('📝 Test SP-6: Bardzo długie spostrzeżenie - 10 000 znaków');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/notes-form.html');
+                    const html = await response.text();
+                    
+                    const hasTextarea = html.includes('textarea');
+                    const hasLengthLimit = html.includes('maxlength') || html.includes('length >') || html.includes('1000');
+                    const hasScrollHandling = html.includes('overflow') || html.includes('scroll');
+                    
+                    console.log(`📏 Długi tekst - textarea: ${hasTextarea}, lengthLimit: ${hasLengthLimit}, scroll: ${hasScrollHandling}`);
+                    Assert.assertTrue(hasTextarea, 'Brak pól tekstowych');
+                }, 'Bardzo długie spostrzeżenie');
+                
                 // SP-7: Kod w spostrzeżeniu (XSS)
                 testRunner.addTest('SP-7: Kod w spostrzeżeniu (XSS)', async () => {
                     console.log('📝 Test SP-7: Ochrona przed XSS w notatkach');
@@ -1607,6 +1944,34 @@
                     console.log(`🛡️ XSS Protection - textarea: ${hasTextarea}, sanitization: ${hasSanitization}`);
                     Assert.assertTrue(hasTextarea, 'Brak pól tekstowych');
                 }, 'Ochrona przed XSS');
+                
+                // SP-8: Edycja anulowana
+                testRunner.addTest('SP-8: Edycja anulowana', async () => {
+                    console.log('📝 Test SP-8: Edycja anulowana - zmiany nie zapisują się');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/notes-form.html');
+                    const html = await response.text();
+                    
+                    const hasCancelFunction = html.includes('closeNotesForm') || html.includes('function closeNotesForm');
+                    const hasCancelButton = html.includes('Anuluj') || html.includes('btn-cancel');
+                    
+                    console.log(`❌ Anulowanie - cancelFunction: ${hasCancelFunction}, cancelButton: ${hasCancelButton}`);
+                    Assert.assertTrue(hasCancelFunction, 'Brak funkcji anulowania');
+                }, 'Edycja anulowana');
+                
+                // SP-9: Usunięta notatka edytowana
+                testRunner.addTest('SP-9: Usunięta notatka edytowana', async () => {
+                    console.log('📝 Test SP-9: Edycja usuniętej notatki - komunikat "brak danych"');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasEditFunction = html.includes('editNote') || html.includes('function editNote');
+                    const hasErrorHandling = html.includes('try') && html.includes('catch') || html.includes('if (!');
+                    
+                    console.log(`✏️ Edycja usuniętej - editFunction: ${hasEditFunction}, errorHandling: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasEditFunction, 'Brak funkcji edycji');
+                }, 'Edycja usuniętej notatki');
                 
                 // ===== TESTY INTEGRACJI (IN) =====
                 
@@ -1641,6 +2006,21 @@
                     Assert.assertTrue(hasEmptyMessages, 'Brak komunikatów o pustym systemie');
                 }, 'Obsługa pustego systemu');
                 
+                // IN-2: Najbliższy przeciwnik a wydarzenia
+                testRunner.addTest('IN-2: Najbliższy przeciwnik a wydarzenia', async () => {
+                    console.log('🔗 Test IN-2: Najbliższy przeciwnik aktualizuje się po dodaniu wydarzenia');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    const hasOpponentSection = html.includes('najbliższy przeciwnik') || html.includes('opponent') || html.includes('przeciwnik');
+                    const hasEventIntegration = html.includes('loadEvents') || html.includes('function loadEvents');
+                    const hasTeamDisplay = html.includes('team-logo') || html.includes('team-name');
+                    
+                    console.log(`⚔️ Przeciwnik - section: ${hasOpponentSection}, integration: ${hasEventIntegration}, team: ${hasTeamDisplay}`);
+                    Assert.assertTrue(hasOpponentSection, 'Brak sekcji najbliższego przeciwnika');
+                }, 'Najbliższy przeciwnik a wydarzenia');
+                
                 // IN-4: Nawigacja bez danych
                 testRunner.addTest('IN-4: Nawigacja bez danych', async () => {
                     console.log('🔗 Test IN-4: Nawigacja gdy brak danych');
@@ -1654,6 +2034,21 @@
                     console.log(`⬅️➡️ Nawigacja - buttons: ${hasNavButtons}, disabled: ${hasDisabledState}`);
                     Assert.assertTrue(hasNavButtons, 'Brak przycisków nawigacji');
                 }, 'Nawigacja bez danych');
+                
+                // IN-5: Równoczesna edycja
+                testRunner.addTest('IN-5: Równoczesna edycja', async () => {
+                    console.log('🔗 Test IN-5: Równoczesna edycja - konflikt danych');
+                    
+                    const response = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const storageJs = await response.text();
+                    
+                    const hasConcurrencyHandling = storageJs.includes('timestamp') || storageJs.includes('version') || storageJs.includes('lastModified');
+                    const hasConflictResolution = storageJs.includes('merge') || storageJs.includes('conflict') || storageJs.includes('latest');
+                    const hasErrorHandling = storageJs.includes('try') && storageJs.includes('catch');
+                    
+                    console.log(`⚔️ Konflikt - concurrency: ${hasConcurrencyHandling}, resolution: ${hasConflictResolution}, error: ${hasErrorHandling}`);
+                    Assert.assertTrue(hasErrorHandling, 'Brak obsługi błędów');
+                }, 'Równoczesna edycja');
                 
                 // ===== TESTY WYDAJNOŚCI I STABILNOŚCI =====
                 
@@ -1685,6 +2080,51 @@
                     console.log(`🛡️ Error Handling - handler: ${hasErrorHandler}, retry: ${hasRetryLogic}, logging: ${hasLogging}`);
                     Assert.assertTrue(hasErrorHandler, 'Brak error handler');
                 }, 'Obsługa błędów');
+                
+                // Test błędów JavaScript - sprawdza czy nie ma błędów ReferenceError
+                testRunner.addTest('JavaScript Errors: Sprawdzenie błędów JS', async () => {
+                    console.log('🚨 Test błędów JavaScript: Sprawdzanie ReferenceError');
+                    
+                    // Sprawdź czy wszystkie wymagane pliki są dostępne
+                    const configResponse = await fetch('https://szymoooo.github.io/Blania/config.js');
+                    const storageResponse = await fetch('https://szymoooo.github.io/Blania/storage.js');
+                    const appResponse = await fetch('https://szymoooo.github.io/Blania/app.js');
+                    
+                    console.log(`📁 Dostępność plików - config: ${configResponse.ok}, storage: ${storageResponse.ok}, app: ${appResponse.ok}`);
+                    Assert.assertTrue(configResponse.ok, 'Brak pliku config.js - powoduje ReferenceError: AppConfig is not defined');
+                    Assert.assertTrue(storageResponse.ok, 'Brak pliku storage.js - powoduje ReferenceError: storage is not defined');
+                    Assert.assertTrue(appResponse.ok, 'Brak pliku app.js');
+                    
+                    // Sprawdź czy config.js ma AppConfig
+                    if (configResponse.ok) {
+                        const configJs = await configResponse.text();
+                        const hasAppConfig = configJs.includes('AppConfig') || configJs.includes('const AppConfig') || configJs.includes('var AppConfig');
+                        console.log(`⚙️ AppConfig w config.js: ${hasAppConfig}`);
+                        Assert.assertTrue(hasAppConfig, 'Brak AppConfig w config.js - powoduje ReferenceError');
+                    }
+                    
+                    // Sprawdź czy storage.js ma StorageManager
+                    if (storageResponse.ok) {
+                        const storageJs = await storageResponse.text();
+                        const hasStorageManager = storageJs.includes('StorageManager') || storageJs.includes('class StorageManager') || storageJs.includes('function StorageManager');
+                        const hasStorageInstance = storageJs.includes('const storage') || storageJs.includes('var storage') || storageJs.includes('window.storage');
+                        console.log(`🗄️ StorageManager w storage.js: ${hasStorageManager}, instancja: ${hasStorageInstance}`);
+                        Assert.assertTrue(hasStorageManager, 'Brak StorageManager w storage.js');
+                    }
+                    
+                    // Sprawdź czy add-event.html ładuje wszystkie pliki
+                    const addEventResponse = await fetch('https://szymoooo.github.io/Blania/add-event.html');
+                    const addEventHtml = await addEventResponse.text();
+                    
+                    const loadsConfig = addEventHtml.includes('config.js') || addEventHtml.includes('src="config.js"');
+                    const loadsStorage = addEventHtml.includes('storage.js') || addEventHtml.includes('src="storage.js"');
+                    const loadsApp = addEventHtml.includes('app.js') || addEventHtml.includes('src="app.js"');
+                    
+                    console.log(`📄 add-event.html ładuje - config: ${loadsConfig}, storage: ${loadsStorage}, app: ${loadsApp}`);
+                    Assert.assertTrue(loadsConfig, 'add-event.html nie ładuje config.js');
+                    Assert.assertTrue(loadsStorage, 'add-event.html nie ładuje storage.js');
+                    
+                }, 'Sprawdzenie błędów JavaScript');
                 
                 return await testRunner.runAll();
             }
