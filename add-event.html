@@ -105,7 +105,6 @@
         </form>
     </div>
 
-    <script src="storage.js"></script>
     <script src="eventHandlers.js"></script>
     <script>
         // Wczytaj edytowane wydarzenie (jeśli istnieje)
@@ -149,7 +148,7 @@
             const eventDate = document.getElementById('event-date').value;
             const eventTime = document.getElementById('event-time').value;
             const eventLocation = document.getElementById('event-location').value;
-            const isRecurring = document.getElementById('recurring').checked;
+            const isRecurring = document.getElementById('event-repeat').checked;
             const eventNotes = document.getElementById('event-notes').value;
             const reminder = document.getElementById('reminder').value;
             
