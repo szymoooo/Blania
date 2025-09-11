@@ -163,7 +163,7 @@ try {
         try {
             $pdo = connectToDatabase($config);
             break;
-        } catch (PDOException $e) {
+    } catch (PDOException $e) {
             $lastException = $e;
             if ($i < $config['max_retries'] - 1) {
                 sleep(pow(2, $i)); // Exponential backoff

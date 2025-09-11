@@ -293,9 +293,6 @@
              * Uruchamia wszystkie testy
              */
             async runAllTests() {
-                // Ustaw flagę testów
-                window.isRunningTests = true;
-                
                 this.showLoading();
                 this.clearOutput();
                 
@@ -385,8 +382,6 @@
                     console.error('❌ Krytyczny błąd podczas uruchamiania testów:', error);
                     this.showError('Krytyczny błąd podczas uruchamiania testów: ' + error.message);
                 } finally {
-                    // Wyłącz flagę testów
-                    window.isRunningTests = false;
                     this.hideLoading();
                 }
             }
@@ -395,9 +390,6 @@
              * Uruchamia testy Storage
              */
             async runStorageTests() {
-                // Ustaw flagę testów
-                window.isRunningTests = true;
-                
                 this.showLoading();
                 this.clearOutput();
                 
@@ -411,8 +403,6 @@
                     console.error('Błąd podczas uruchamiania testów Storage:', error);
                     this.showError('Błąd podczas uruchamiania testów Storage: ' + error.message);
                 } finally {
-                    // Wyłącz flagę testów
-                    window.isRunningTests = false;
                     this.hideLoading();
                 }
             }
@@ -421,9 +411,6 @@
              * Uruchamia testy Error Handler
              */
             async runErrorTests() {
-                // Ustaw flagę testów
-                window.isRunningTests = true;
-                
                 this.showLoading();
                 this.clearOutput();
                 
@@ -437,8 +424,6 @@
                     console.error('Błąd podczas uruchamiania testów Error Handler:', error);
                     this.showError('Błąd podczas uruchamiania testów Error Handler: ' + error.message);
                 } finally {
-                    // Wyłącz flagę testów
-                    window.isRunningTests = false;
                     this.hideLoading();
                 }
             }
