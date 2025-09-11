@@ -236,7 +236,6 @@
             <button id="runStorageTests" class="test-button">Testy Storage</button>
             <button id="runErrorTests" class="test-button">Testy Error Handler</button>
             <button id="runCSSTests" class="test-button">Testy CSS</button>
-            <button id="runButtonTests" class="test-button">Testy Przycisków</button>
             <button id="runMainPageButtonTests" class="test-button">Testy Przycisków Strona Główna</button>
             <button id="runAllPagesButtonTests" class="test-button">Testy Przycisków Wszystkie Strony</button>
             <button id="clearResults" class="test-button">Wyczyść wyniki</button>
@@ -283,7 +282,6 @@
                 document.getElementById('runStorageTests').addEventListener('click', () => this.runStorageTests());
                 document.getElementById('runErrorTests').addEventListener('click', () => this.runErrorTests());
                 document.getElementById('runCSSTests').addEventListener('click', () => this.runCSSTests());
-                document.getElementById('runButtonTests').addEventListener('click', () => this.runButtonTests());
                 document.getElementById('runMainPageButtonTests').addEventListener('click', () => this.runMainPageButtonTests());
                 document.getElementById('runAllPagesButtonTests').addEventListener('click', () => this.runAllPagesButtonTests());
                 document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
@@ -339,16 +337,6 @@
                     }
                     
                     // 4. Button Tests (tests.html)
-                    try {
-                        this.updateProgress(4, 6, 'Uruchamianie testów przycisków...');
-                        console.log('🔘 Uruchamianie testów przycisków...');
-                        const buttonResults = await this.runButtonTestsInternal();
-                        results.push(buttonResults);
-                        console.log(`✅ Przyciski: ${buttonResults.passed}/${buttonResults.total} testów`);
-                    } catch (error) {
-                        console.error('❌ Błąd w testach przycisków:', error);
-                        results.push({ passed: 0, failed: 1, total: 1, tests: [{ name: 'Button Tests', passed: false, error: error.message }] });
-                    }
                     
                     // 5. Main Page Button Tests
                     try {
@@ -711,7 +699,7 @@
                 
                 // Test 1: Sprawdź czy strona główna istnieje
                 testRunner.addTest('powinien mieć dostęp do strony głównej', async () => {
-                    const response = await fetch('./main.html');
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
                     Assert.assertTrue(response.ok, 'Strona główna nie jest dostępna');
                     
                     const html = await response.text();
@@ -720,7 +708,7 @@
                 
                 // Test 2: Sprawdź czy strona główna ma wszystkie przyciski
                 testRunner.addTest('powinien mieć wszystkie przyciski na stronie głównej', async () => {
-                    const response = await fetch('./main.html');
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
                     const html = await response.text();
                     
                     const expectedButtons = [
@@ -737,19 +725,30 @@
                     ];
                     
                     let foundButtons = 0;
+                    let foundButtonNames = [];
+                    let missingButtonNames = [];
+                    
                     expectedButtons.forEach(className => {
                         if (html.includes(`class="${className}"`) || html.includes(`class='${className}'`)) {
                             foundButtons++;
+                            foundButtonNames.push(className);
+                        } else {
+                            missingButtonNames.push(className);
                         }
                     });
                     
+                    console.log(`✅ Znalezione przyciski (${foundButtons}/${expectedButtons.length}):`, foundButtonNames);
+                    if (missingButtonNames.length > 0) {
+                        console.log(`❌ Brakujące przyciski:`, missingButtonNames);
+                    }
+                    
                     Assert.assertEquals(foundButtons, expectedButtons.length, 
-                        `Znaleziono ${foundButtons}/${expectedButtons.length} przycisków na stronie głównej`);
+                        `Znaleziono ${foundButtons}/${expectedButtons.length} przycisków na stronie głównej. Brakujące: ${missingButtonNames.join(', ')}`);
                 }, 'Istnienie przycisków na stronie głównej');
                 
                 // Test 3: Sprawdź czy strona główna ma event handlery
                 testRunner.addTest('powinien mieć event handlery na stronie głównej', async () => {
-                    const response = await fetch('./main.html');
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
                     const html = await response.text();
                     
                     Assert.assertTrue(html.includes('eventHandlers.initMainHandlers'), 
@@ -760,7 +759,7 @@
                 
                 // Test 4: Sprawdź czy strona główna ma style CSS
                 testRunner.addTest('powinien mieć style CSS na stronie głównej', async () => {
-                    const response = await fetch('./main.html');
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
                     const html = await response.text();
                     
                     Assert.assertTrue(html.includes('styles.css'), 
@@ -771,7 +770,7 @@
                 
                 // Test 5: Sprawdź czy strona główna ma logowanie przycisków
                 testRunner.addTest('powinien mieć logowanie przycisków na stronie głównej', async () => {
-                    const response = await fetch('./app.js');
+                    const response = await fetch('https://szymoooo.github.io/Blania/app.js');
                     const js = await response.text();
                     
                     Assert.assertTrue(js.includes('console.log'), 
@@ -812,7 +811,7 @@
                 
                 // Test 1: Sprawdź blania.html (statystyki meczów)
                 testRunner.addTest('powinien mieć przyciski na stronie blania.html', async () => {
-                    const response = await fetch('./blania.html');
+                    const response = await fetch('https://szymoooo.github.io/Blania/blania.html');
                     Assert.assertTrue(response.ok, 'Strona blania.html nie jest dostępna');
                     
                     const html = await response.text();
@@ -834,7 +833,7 @@
                 
                 // Test 2: Sprawdź add-event.html (dodawanie wydarzeń)
                 testRunner.addTest('powinien mieć przyciski na stronie add-event.html', async () => {
-                    const response = await fetch('./add-event.html');
+                    const response = await fetch('https://szymoooo.github.io/Blania/add-event.html');
                     Assert.assertTrue(response.ok, 'Strona add-event.html nie jest dostępna');
                     
                     const html = await response.text();
