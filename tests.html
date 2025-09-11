@@ -829,6 +829,44 @@
                     Assert.assertTrue(hasStatsButtons, 'Brak przycisków nawigacji statystyk');
                 }, 'Komunikat o braku statystyk');
                 
+                // Test 7: Sprawdź czy przyciski mają odpowiednie przekierowania
+                testRunner.addTest('powinien mieć odpowiednie przekierowania między stronami', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy przycisk "Dodaj wydarzenie" ma przekierowanie do add-event.html
+                    const hasAddEventRedirect = html.includes('add-event.html') || html.includes('addEvent()');
+                    const hasAddEventOnclick = html.includes('onclick="addEvent()"') || html.includes('onclick=\'addEvent()\'');
+                    
+                    // Sprawdź czy są linki do innych stron
+                    const hasBlaniaLink = html.includes('blania.html');
+                    const hasNotesFormLink = html.includes('notes-form.html');
+                    
+                    console.log(`🔗 Przekierowania - Dodaj wydarzenie: ${hasAddEventRedirect}, Onclick: ${hasAddEventOnclick}`);
+                    console.log(`🔗 Linki - Blania: ${hasBlaniaLink}, Notes Form: ${hasNotesFormLink}`);
+                    
+                    Assert.assertTrue(hasAddEventRedirect || hasAddEventOnclick, 'Brak przekierowania do add-event.html');
+                }, 'Przekierowania między stronami');
+                
+                // Test 8: Sprawdź czy funkcje JavaScript są zdefiniowane
+                testRunner.addTest('powinien mieć zdefiniowane funkcje JavaScript', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy są zdefiniowane funkcje
+                    const hasMoveCalendar = html.includes('function moveCalendar') || html.includes('moveCalendar(');
+                    const hasAddEvent = html.includes('function addEvent') || html.includes('addEvent(');
+                    const hasSetTodayDate = html.includes('function setTodayDate') || html.includes('setTodayDate(');
+                    const hasGenerateCalendar = html.includes('function generateCalendar') || html.includes('generateCalendar(');
+                    
+                    console.log(`⚙️ Funkcje JS - moveCalendar: ${hasMoveCalendar}, addEvent: ${hasAddEvent}, setTodayDate: ${hasSetTodayDate}, generateCalendar: ${hasGenerateCalendar}`);
+                    
+                    Assert.assertTrue(hasMoveCalendar, 'Brak funkcji moveCalendar');
+                    Assert.assertTrue(hasAddEvent, 'Brak funkcji addEvent');
+                    Assert.assertTrue(hasSetTodayDate, 'Brak funkcji setTodayDate');
+                    Assert.assertTrue(hasGenerateCalendar, 'Brak funkcji generateCalendar');
+                }, 'Funkcje JavaScript');
+                
                 // Test 3: Sprawdź czy strona główna ma event handlery
                 testRunner.addTest('powinien mieć event handlery na stronie głównej', async () => {
                     const response = await fetch('https://szymoooo.github.io/Blania/main.html');
@@ -1023,6 +1061,68 @@
                     Assert.assertEquals(formsFound, pageForms.length, 
                         `Znaleziono formularze na ${formsFound}/${pageForms.length} stronach`);
                 }, 'Formularze na wszystkich stronach');
+                
+                // Test 7: Sprawdź przekierowania między stronami
+                testRunner.addTest('powinien mieć przekierowania między wszystkimi stronami', async () => {
+                    const pages = [
+                        { page: 'main.html', expectedLinks: ['add-event.html', 'blania.html', 'notes-form.html'] },
+                        { page: 'add-event.html', expectedLinks: ['main.html'] },
+                        { page: 'blania.html', expectedLinks: ['main.html'] },
+                        { page: 'notes-form.html', expectedLinks: ['main.html'] }
+                    ];
+                    
+                    let totalLinks = 0;
+                    let foundLinks = 0;
+                    
+                    for (const { page, expectedLinks } of pages) {
+                        const response = await fetch(page);
+                        if (response.ok) {
+                            const html = await response.text();
+                            totalLinks += expectedLinks.length;
+                            
+                            expectedLinks.forEach(link => {
+                                if (html.includes(link) || html.includes(`href="${link}"`) || html.includes(`href='${link}'`)) {
+                                    foundLinks++;
+                                }
+                            });
+                        }
+                    }
+                    
+                    console.log(`🔗 Znaleziono ${foundLinks}/${totalLinks} linków między stronami`);
+                    
+                    Assert.assertTrue(foundLinks > 0, `Brak linków między stronami. Znaleziono: ${foundLinks}/${totalLinks}`);
+                }, 'Przekierowania między wszystkimi stronami');
+                
+                // Test 8: Sprawdź czy przyciski mają funkcje JavaScript
+                testRunner.addTest('powinien mieć funkcje JavaScript na przyciskach', async () => {
+                    const pages = [
+                        { page: 'main.html', expectedFunctions: ['moveCalendar', 'addEvent', 'setTodayDate'] },
+                        { page: 'add-event.html', expectedFunctions: ['saveEvent', 'cancelEvent'] },
+                        { page: 'blania.html', expectedFunctions: ['saveStats', 'editStats'] },
+                        { page: 'notes-form.html', expectedFunctions: ['saveNote', 'closeNotesForm'] }
+                    ];
+                    
+                    let totalFunctions = 0;
+                    let foundFunctions = 0;
+                    
+                    for (const { page, expectedFunctions } of pages) {
+                        const response = await fetch(page);
+                        if (response.ok) {
+                            const html = await response.text();
+                            totalFunctions += expectedFunctions.length;
+                            
+                            expectedFunctions.forEach(func => {
+                                if (html.includes(`function ${func}`) || html.includes(`${func}(`) || html.includes(`onclick="${func}`)) {
+                                    foundFunctions++;
+                                }
+                            });
+                        }
+                    }
+                    
+                    console.log(`⚙️ Znaleziono ${foundFunctions}/${totalFunctions} funkcji JavaScript`);
+                    
+                    Assert.assertTrue(foundFunctions > 0, `Brak funkcji JavaScript. Znaleziono: ${foundFunctions}/${totalFunctions}`);
+                }, 'Funkcje JavaScript na przyciskach');
                 
                 return await testRunner.runAll();
             }
