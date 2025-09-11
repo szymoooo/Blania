@@ -140,7 +140,22 @@
         </form>
     </div>
 
+    <!-- Skrypty JavaScript -->
+    <script src="config.js"></script>
+    <script src="storage.js"></script>
+    
     <script>
+        // Czekaj na załadowanie storage
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sprawdź czy storage jest dostępne
+            if (typeof window.storage === 'undefined') {
+                console.error('❌ Storage nie jest dostępne!');
+                return;
+            }
+            
+            console.log('✅ Storage załadowane:', window.storage);
+        });
+
         // Automatyczne przypisanie koloru na podstawie typu wydarzenia
         const eventColors = {
             'mecz-dom': '#0078d7',
@@ -230,18 +245,14 @@
                 color: eventColors[eventType]
             };
 
-            // Zapisz wydarzenie w localStorage
-            const savedEvents = JSON.parse(localStorage.getItem('savedEvents')) || [];
+            // Zapisz wydarzenie używając storage.js
             if (editEvent) {
                 // Edytuj istniejące wydarzenie
-                const eventIndex = savedEvents.findIndex(e => e.id === editEvent.id);
-                if (eventIndex !== -1) {
-                    savedEvents[eventIndex] = event;
-                    console.log(`Zaktualizowano wydarzenie: ${event.name} na dzień ${eventDate}`);
-                }
+                window.storage.saveEvent(event);
+                console.log(`Zaktualizowano wydarzenie: ${event.name} na dzień ${eventDate}`);
             } else {
                 // Dodaj nowe wydarzenie
-                savedEvents.push(event);
+                window.storage.saveEvent(event);
                 console.log(`Dodano wydarzenie: ${event.name} na dzień ${eventDate}`);
 
                 // Jeśli opcja "Powtarzaj co tydzień" jest zaznaczona, dodaj wydarzenia dla kolejnych tygodni
@@ -259,15 +270,13 @@
                             date: newEventDate.toISOString().split('T')[0] + 'T' + eventTime
                         };
 
-                        savedEvents.push(repeatedEvent);
+                        window.storage.saveEvent(repeatedEvent);
                         console.log(`Dodano powtórzenie ${i}: ${repeatedEvent.name} na dzień ${repeatedEvent.date.split('T')[0]}`);
                     }
                     
                     console.log(`Łącznie dodano ${repeatWeeks + 1} wydarzeń (oryginalne + ${repeatWeeks} powtórzeń)`);
                 }
             }
-
-            localStorage.setItem('savedEvents', JSON.stringify(savedEvents));
 
             // Wyczyść edytowane wydarzenie
             localStorage.removeItem('editEventId');
