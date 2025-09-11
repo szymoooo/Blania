@@ -167,6 +167,14 @@ p { margin-bottom: 15px; }
     margin-top: 2px;
 }
 
+.regeneration-text {
+    font-style: italic;
+    color: rgb(102, 102, 102);
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
 /* ===== 7. TEAM SELECTION ===== */
 .team-and-notes-container {
     display: flex;
