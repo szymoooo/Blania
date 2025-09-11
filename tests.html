@@ -293,6 +293,9 @@
              * Uruchamia wszystkie testy
              */
             async runAllTests() {
+                // Ustaw flagę testów
+                window.isRunningTests = true;
+                
                 this.showLoading();
                 this.clearOutput();
                 
@@ -382,6 +385,8 @@
                     console.error('❌ Krytyczny błąd podczas uruchamiania testów:', error);
                     this.showError('Krytyczny błąd podczas uruchamiania testów: ' + error.message);
                 } finally {
+                    // Wyłącz flagę testów
+                    window.isRunningTests = false;
                     this.hideLoading();
                 }
             }
@@ -390,6 +395,9 @@
              * Uruchamia testy Storage
              */
             async runStorageTests() {
+                // Ustaw flagę testów
+                window.isRunningTests = true;
+                
                 this.showLoading();
                 this.clearOutput();
                 
@@ -403,6 +411,8 @@
                     console.error('Błąd podczas uruchamiania testów Storage:', error);
                     this.showError('Błąd podczas uruchamiania testów Storage: ' + error.message);
                 } finally {
+                    // Wyłącz flagę testów
+                    window.isRunningTests = false;
                     this.hideLoading();
                 }
             }
@@ -411,6 +421,9 @@
              * Uruchamia testy Error Handler
              */
             async runErrorTests() {
+                // Ustaw flagę testów
+                window.isRunningTests = true;
+                
                 this.showLoading();
                 this.clearOutput();
                 
@@ -424,6 +437,8 @@
                     console.error('Błąd podczas uruchamiania testów Error Handler:', error);
                     this.showError('Błąd podczas uruchamiania testów Error Handler: ' + error.message);
                 } finally {
+                    // Wyłącz flagę testów
+                    window.isRunningTests = false;
                     this.hideLoading();
                 }
             }
@@ -711,7 +726,7 @@
                 
                 // Test 1: Sprawdź czy strona główna istnieje
                 testRunner.addTest('powinien mieć dostęp do strony głównej', async () => {
-                    const response = await fetch('main.html');
+                    const response = await fetch('./main.html');
                     Assert.assertTrue(response.ok, 'Strona główna nie jest dostępna');
                     
                     const html = await response.text();
@@ -720,7 +735,7 @@
                 
                 // Test 2: Sprawdź czy strona główna ma wszystkie przyciski
                 testRunner.addTest('powinien mieć wszystkie przyciski na stronie głównej', async () => {
-                    const response = await fetch('main.html');
+                    const response = await fetch('./main.html');
                     const html = await response.text();
                     
                     const expectedButtons = [
@@ -749,7 +764,7 @@
                 
                 // Test 3: Sprawdź czy strona główna ma event handlery
                 testRunner.addTest('powinien mieć event handlery na stronie głównej', async () => {
-                    const response = await fetch('main.html');
+                    const response = await fetch('./main.html');
                     const html = await response.text();
                     
                     Assert.assertTrue(html.includes('eventHandlers.initMainHandlers'), 
@@ -760,7 +775,7 @@
                 
                 // Test 4: Sprawdź czy strona główna ma style CSS
                 testRunner.addTest('powinien mieć style CSS na stronie głównej', async () => {
-                    const response = await fetch('main.html');
+                    const response = await fetch('./main.html');
                     const html = await response.text();
                     
                     Assert.assertTrue(html.includes('styles.css'), 
@@ -771,7 +786,7 @@
                 
                 // Test 5: Sprawdź czy strona główna ma logowanie przycisków
                 testRunner.addTest('powinien mieć logowanie przycisków na stronie głównej', async () => {
-                    const response = await fetch('app.js');
+                    const response = await fetch('./app.js');
                     const js = await response.text();
                     
                     Assert.assertTrue(js.includes('console.log'), 
@@ -812,7 +827,7 @@
                 
                 // Test 1: Sprawdź blania.html (statystyki meczów)
                 testRunner.addTest('powinien mieć przyciski na stronie blania.html', async () => {
-                    const response = await fetch('blania.html');
+                    const response = await fetch('./blania.html');
                     Assert.assertTrue(response.ok, 'Strona blania.html nie jest dostępna');
                     
                     const html = await response.text();
@@ -834,7 +849,7 @@
                 
                 // Test 2: Sprawdź add-event.html (dodawanie wydarzeń)
                 testRunner.addTest('powinien mieć przyciski na stronie add-event.html', async () => {
-                    const response = await fetch('add-event.html');
+                    const response = await fetch('./add-event.html');
                     Assert.assertTrue(response.ok, 'Strona add-event.html nie jest dostępna');
                     
                     const html = await response.text();

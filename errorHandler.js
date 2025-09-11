@@ -66,7 +66,10 @@ class ErrorHandler {
             url: window.location.href
         };
         
-        console.error('Error logged:', errorInfo);
+        // Wyłącz logowanie podczas testów
+        if (!window.isRunningTests) {
+            console.error('Error logged:', errorInfo);
+        }
         
         // Send to external logging service if available
         this.sendToLoggingService(errorInfo);
