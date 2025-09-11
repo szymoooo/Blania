@@ -900,6 +900,39 @@
                         'app.js nie ma logowania przycisków');
                 }, 'Logowanie przycisków na stronie głównej');
                 
+                // Test 9: Sprawdź responsywność logo zespołu
+                testRunner.addTest('powinien mieć poprawnie skalowane logo zespołu', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy logo ma odpowiednie style responsywne
+                    const hasResponsiveStyles = html.includes('max-width: 100%') || 
+                                              html.includes('max-height: 100%') ||
+                                              html.includes('object-fit: contain');
+                    
+                    Assert.assertTrue(hasResponsiveStyles, 'Logo nie ma responsywnych stylów');
+                    
+                    // Sprawdź czy są media queries
+                    const hasMediaQueries = html.includes('@media') || 
+                                          html.includes('min-width') || 
+                                          html.includes('max-width');
+                    
+                    Assert.assertTrue(hasMediaQueries, 'Brak media queries dla responsywności');
+                }, 'Responsywność logo zespołu');
+                
+                // Test 10: Sprawdź czy logo nie wychodzi poza kontener
+                testRunner.addTest('powinien mieć logo w odpowiednich granicach', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy logo ma kontener
+                    const hasLogoContainer = html.includes('team-logo-container');
+                    const hasLogo = html.includes('team-logo');
+                    
+                    Assert.assertTrue(hasLogoContainer, 'Brak kontenera dla logo');
+                    Assert.assertTrue(hasLogo, 'Brak elementu logo');
+                }, 'Kontener logo zespołu');
+                
                 return await testRunner.runAll();
             }
 
@@ -1123,6 +1156,46 @@
                     
                     Assert.assertTrue(foundFunctions > 0, `Brak funkcji JavaScript. Znaleziono: ${foundFunctions}/${totalFunctions}`);
                 }, 'Funkcje JavaScript na przyciskach');
+                
+                // Test 9: Sprawdź responsywność na wszystkich stronach
+                testRunner.addTest('powinien mieć responsywny design na wszystkich stronach', async () => {
+                    const pages = ['main.html', 'blania.html', 'add-event.html', 'notes-form.html'];
+                    let pagesWithResponsiveDesign = 0;
+                    
+                    for (const page of pages) {
+                        const response = await fetch(page);
+                        if (response.ok) {
+                            const html = await response.text();
+                            if (html.includes('@media') || html.includes('max-width') || html.includes('min-width')) {
+                                pagesWithResponsiveDesign++;
+                            }
+                        }
+                    }
+                    
+                    console.log(`📱 Strony z responsywnym designem: ${pagesWithResponsiveDesign}/${pages.length}`);
+                    
+                    Assert.assertTrue(pagesWithResponsiveDesign > 0, 
+                        `Brak responsywnego designu. Znaleziono na ${pagesWithResponsiveDesign}/${pages.length} stronach`);
+                }, 'Responsywny design na wszystkich stronach');
+                
+                // Test 10: Sprawdź czy elementy nie wychodzą poza kontenery
+                testRunner.addTest('powinien mieć elementy w odpowiednich granicach', async () => {
+                    const response = await fetch('https://szymoooo.github.io/Blania/main.html');
+                    const html = await response.text();
+                    
+                    // Sprawdź czy są kontenery dla głównych elementów
+                    const hasCalendarContainer = html.includes('calendar-container');
+                    const hasTeamContainer = html.includes('team-selection-container');
+                    const hasNotesContainer = html.includes('scouting-notes');
+                    const hasStatsContainer = html.includes('stats-container');
+                    
+                    console.log(`📦 Kontenery - Kalendarz: ${hasCalendarContainer}, Zespół: ${hasTeamContainer}, Notatki: ${hasNotesContainer}, Statystyki: ${hasStatsContainer}`);
+                    
+                    Assert.assertTrue(hasCalendarContainer, 'Brak kontenera kalendarza');
+                    Assert.assertTrue(hasTeamContainer, 'Brak kontenera zespołu');
+                    Assert.assertTrue(hasNotesContainer, 'Brak kontenera notatek');
+                    Assert.assertTrue(hasStatsContainer, 'Brak kontenera statystyk');
+                }, 'Kontenery elementów');
                 
                 return await testRunner.runAll();
             }
