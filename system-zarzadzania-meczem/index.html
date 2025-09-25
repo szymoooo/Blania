@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Zarządzania Meczem Koszykówki</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        .welcome-container {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 25px;
+            padding: 60px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+            max-width: 800px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-container h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .basketball-icon {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .description {
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            text-decoration: none;
+            padding: 20px 35px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(72, 187, 120, 0.3);
+            border: 2px solid transparent;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn.secondary:hover {
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
+        }
+
+        .feature {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .feature h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .feature p {
+            color: #4a5568;
+            margin: 0;
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        .version-info {
+            background: #edf2f7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 40px;
+            border: 2px dashed #cbd5e0;
+        }
+
+        .version-info h4 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .version-info p {
+            color: #718096;
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .welcome-container h1 {
+                font-size: 2.2rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="basketball-icon">🏀</div>
+        
+        <h1>System Zarządzania Meczem</h1>
+        
+        <p class="description">
+            Profesjonalny system do obsługi meczów koszykówki na żywo
+            <br>z panelem administracyjnym i live feedem wydarzeń
+        </p>
+
+        <div class="buttons">
+            <a href="zarzadzanie-meczu.html" class="btn">
+                <i>🚀</i> Uruchom System
+            </a>
+            <a href="demo-test.html" class="btn secondary">
+                <i>📋</i> Przegląd Funkcji
+            </a>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature">
+                <h3>⏱️ Timer Meczu</h3>
+                <p>Automatyczny licznik z okresami i pauzami</p>
+            </div>
+
+            <div class="feature">
+                <h3>📊 Live Wyniki</h3>
+                <p>Wyniki w czasie rzeczywistym</p>
+            </div>
+
+            <div class="feature">
+                <h3>🎯 Wydarzenia</h3>
+                <p>Gole, faule, timeout'y z detalami</p>
+            </div>
+
+            <div class="feature">
+                <h3>💾 Auto-Save</h3>
+                <p>Automatyczne zapisywanie danych</p>
+            </div>
+
+            <div class="feature">
+                <h3>📱 Responsywny</h3>
+                <p>Działa na wszystkich urządzeniach</p>
+            </div>
+
+            <div class="feature">
+                <h3>📈 Statystyki</h3>
+                <p>Kompletne statystyki meczu</p>
+            </div>
+        </div>
+
+        <div class="version-info">
+            <h4>🗂️ Pliki w Systemie:</h4>
+            <p><strong>📄 zarzadzanie-meczu.html</strong> - Główny interfejs systemu</p>
+            <p><strong>🎨 style-mecz.css</strong> - Stylowanie interfejsu</p>
+            <p><strong>⚙️ mecz-manager.js</strong> - Logika zarządzania meczem</p>
+            <p><strong>📖 README-MECZ.md</strong> - Instrukcja obsługi</p>
+            <p><strong>🧪 demo-test.html</strong> - Prezentacja funkcji</p>
+        </div>
+
+        <p style="margin-top: 30px; color: #a0aec0; font-size: 0.9rem;">
+            System gotowy do użycia • Wszystkie dane zapisywane automatycznie
+        </p>
+    </div>
+
+    <script>
+        // Animacja przy ładowaniu
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.welcome-container');
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.8s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
